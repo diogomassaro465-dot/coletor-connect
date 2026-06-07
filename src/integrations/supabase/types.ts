@@ -14,16 +14,158 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      catadores: {
+        Row: {
+          area_atuacao: string | null
+          autodeclaracao_racial: string
+          cadastro_gov_br: boolean
+          comprovante_residencia_url: string | null
+          conta_bancaria_digital: string | null
+          contribui_inss: boolean
+          cpf: string
+          cpf_foto_url: string | null
+          created_by: string | null
+          ctps: string | null
+          ctps_foto_url: string | null
+          data_cadastro: string
+          email: string | null
+          endereco_completo: string
+          escolaridade: string
+          genero: Database["public"]["Enums"]["catador_genero"]
+          id: string
+          inscrito_cadunico: boolean
+          materiais_coletados: string[]
+          nis: string | null
+          nis_foto_url: string | null
+          nivel_cadastro_gov_br: string | null
+          nome_completo: string
+          nome_cooperativa: string | null
+          possui_bolsa_familia: boolean
+          possui_carroca: boolean
+          renda_media_mensal: number
+          rg_cin: string
+          rg_cin_foto_url: string | null
+          status: Database["public"]["Enums"]["catador_status"]
+          telefone: string | null
+          tipo_carroca: string | null
+          titulo_eleitor: string | null
+          titulo_eleitor_foto_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          area_atuacao?: string | null
+          autodeclaracao_racial: string
+          cadastro_gov_br?: boolean
+          comprovante_residencia_url?: string | null
+          conta_bancaria_digital?: string | null
+          contribui_inss?: boolean
+          cpf: string
+          cpf_foto_url?: string | null
+          created_by?: string | null
+          ctps?: string | null
+          ctps_foto_url?: string | null
+          data_cadastro?: string
+          email?: string | null
+          endereco_completo: string
+          escolaridade: string
+          genero: Database["public"]["Enums"]["catador_genero"]
+          id?: string
+          inscrito_cadunico?: boolean
+          materiais_coletados?: string[]
+          nis?: string | null
+          nis_foto_url?: string | null
+          nivel_cadastro_gov_br?: string | null
+          nome_completo: string
+          nome_cooperativa?: string | null
+          possui_bolsa_familia?: boolean
+          possui_carroca?: boolean
+          renda_media_mensal?: number
+          rg_cin: string
+          rg_cin_foto_url?: string | null
+          status?: Database["public"]["Enums"]["catador_status"]
+          telefone?: string | null
+          tipo_carroca?: string | null
+          titulo_eleitor?: string | null
+          titulo_eleitor_foto_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          area_atuacao?: string | null
+          autodeclaracao_racial?: string
+          cadastro_gov_br?: boolean
+          comprovante_residencia_url?: string | null
+          conta_bancaria_digital?: string | null
+          contribui_inss?: boolean
+          cpf?: string
+          cpf_foto_url?: string | null
+          created_by?: string | null
+          ctps?: string | null
+          ctps_foto_url?: string | null
+          data_cadastro?: string
+          email?: string | null
+          endereco_completo?: string
+          escolaridade?: string
+          genero?: Database["public"]["Enums"]["catador_genero"]
+          id?: string
+          inscrito_cadunico?: boolean
+          materiais_coletados?: string[]
+          nis?: string | null
+          nis_foto_url?: string | null
+          nivel_cadastro_gov_br?: string | null
+          nome_completo?: string
+          nome_cooperativa?: string | null
+          possui_bolsa_familia?: boolean
+          possui_carroca?: boolean
+          renda_media_mensal?: number
+          rg_cin?: string
+          rg_cin_foto_url?: string | null
+          status?: Database["public"]["Enums"]["catador_status"]
+          telefone?: string | null
+          tipo_carroca?: string | null
+          titulo_eleitor?: string | null
+          titulo_eleitor_foto_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "atendente"
+      catador_genero: "feminino" | "masculino" | "lgbtqia" | "nao_responder"
+      catador_status: "pendente" | "ativo" | "inativo"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +292,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "atendente"],
+      catador_genero: ["feminino", "masculino", "lgbtqia", "nao_responder"],
+      catador_status: ["pendente", "ativo", "inativo"],
+    },
   },
 } as const
