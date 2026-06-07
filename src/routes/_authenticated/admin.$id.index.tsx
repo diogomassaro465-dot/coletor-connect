@@ -36,7 +36,10 @@ function CatadorDetails() {
 
   const statusMutation = useMutation({
     mutationFn: async (status: string) => {
-      const { error } = await supabase.from("catadores").update({ status }).eq("id", id);
+      const { error } = await supabase
+        .from("catadores")
+        .update({ status: status as "ativo" | "inativo" | "pendente" })
+        .eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
