@@ -37,7 +37,7 @@ function AuthPage() {
       return;
     }
     toast.success("Bem-vindo!");
-    navigate({ to: "/admin" });
+    navigate({ to: "/admin/novo" });
   }
 
   async function handleSignup(e: React.FormEvent) {
