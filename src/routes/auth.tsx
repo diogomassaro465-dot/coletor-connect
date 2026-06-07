@@ -23,7 +23,7 @@ function AuthPage() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/admin" });
+      if (data.session) navigate({ to: "/admin/novo" });
     });
   }, [navigate]);
 
