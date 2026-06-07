@@ -23,7 +23,7 @@ function AuthPage() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/admin" });
+      if (data.session) navigate({ to: "/admin/novo" });
     });
   }, [navigate]);
 
@@ -37,7 +37,7 @@ function AuthPage() {
       return;
     }
     toast.success("Bem-vindo!");
-    navigate({ to: "/admin" });
+    navigate({ to: "/admin/novo" });
   }
 
   async function handleSignup(e: React.FormEvent) {
@@ -46,7 +46,7 @@ function AuthPage() {
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: { emailRedirectTo: `${window.location.origin}/admin` },
+      options: { emailRedirectTo: `${window.location.origin}/admin/novo` },
     });
     setLoading(false);
     if (error) {
@@ -56,7 +56,7 @@ function AuthPage() {
     toast.success("Conta criada!", { description: "Você já pode entrar." });
     // Auto sign in (email confirm is auto)
     const { error: e2 } = await supabase.auth.signInWithPassword({ email, password });
-    if (!e2) navigate({ to: "/admin" });
+    if (!e2) navigate({ to: "/admin/novo" });
   }
 
   return (
