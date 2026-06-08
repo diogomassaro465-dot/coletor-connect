@@ -126,6 +126,12 @@ export function CatadorForm({
       nivel_cadastro_gov_br: values.cadastro_gov_br ? values.nivel_cadastro_gov_br || null : null,
       tipo_carroca: values.possui_carroca ? values.tipo_carroca || null : null,
       area_atuacao: values.area_atuacao || null,
+      comprovante_residencia_url: naoTem.comprovante_residencia ? null : urls.comprovante_residencia_url,
+      cpf_foto_url: naoTem.cpf_foto ? null : urls.cpf_foto_url,
+      rg_cin_foto_url: naoTem.rg_foto ? null : urls.rg_cin_foto_url,
+      titulo_eleitor_foto_url: naoTem.titulo_foto ? null : urls.titulo_eleitor_foto_url,
+      ctps_foto_url: naoTem.ctps_foto ? null : urls.ctps_foto_url,
+      nis_foto_url: naoTem.nis_foto ? null : urls.nis_foto_url,
     };
 
     const { error } =
