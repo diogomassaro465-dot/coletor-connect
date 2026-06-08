@@ -172,7 +172,7 @@ export function CatadorForm({
             {GENERO_OPTIONS.map((o) => (
               <label key={o.value} className="flex items-center gap-2 cursor-pointer text-sm">
                 <RadioGroupItem value={o.value} />
-                <span>( ) {o.label}</span>
+                <span>{o.label}</span>
               </label>
             ))}
           </RadioGroup>
@@ -293,7 +293,7 @@ export function CatadorForm({
               {NIVEL_GOV_BR_OPTIONS.map((n) => (
                 <label key={n} className="flex items-center gap-2 cursor-pointer text-sm">
                   <RadioGroupItem value={n} />
-                  <span>( ) {n}</span>
+                  <span>{n}</span>
                 </label>
               ))}
             </RadioGroup>
@@ -333,8 +333,8 @@ export function CatadorForm({
           {v.possui_carroca && (
             <Item n={22} label="Tipo de carroça:">
               <RadioGroup value={v.tipo_carroca ?? ""} onValueChange={(val) => form.setValue("tipo_carroca", val)} className="flex gap-6">
-                <label className="flex items-center gap-2 text-sm"><RadioGroupItem value="Manual" /> ( ) Manual</label>
-                <label className="flex items-center gap-2 text-sm"><RadioGroupItem value="Motorizada" /> ( ) Motorizada</label>
+                <label className="flex items-center gap-2 text-sm"><RadioGroupItem value="Manual" /> Manual</label>
+                <label className="flex items-center gap-2 text-sm"><RadioGroupItem value="Motorizada" /> Motorizada</label>
               </RadioGroup>
             </Item>
           )}
@@ -395,11 +395,11 @@ function SimNao({
         <div className="flex gap-4 pl-6 sm:pl-0">
           <label className="flex items-center gap-2 cursor-pointer font-normal">
             <input type="radio" checked={value === true} onChange={() => onChange(true)} className="accent-primary" />
-            <span>[ ] SIM</span>
+            <span>SIM</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer font-normal">
             <input type="radio" checked={value === false} onChange={() => onChange(false)} className="accent-primary" />
-            <span>[ ] NÃO</span>
+            <span>NÃO</span>
           </label>
         </div>
       </label>
@@ -415,7 +415,7 @@ function Anexo({
       <span>📎 {label}</span>
       <label className="flex items-center gap-2 cursor-pointer">
         <Checkbox checked={checked} onCheckedChange={(c) => onChange(!!c)} />
-        <span>( ) não tem</span>
+        <span>não tem</span>
       </label>
     </div>
   );
@@ -425,7 +425,7 @@ function NaoTem({ checked, onChange }: { checked: boolean; onChange: (v: boolean
   return (
     <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer whitespace-nowrap">
       <Checkbox checked={checked} onCheckedChange={(c) => onChange(!!c)} />
-      <span>( ) não tem</span>
+      <span>não tem</span>
     </label>
   );
 }
