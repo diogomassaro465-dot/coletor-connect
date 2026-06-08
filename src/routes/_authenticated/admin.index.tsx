@@ -52,6 +52,7 @@ function AdminDashboard() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("todos");
   const [materialFilter, setMaterialFilter] = useState<string>("todos");
+  const [rendaFilter, setRendaFilter] = useState<string>("todos");
 
   const { data: catadores, isLoading } = useQuery({
     queryKey: ["catadores"],
@@ -65,11 +66,15 @@ function AdminDashboard() {
     },
   });
 
+  const RENDA_THRESHOLD = 1412; // salário mínimo de referência
+
   const filtered = useMemo(() => {
     if (!catadores) return [];
     return catadores.filter((c) => {
       if (statusFilter !== "todos" && c.status !== statusFilter) return false;
       if (materialFilter !== "todos" && !c.materiais_coletados.includes(materialFilter)) return false;
+      if (rendaFilter === "menor" && !(c.renda_media_mensal < RENDA_THRESHOLD)) return false;
+      if (rendaFilter === "maior" && !(c.renda_media_mensal >= RENDA_THRESHOLD)) return false;
       if (search.trim()) {
         const q = search.toLowerCase();
         const blob = `${c.nome_completo} ${c.cpf} ${c.nome_cooperativa ?? ""}`.toLowerCase();
@@ -77,7 +82,7 @@ function AdminDashboard() {
       }
       return true;
     });
-  }, [catadores, statusFilter, materialFilter, search]);
+  }, [catadores, statusFilter, materialFilter, rendaFilter, search]);
 
   const stats = useMemo(() => {
     const total = catadores?.length ?? 0;
@@ -195,6 +200,14 @@ function AdminDashboard() {
               {MATERIAIS_OPTIONS.map((m) => (
                 <SelectItem key={m} value={m}>{m}</SelectItem>
               ))}
+            </SelectContent>
+          </Select>
+          <Select value={rendaFilter} onValueChange={setRendaFilter}>
+            <SelectTrigger className="w-[180px]"><SelectValue placeholder="Renda" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todas as rendas</SelectItem>
+              <SelectItem value="menor">Menor que R$ 1.412</SelectItem>
+              <SelectItem value="maior">Maior ou igual a R$ 1.412</SelectItem>
             </SelectContent>
           </Select>
         </div>
