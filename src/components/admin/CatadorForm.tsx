@@ -249,8 +249,14 @@ export function CatadorForm({
           error={e.endereco_completo?.message}
         >
           <Textarea {...form.register("endereco_completo")} rows={3} />
-          <Anexo label="Foto de comprovante de residência" checked={naoTem.comprovante_residencia}
-            onChange={(c) => setNaoTem((s) => ({ ...s, comprovante_residencia: c }))} />
+          <Anexo
+            label="Foto de comprovante de residência"
+            fieldKey="comprovante_residencia_url"
+            url={urls.comprovante_residencia_url}
+            onUpload={(u) => setUrls((s) => ({ ...s, comprovante_residencia_url: u }))}
+            checked={naoTem.comprovante_residencia}
+            onChange={(c) => setNaoTem((s) => ({ ...s, comprovante_residencia: c }))}
+          />
         </Item>
 
         <Item n={8} label="CPF:" error={e.cpf?.message}>
@@ -259,33 +265,64 @@ export function CatadorForm({
             onChange={(ev) => form.setValue("cpf", maskCPF(ev.target.value), { shouldValidate: true })}
             placeholder="000.000.000-00"
           />
-          <Anexo label="Foto do CPF (frente e verso)" checked={naoTem.cpf_foto}
-            onChange={(c) => setNaoTem((s) => ({ ...s, cpf_foto: c }))} />
+          <Anexo
+            label="Foto do CPF (frente e verso)"
+            fieldKey="cpf_foto_url"
+            url={urls.cpf_foto_url}
+            onUpload={(u) => setUrls((s) => ({ ...s, cpf_foto_url: u }))}
+            checked={naoTem.cpf_foto}
+            onChange={(c) => setNaoTem((s) => ({ ...s, cpf_foto: c }))}
+          />
         </Item>
 
         <Item n={9} label="RG / CIN:" error={e.rg_cin?.message}>
           <Input {...form.register("rg_cin")} />
-          <Anexo label="Foto do RG / CIN (frente e verso)" checked={naoTem.rg_foto}
-            onChange={(c) => setNaoTem((s) => ({ ...s, rg_foto: c }))} />
+          <Anexo
+            label="Foto do RG / CIN (frente e verso)"
+            fieldKey="rg_cin_foto_url"
+            url={urls.rg_cin_foto_url}
+            onUpload={(u) => setUrls((s) => ({ ...s, rg_cin_foto_url: u }))}
+            checked={naoTem.rg_foto}
+            onChange={(c) => setNaoTem((s) => ({ ...s, rg_foto: c }))}
+          />
         </Item>
 
         <Item n={10} label="Título de Eleitor:">
           <Input {...form.register("titulo_eleitor")} />
-          <Anexo label="Foto do Título de Eleitor" checked={naoTem.titulo_foto}
-            onChange={(c) => setNaoTem((s) => ({ ...s, titulo_foto: c }))} />
+          <Anexo
+            label="Foto do Título de Eleitor"
+            fieldKey="titulo_eleitor_foto_url"
+            url={urls.titulo_eleitor_foto_url}
+            onUpload={(u) => setUrls((s) => ({ ...s, titulo_eleitor_foto_url: u }))}
+            checked={naoTem.titulo_foto}
+            onChange={(c) => setNaoTem((s) => ({ ...s, titulo_foto: c }))}
+          />
         </Item>
 
         <Item n={11} label="CTPS:">
           <Input {...form.register("ctps")} />
-          <Anexo label="Foto da CTPS" checked={naoTem.ctps_foto}
-            onChange={(c) => setNaoTem((s) => ({ ...s, ctps_foto: c }))} />
+          <Anexo
+            label="Foto da CTPS"
+            fieldKey="ctps_foto_url"
+            url={urls.ctps_foto_url}
+            onUpload={(u) => setUrls((s) => ({ ...s, ctps_foto_url: u }))}
+            checked={naoTem.ctps_foto}
+            onChange={(c) => setNaoTem((s) => ({ ...s, ctps_foto: c }))}
+          />
         </Item>
 
         <Item n={12} label="NIS:">
           <Input {...form.register("nis")} />
-          <Anexo label="Foto do NIS" checked={naoTem.nis_foto}
-            onChange={(c) => setNaoTem((s) => ({ ...s, nis_foto: c }))} />
+          <Anexo
+            label="Foto do NIS"
+            fieldKey="nis_foto_url"
+            url={urls.nis_foto_url}
+            onUpload={(u) => setUrls((s) => ({ ...s, nis_foto_url: u }))}
+            checked={naoTem.nis_foto}
+            onChange={(c) => setNaoTem((s) => ({ ...s, nis_foto: c }))}
+          />
         </Item>
+
 
         <Item n={13} label="Qual a renda média mensal?" error={e.renda_media_mensal?.message}>
           <Input type="number" step="0.01" min="0" {...form.register("renda_media_mensal")} placeholder="R$" />
