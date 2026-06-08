@@ -202,6 +202,14 @@ function AdminDashboard() {
               ))}
             </SelectContent>
           </Select>
+          <Select value={rendaFilter} onValueChange={setRendaFilter}>
+            <SelectTrigger className="w-[180px]"><SelectValue placeholder="Renda" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todas as rendas</SelectItem>
+              <SelectItem value="menor">Menor que R$ 1.412</SelectItem>
+              <SelectItem value="maior">Maior ou igual a R$ 1.412</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
