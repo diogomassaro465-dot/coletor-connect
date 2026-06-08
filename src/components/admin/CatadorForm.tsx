@@ -61,12 +61,20 @@ export function CatadorForm({
   catadorId,
   mode = "create",
 }: {
-  defaultValues?: Partial<CatadorFormData>;
+  defaultValues?: Partial<CatadorFormData> & Partial<Record<DocKey, string | null>>;
   catadorId?: string;
   mode?: "create" | "edit";
 }) {
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
+  const [urls, setUrls] = useState<Record<DocKey, string | null>>({
+    comprovante_residencia_url: defaultValues?.comprovante_residencia_url ?? null,
+    cpf_foto_url: defaultValues?.cpf_foto_url ?? null,
+    rg_cin_foto_url: defaultValues?.rg_cin_foto_url ?? null,
+    titulo_eleitor_foto_url: defaultValues?.titulo_eleitor_foto_url ?? null,
+    ctps_foto_url: defaultValues?.ctps_foto_url ?? null,
+    nis_foto_url: defaultValues?.nis_foto_url ?? null,
+  });
   const [naoTem, setNaoTem] = useState({
     email: false, telefone: false, comprovante_residencia: false,
     cpf_foto: false, rg_foto: false, titulo_foto: false,
