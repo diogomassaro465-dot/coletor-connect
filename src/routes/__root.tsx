@@ -85,13 +85,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "Plataforma para cadastro e gestão de catadores de materiais recicláveis, conectando organizações e empresas a quem move a reciclagem.",
       },
-      { property: "og:title", content: "RecicladoresBR — Cadastro de Catadores" },
+      { property: "og:title", content: "RecicladoresBR — Cadastro de Catadores de Materiais Recicláveis" },
       {
         property: "og:description",
         content:
           "Banco de dados de catadores de materiais recicláveis para organizações e empresas.",
       },
       { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "RecicladoresBR — Cadastro de Catadores de Materiais Recicláveis" },
+      { name: "description", content: "EcoConnect Hub is a web platform for registering and managing recyclable material collectors." },
+      { property: "og:description", content: "EcoConnect Hub is a web platform for registering and managing recyclable material collectors." },
+      { name: "twitter:description", content: "EcoConnect Hub is a web platform for registering and managing recyclable material collectors." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3418c4dc-67ec-47d4-8cde-98af3b149b40/id-preview-d910ac1e--551529a8-1929-4adf-9dc7-1cb72758c1e5.lovable.app-1780871891247.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3418c4dc-67ec-47d4-8cde-98af3b149b40/id-preview-d910ac1e--551529a8-1929-4adf-9dc7-1cb72758c1e5.lovable.app-1780871891247.png" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
