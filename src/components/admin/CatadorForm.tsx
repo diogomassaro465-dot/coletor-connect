@@ -13,11 +13,19 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Recycle } from "lucide-react";
+import { Loader2, Recycle, Camera, Upload, Check, X } from "lucide-react";
 import {
   GENERO_OPTIONS, RACA_OPTIONS, ESCOLARIDADE_OPTIONS, MATERIAIS_OPTIONS,
   NIVEL_GOV_BR_OPTIONS, isValidCPF, maskCPF, maskPhone,
 } from "@/lib/catador-constants";
+
+type DocKey =
+  | "comprovante_residencia_url"
+  | "cpf_foto_url"
+  | "rg_cin_foto_url"
+  | "titulo_eleitor_foto_url"
+  | "ctps_foto_url"
+  | "nis_foto_url";
 
 const schema = z.object({
   nome_cooperativa: z.string().trim().max(150).optional().or(z.literal("")),
