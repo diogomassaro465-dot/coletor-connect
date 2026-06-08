@@ -13,11 +13,19 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Recycle } from "lucide-react";
+import { Loader2, Recycle, Camera, Upload, Check, X } from "lucide-react";
 import {
   GENERO_OPTIONS, RACA_OPTIONS, ESCOLARIDADE_OPTIONS, MATERIAIS_OPTIONS,
   NIVEL_GOV_BR_OPTIONS, isValidCPF, maskCPF, maskPhone,
 } from "@/lib/catador-constants";
+
+type DocKey =
+  | "comprovante_residencia_url"
+  | "cpf_foto_url"
+  | "rg_cin_foto_url"
+  | "titulo_eleitor_foto_url"
+  | "ctps_foto_url"
+  | "nis_foto_url";
 
 const schema = z.object({
   nome_cooperativa: z.string().trim().max(150).optional().or(z.literal("")),
@@ -53,12 +61,20 @@ export function CatadorForm({
   catadorId,
   mode = "create",
 }: {
-  defaultValues?: Partial<CatadorFormData>;
+  defaultValues?: Partial<CatadorFormData> & Partial<Record<DocKey, string | null>>;
   catadorId?: string;
   mode?: "create" | "edit";
 }) {
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
+  const [urls, setUrls] = useState<Record<DocKey, string | null>>({
+    comprovante_residencia_url: defaultValues?.comprovante_residencia_url ?? null,
+    cpf_foto_url: defaultValues?.cpf_foto_url ?? null,
+    rg_cin_foto_url: defaultValues?.rg_cin_foto_url ?? null,
+    titulo_eleitor_foto_url: defaultValues?.titulo_eleitor_foto_url ?? null,
+    ctps_foto_url: defaultValues?.ctps_foto_url ?? null,
+    nis_foto_url: defaultValues?.nis_foto_url ?? null,
+  });
   const [naoTem, setNaoTem] = useState({
     email: false, telefone: false, comprovante_residencia: false,
     cpf_foto: false, rg_foto: false, titulo_foto: false,
@@ -110,6 +126,12 @@ export function CatadorForm({
       nivel_cadastro_gov_br: values.cadastro_gov_br ? values.nivel_cadastro_gov_br || null : null,
       tipo_carroca: values.possui_carroca ? values.tipo_carroca || null : null,
       area_atuacao: values.area_atuacao || null,
+      comprovante_residencia_url: naoTem.comprovante_residencia ? null : urls.comprovante_residencia_url,
+      cpf_foto_url: naoTem.cpf_foto ? null : urls.cpf_foto_url,
+      rg_cin_foto_url: naoTem.rg_foto ? null : urls.rg_cin_foto_url,
+      titulo_eleitor_foto_url: naoTem.titulo_foto ? null : urls.titulo_eleitor_foto_url,
+      ctps_foto_url: naoTem.ctps_foto ? null : urls.ctps_foto_url,
+      nis_foto_url: naoTem.nis_foto ? null : urls.nis_foto_url,
     };
 
     const { error } =
@@ -227,8 +249,14 @@ export function CatadorForm({
           error={e.endereco_completo?.message}
         >
           <Textarea {...form.register("endereco_completo")} rows={3} />
-          <Anexo label="Foto de comprovante de residência" checked={naoTem.comprovante_residencia}
-            onChange={(c) => setNaoTem((s) => ({ ...s, comprovante_residencia: c }))} />
+          <Anexo
+            label="Foto de comprovante de residência"
+            fieldKey="comprovante_residencia_url"
+            url={urls.comprovante_residencia_url}
+            onUpload={(u) => setUrls((s) => ({ ...s, comprovante_residencia_url: u }))}
+            checked={naoTem.comprovante_residencia}
+            onChange={(c) => setNaoTem((s) => ({ ...s, comprovante_residencia: c }))}
+          />
         </Item>
 
         <Item n={8} label="CPF:" error={e.cpf?.message}>
@@ -237,33 +265,64 @@ export function CatadorForm({
             onChange={(ev) => form.setValue("cpf", maskCPF(ev.target.value), { shouldValidate: true })}
             placeholder="000.000.000-00"
           />
-          <Anexo label="Foto do CPF (frente e verso)" checked={naoTem.cpf_foto}
-            onChange={(c) => setNaoTem((s) => ({ ...s, cpf_foto: c }))} />
+          <Anexo
+            label="Foto do CPF (frente e verso)"
+            fieldKey="cpf_foto_url"
+            url={urls.cpf_foto_url}
+            onUpload={(u) => setUrls((s) => ({ ...s, cpf_foto_url: u }))}
+            checked={naoTem.cpf_foto}
+            onChange={(c) => setNaoTem((s) => ({ ...s, cpf_foto: c }))}
+          />
         </Item>
 
         <Item n={9} label="RG / CIN:" error={e.rg_cin?.message}>
           <Input {...form.register("rg_cin")} />
-          <Anexo label="Foto do RG / CIN (frente e verso)" checked={naoTem.rg_foto}
-            onChange={(c) => setNaoTem((s) => ({ ...s, rg_foto: c }))} />
+          <Anexo
+            label="Foto do RG / CIN (frente e verso)"
+            fieldKey="rg_cin_foto_url"
+            url={urls.rg_cin_foto_url}
+            onUpload={(u) => setUrls((s) => ({ ...s, rg_cin_foto_url: u }))}
+            checked={naoTem.rg_foto}
+            onChange={(c) => setNaoTem((s) => ({ ...s, rg_foto: c }))}
+          />
         </Item>
 
         <Item n={10} label="Título de Eleitor:">
           <Input {...form.register("titulo_eleitor")} />
-          <Anexo label="Foto do Título de Eleitor" checked={naoTem.titulo_foto}
-            onChange={(c) => setNaoTem((s) => ({ ...s, titulo_foto: c }))} />
+          <Anexo
+            label="Foto do Título de Eleitor"
+            fieldKey="titulo_eleitor_foto_url"
+            url={urls.titulo_eleitor_foto_url}
+            onUpload={(u) => setUrls((s) => ({ ...s, titulo_eleitor_foto_url: u }))}
+            checked={naoTem.titulo_foto}
+            onChange={(c) => setNaoTem((s) => ({ ...s, titulo_foto: c }))}
+          />
         </Item>
 
         <Item n={11} label="CTPS:">
           <Input {...form.register("ctps")} />
-          <Anexo label="Foto da CTPS" checked={naoTem.ctps_foto}
-            onChange={(c) => setNaoTem((s) => ({ ...s, ctps_foto: c }))} />
+          <Anexo
+            label="Foto da CTPS"
+            fieldKey="ctps_foto_url"
+            url={urls.ctps_foto_url}
+            onUpload={(u) => setUrls((s) => ({ ...s, ctps_foto_url: u }))}
+            checked={naoTem.ctps_foto}
+            onChange={(c) => setNaoTem((s) => ({ ...s, ctps_foto: c }))}
+          />
         </Item>
 
         <Item n={12} label="NIS:">
           <Input {...form.register("nis")} />
-          <Anexo label="Foto do NIS" checked={naoTem.nis_foto}
-            onChange={(c) => setNaoTem((s) => ({ ...s, nis_foto: c }))} />
+          <Anexo
+            label="Foto do NIS"
+            fieldKey="nis_foto_url"
+            url={urls.nis_foto_url}
+            onUpload={(u) => setUrls((s) => ({ ...s, nis_foto_url: u }))}
+            checked={naoTem.nis_foto}
+            onChange={(c) => setNaoTem((s) => ({ ...s, nis_foto: c }))}
+          />
         </Item>
+
 
         <Item n={13} label="Qual a renda média mensal?" error={e.renda_media_mensal?.message}>
           <Input type="number" step="0.01" min="0" {...form.register("renda_media_mensal")} placeholder="R$" />
@@ -408,15 +467,103 @@ function SimNao({
 }
 
 function Anexo({
-  label, checked, onChange,
-}: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
+  label, fieldKey, url, onUpload, checked, onChange,
+}: {
+  label: string;
+  fieldKey: DocKey;
+  url: string | null;
+  onUpload: (url: string | null) => void;
+  checked: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  const cameraId = `${fieldKey}-cam`;
+  const fileId = `${fieldKey}-file`;
+
+  async function handleFile(file: File) {
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Arquivo muito grande", { description: "Máx. 10 MB." });
+      return;
+    }
+    setBusy(true);
+    const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+    const path = `${fieldKey}/${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage
+      .from("catadores-docs")
+      .upload(path, file, { upsert: false, contentType: file.type || "image/jpeg" });
+    setBusy(false);
+    if (error) {
+      toast.error("Falha no envio", { description: error.message });
+      return;
+    }
+    onUpload(path);
+    toast.success("Foto enviada!");
+  }
+
+  async function handleRemove() {
+    if (!url) return;
+    await supabase.storage.from("catadores-docs").remove([url]);
+    onUpload(null);
+  }
+
+  const hasFile = !!url && !checked;
+
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 mt-2 text-xs text-muted-foreground bg-muted/40 rounded-md px-3 py-2 border border-border">
-      <span>📎 {label}</span>
-      <label className="flex items-center gap-2 cursor-pointer">
-        <Checkbox checked={checked} onCheckedChange={(c) => onChange(!!c)} />
-        <span>não tem</span>
-      </label>
+    <div className="mt-2 text-xs bg-muted/40 rounded-md px-3 py-2 border border-border space-y-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="text-muted-foreground">📎 {label}</span>
+        <label className="flex items-center gap-2 cursor-pointer text-muted-foreground">
+          <Checkbox checked={checked} onCheckedChange={(c) => onChange(!!c)} />
+          <span>não tem</span>
+        </label>
+      </div>
+      {!checked && (
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            id={cameraId}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            className="hidden"
+            onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
+          />
+          <input
+            id={fileId}
+            type="file"
+            accept="image/*,application/pdf"
+            className="hidden"
+            onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
+          />
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            disabled={busy}
+            onClick={() => document.getElementById(cameraId)?.click()}
+          >
+            {busy ? <Loader2 className="size-3 animate-spin" /> : <Camera className="size-3" />}
+            Tirar foto
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            disabled={busy}
+            onClick={() => document.getElementById(fileId)?.click()}
+          >
+            <Upload className="size-3" /> Enviar arquivo
+          </Button>
+          {hasFile && (
+            <span className="flex items-center gap-1 text-success">
+              <Check className="size-3" /> Anexado
+              <button type="button" onClick={handleRemove} className="ml-1 text-muted-foreground hover:text-destructive">
+                <X className="size-3" />
+              </button>
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 }

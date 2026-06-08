@@ -118,32 +118,40 @@ function AdminDashboard() {
     onError: (e: Error) => toast.error("Erro ao atualizar", { description: e.message }),
   });
 
-  function exportCSV() {
+  async function exportXLSX() {
     if (!filtered.length) return toast.info("Nada para exportar.");
+    const XLSX = await import("xlsx");
     const headers = [
-      "Nome", "CPF", "Gênero", "Escolaridade", "Cooperativa", "Renda",
+      "Nome", "CPF", "Gênero", "Escolaridade", "Cooperativa", "Renda (R$)",
       "Materiais", "Contribui INSS", "CadÚnico", "Bolsa Família", "Status", "Data Cadastro",
     ];
     const rows = filtered.map((c) => [
       c.nome_completo, c.cpf, GENERO_LABEL[c.genero] ?? c.genero, c.escolaridade,
-      c.nome_cooperativa ?? "", c.renda_media_mensal,
-      c.materiais_coletados.join("; "),
+      c.nome_cooperativa ?? "", Number(c.renda_media_mensal) || 0,
+      c.materiais_coletados.join(", "),
       c.contribui_inss ? "Sim" : "Não",
       c.inscrito_cadunico ? "Sim" : "Não",
       c.possui_bolsa_familia ? "Sim" : "Não",
       STATUS_LABEL[c.status] ?? c.status,
       new Date(c.data_cadastro).toLocaleString("pt-BR"),
     ]);
-    const csv = [headers, ...rows]
-      .map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(","))
-      .join("\n");
-    const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `catadores-${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    const aoa = [headers, ...rows];
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    // Auto-fit column widths based on max content length per column
+    const colWidths = headers.map((_, colIdx) => {
+      const maxLen = aoa.reduce((m, row) => {
+        const val = row[colIdx];
+        const len = val == null ? 0 : String(val).length;
+        return Math.max(m, len);
+      }, 0);
+      return { wch: Math.min(Math.max(maxLen + 2, 10), 60) };
+    });
+    ws["!cols"] = colWidths;
+    // Freeze header row
+    ws["!freeze"] = { xSplit: 0, ySplit: 1 };
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Catadores");
+    XLSX.writeFile(wb, `catadores-${new Date().toISOString().slice(0, 10)}.xlsx`);
     toast.success(`${filtered.length} registros exportados.`);
   }
 
@@ -155,8 +163,8 @@ function AdminDashboard() {
           <p className="text-muted-foreground">Gerencie cadastros, filtre e exporte dados.</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={exportCSV}>
-            <Download className="size-4" /> Exportar CSV
+          <Button variant="outline" onClick={exportXLSX}>
+            <Download className="size-4" /> Exportar Excel
           </Button>
           <Link to="/admin/novo">
             <Button>Novo cadastro</Button>
