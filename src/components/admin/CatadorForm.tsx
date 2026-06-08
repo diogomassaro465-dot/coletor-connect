@@ -467,15 +467,103 @@ function SimNao({
 }
 
 function Anexo({
-  label, checked, onChange,
-}: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
+  label, fieldKey, url, onUpload, checked, onChange,
+}: {
+  label: string;
+  fieldKey: DocKey;
+  url: string | null;
+  onUpload: (url: string | null) => void;
+  checked: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  const cameraId = `${fieldKey}-cam`;
+  const fileId = `${fieldKey}-file`;
+
+  async function handleFile(file: File) {
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Arquivo muito grande", { description: "Máx. 10 MB." });
+      return;
+    }
+    setBusy(true);
+    const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+    const path = `${fieldKey}/${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage
+      .from("catadores-docs")
+      .upload(path, file, { upsert: false, contentType: file.type || "image/jpeg" });
+    setBusy(false);
+    if (error) {
+      toast.error("Falha no envio", { description: error.message });
+      return;
+    }
+    onUpload(path);
+    toast.success("Foto enviada!");
+  }
+
+  async function handleRemove() {
+    if (!url) return;
+    await supabase.storage.from("catadores-docs").remove([url]);
+    onUpload(null);
+  }
+
+  const hasFile = !!url && !checked;
+
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 mt-2 text-xs text-muted-foreground bg-muted/40 rounded-md px-3 py-2 border border-border">
-      <span>📎 {label}</span>
-      <label className="flex items-center gap-2 cursor-pointer">
-        <Checkbox checked={checked} onCheckedChange={(c) => onChange(!!c)} />
-        <span>não tem</span>
-      </label>
+    <div className="mt-2 text-xs bg-muted/40 rounded-md px-3 py-2 border border-border space-y-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="text-muted-foreground">📎 {label}</span>
+        <label className="flex items-center gap-2 cursor-pointer text-muted-foreground">
+          <Checkbox checked={checked} onCheckedChange={(c) => onChange(!!c)} />
+          <span>não tem</span>
+        </label>
+      </div>
+      {!checked && (
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            id={cameraId}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            className="hidden"
+            onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
+          />
+          <input
+            id={fileId}
+            type="file"
+            accept="image/*,application/pdf"
+            className="hidden"
+            onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
+          />
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            disabled={busy}
+            onClick={() => document.getElementById(cameraId)?.click()}
+          >
+            {busy ? <Loader2 className="size-3 animate-spin" /> : <Camera className="size-3" />}
+            Tirar foto
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            disabled={busy}
+            onClick={() => document.getElementById(fileId)?.click()}
+          >
+            <Upload className="size-3" /> Enviar arquivo
+          </Button>
+          {hasFile && (
+            <span className="flex items-center gap-1 text-success">
+              <Check className="size-3" /> Anexado
+              <button type="button" onClick={handleRemove} className="ml-1 text-muted-foreground hover:text-destructive">
+                <X className="size-3" />
+              </button>
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 }
