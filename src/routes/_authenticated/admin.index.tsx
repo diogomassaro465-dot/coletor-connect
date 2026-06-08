@@ -66,11 +66,15 @@ function AdminDashboard() {
     },
   });
 
+  const RENDA_THRESHOLD = 1412; // salário mínimo de referência
+
   const filtered = useMemo(() => {
     if (!catadores) return [];
     return catadores.filter((c) => {
       if (statusFilter !== "todos" && c.status !== statusFilter) return false;
       if (materialFilter !== "todos" && !c.materiais_coletados.includes(materialFilter)) return false;
+      if (rendaFilter === "menor" && !(c.renda_media_mensal < RENDA_THRESHOLD)) return false;
+      if (rendaFilter === "maior" && !(c.renda_media_mensal >= RENDA_THRESHOLD)) return false;
       if (search.trim()) {
         const q = search.toLowerCase();
         const blob = `${c.nome_completo} ${c.cpf} ${c.nome_cooperativa ?? ""}`.toLowerCase();
@@ -78,7 +82,7 @@ function AdminDashboard() {
       }
       return true;
     });
-  }, [catadores, statusFilter, materialFilter, search]);
+  }, [catadores, statusFilter, materialFilter, rendaFilter, search]);
 
   const stats = useMemo(() => {
     const total = catadores?.length ?? 0;
