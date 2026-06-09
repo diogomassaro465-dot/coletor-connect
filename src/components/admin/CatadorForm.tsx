@@ -478,7 +478,7 @@ function Anexo({
   onChange: (v: boolean) => void;
 }) {
   const [busy, setBusy] = useState(false);
-  const cameraId = `${fieldKey}-cam`;
+  const [camOpen, setCamOpen] = useState(false);
   const fileId = `${fieldKey}-file`;
 
   async function handleFile(file: File) {
