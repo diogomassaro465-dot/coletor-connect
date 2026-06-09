@@ -522,14 +522,6 @@ function Anexo({
       {!checked && (
         <div className="flex flex-wrap items-center gap-2">
           <input
-            id={cameraId}
-            type="file"
-            accept="image/*"
-            capture="environment"
-            className="hidden"
-            onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
-          />
-          <input
             id={fileId}
             type="file"
             accept="image/*,application/pdf"
@@ -541,11 +533,16 @@ function Anexo({
             size="sm"
             variant="outline"
             disabled={busy}
-            onClick={() => document.getElementById(cameraId)?.click()}
+            onClick={() => setCamOpen(true)}
           >
             {busy ? <Loader2 className="size-3 animate-spin" /> : <Camera className="size-3" />}
             Tirar foto
           </Button>
+          <CameraCapture
+            open={camOpen}
+            onOpenChange={setCamOpen}
+            onCapture={(file) => handleFile(file)}
+          />
           <Button
             type="button"
             size="sm"
@@ -555,6 +552,7 @@ function Anexo({
           >
             <Upload className="size-3" /> Enviar arquivo
           </Button>
+
           {hasFile && (
             <span className="flex items-center gap-1 text-success">
               <Check className="size-3" /> Anexado
