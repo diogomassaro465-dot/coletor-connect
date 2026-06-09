@@ -18,6 +18,7 @@ import {
   GENERO_OPTIONS, RACA_OPTIONS, ESCOLARIDADE_OPTIONS, MATERIAIS_OPTIONS,
   NIVEL_GOV_BR_OPTIONS, isValidCPF, maskCPF, maskPhone,
 } from "@/lib/catador-constants";
+import { CameraCapture } from "./CameraCapture";
 
 type DocKey =
   | "comprovante_residencia_url"
