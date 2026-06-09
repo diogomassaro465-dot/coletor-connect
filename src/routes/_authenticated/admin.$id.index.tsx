@@ -177,6 +177,17 @@ function CatadorDetails() {
           <Field k="Possui carroça" v={c.possui_carroca ? `Sim (${c.tipo_carroca ?? "—"})` : "Não"} />
           <Field k="Área de atuação" v={c.area_atuacao ?? "—"} />
         </Section>
+
+        <Section title="Documentos anexados" className="lg:col-span-2">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <DocPreview label="Comprovante de residência" path={c.comprovante_residencia_url} />
+            <DocPreview label="CPF" path={c.cpf_foto_url} />
+            <DocPreview label="RG / CIN" path={c.rg_cin_foto_url} />
+            <DocPreview label="Título de Eleitor" path={c.titulo_eleitor_foto_url} />
+            <DocPreview label="CTPS" path={c.ctps_foto_url} />
+            <DocPreview label="NIS" path={c.nis_foto_url} />
+          </div>
+        </Section>
       </div>
     </AdminShell>
   );
