@@ -177,6 +177,17 @@ function CatadorDetails() {
           <Field k="Possui carroça" v={c.possui_carroca ? `Sim (${c.tipo_carroca ?? "—"})` : "Não"} />
           <Field k="Área de atuação" v={c.area_atuacao ?? "—"} />
         </Section>
+
+        <Section title="Documentos anexados" className="lg:col-span-2">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <DocPreview label="Comprovante de residência" path={c.comprovante_residencia_url} />
+            <DocPreview label="CPF" path={c.cpf_foto_url} />
+            <DocPreview label="RG / CIN" path={c.rg_cin_foto_url} />
+            <DocPreview label="Título de Eleitor" path={c.titulo_eleitor_foto_url} />
+            <DocPreview label="CTPS" path={c.ctps_foto_url} />
+            <DocPreview label="NIS" path={c.nis_foto_url} />
+          </div>
+        </Section>
       </div>
     </AdminShell>
   );
@@ -208,3 +219,40 @@ function Field({ k, v }: { k: string; v: React.ReactNode }) {
     </div>
   );
 }
+
+function DocPreview({ label, path }: { label: string; path: string | null }) {
+  const { data: url } = useQuery({
+    queryKey: ["doc-url", path],
+    queryFn: async () => {
+      if (!path) return null;
+      const { data, error } = await supabase.storage
+        .from("catadores-docs")
+        .createSignedUrl(path, 60 * 60);
+      if (error) throw error;
+      return data.signedUrl;
+    },
+    enabled: !!path,
+  });
+
+  const isPdf = !!path && path.toLowerCase().endsWith(".pdf");
+
+  return (
+    <div className="border border-border rounded-lg overflow-hidden bg-muted/30">
+      <div className="px-3 py-2 text-xs font-medium border-b border-border bg-card">{label}</div>
+      {!path ? (
+        <div className="aspect-[4/3] grid place-items-center text-xs text-muted-foreground">Não anexado</div>
+      ) : !url ? (
+        <div className="aspect-[4/3] grid place-items-center text-xs text-muted-foreground">Carregando...</div>
+      ) : isPdf ? (
+        <a href={url} target="_blank" rel="noreferrer" className="aspect-[4/3] grid place-items-center text-sm text-primary underline">
+          Abrir PDF
+        </a>
+      ) : (
+        <a href={url} target="_blank" rel="noreferrer" className="block">
+          <img src={url} alt={label} className="w-full aspect-[4/3] object-cover hover:opacity-90 transition" />
+        </a>
+      )}
+    </div>
+  );
+}
+
