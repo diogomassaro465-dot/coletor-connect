@@ -120,38 +120,97 @@ function AdminDashboard() {
 
   async function exportXLSX() {
     if (!filtered.length) return toast.info("Nada para exportar.");
-    const XLSX = await import("xlsx");
-    const headers = [
-      "Nome", "CPF", "Gênero", "Escolaridade", "Cooperativa", "Renda (R$)",
-      "Materiais", "Contribui INSS", "CadÚnico", "Bolsa Família", "Status", "Data Cadastro",
-    ];
-    const rows = filtered.map((c) => [
-      c.nome_completo, c.cpf, GENERO_LABEL[c.genero] ?? c.genero, c.escolaridade,
-      c.nome_cooperativa ?? "", Number(c.renda_media_mensal) || 0,
-      c.materiais_coletados.join(", "),
-      c.contribui_inss ? "Sim" : "Não",
-      c.inscrito_cadunico ? "Sim" : "Não",
-      c.possui_bolsa_familia ? "Sim" : "Não",
-      STATUS_LABEL[c.status] ?? c.status,
-      new Date(c.data_cadastro).toLocaleString("pt-BR"),
-    ]);
-    const aoa = [headers, ...rows];
-    const ws = XLSX.utils.aoa_to_sheet(aoa);
-    // Auto-fit column widths based on max content length per column
-    const colWidths = headers.map((_, colIdx) => {
-      const maxLen = aoa.reduce((m, row) => {
-        const val = row[colIdx];
-        const len = val == null ? 0 : String(val).length;
-        return Math.max(m, len);
-      }, 0);
-      return { wch: Math.min(Math.max(maxLen + 2, 10), 60) };
+    const ExcelJS = (await import("exceljs")).default;
+    const wb = new ExcelJS.Workbook();
+    wb.creator = "RecicladoresBR";
+    wb.created = new Date();
+    const ws = wb.addWorksheet("Catadores", {
+      views: [{ state: "frozen", ySplit: 1 }],
     });
-    ws["!cols"] = colWidths;
-    // Freeze header row
-    ws["!freeze"] = { xSplit: 0, ySplit: 1 };
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Catadores");
-    XLSX.writeFile(wb, `catadores-${new Date().toISOString().slice(0, 10)}.xlsx`);
+
+    const columns: Array<{ header: string; key: string; numFmt?: string }> = [
+      { header: "Nome", key: "nome" },
+      { header: "CPF", key: "cpf" },
+      { header: "Gênero", key: "genero" },
+      { header: "Escolaridade", key: "escolaridade" },
+      { header: "Cooperativa", key: "cooperativa" },
+      { header: "Renda (R$)", key: "renda", numFmt: '"R$" #,##0.00' },
+      { header: "Materiais", key: "materiais" },
+      { header: "Contribui INSS", key: "inss" },
+      { header: "CadÚnico", key: "cadunico" },
+      { header: "Bolsa Família", key: "bolsa" },
+      { header: "Status", key: "status" },
+      { header: "Data Cadastro", key: "data", numFmt: "dd/mm/yyyy hh:mm" },
+    ];
+    ws.columns = columns.map((c) => ({ header: c.header, key: c.key, style: c.numFmt ? { numFmt: c.numFmt } : undefined }));
+
+    filtered.forEach((c) => {
+      ws.addRow({
+        nome: c.nome_completo,
+        cpf: c.cpf,
+        genero: GENERO_LABEL[c.genero] ?? c.genero,
+        escolaridade: c.escolaridade,
+        cooperativa: c.nome_cooperativa ?? "",
+        renda: Number(c.renda_media_mensal) || 0,
+        materiais: c.materiais_coletados.join(", "),
+        inss: c.contribui_inss ? "Sim" : "Não",
+        cadunico: c.inscrito_cadunico ? "Sim" : "Não",
+        bolsa: c.possui_bolsa_familia ? "Sim" : "Não",
+        status: STATUS_LABEL[c.status] ?? c.status,
+        data: new Date(c.data_cadastro),
+      });
+    });
+
+    // Header styling
+    const headerRow = ws.getRow(1);
+    headerRow.height = 24;
+    headerRow.eachCell((cell) => {
+      cell.font = { bold: true, color: { argb: "FFFFFFFF" }, size: 11 };
+      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF15803D" } };
+      cell.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+      cell.border = {
+        top: { style: "thin", color: { argb: "FF15803D" } },
+        bottom: { style: "thin", color: { argb: "FF15803D" } },
+        left: { style: "thin", color: { argb: "FF15803D" } },
+        right: { style: "thin", color: { argb: "FF15803D" } },
+      };
+    });
+
+    // Body styling: zebra + borders
+    const thin = { style: "thin" as const, color: { argb: "FFE5E7EB" } };
+    for (let r = 2; r <= ws.rowCount; r++) {
+      const row = ws.getRow(r);
+      const isEven = r % 2 === 0;
+      row.eachCell({ includeEmpty: true }, (cell) => {
+        cell.border = { top: thin, bottom: thin, left: thin, right: thin };
+        cell.alignment = { vertical: "middle", wrapText: true };
+        if (isEven) {
+          cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF3F4F6" } };
+        }
+      });
+    }
+
+    // Auto-fit column widths
+    ws.columns.forEach((col) => {
+      let max = col.header ? String(col.header).length : 10;
+      col.eachCell?.({ includeEmpty: false }, (cell) => {
+        const v = cell.value;
+        let len = 0;
+        if (v instanceof Date) len = 16;
+        else if (v != null) len = String(v).length;
+        if (len > max) max = len;
+      });
+      col.width = Math.min(Math.max(max + 2, 12), 60);
+    });
+
+    const buf = await wb.xlsx.writeBuffer();
+    const blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `catadores-${new Date().toISOString().slice(0, 10)}.xlsx`;
+    a.click();
+    URL.revokeObjectURL(url);
     toast.success(`${filtered.length} registros exportados.`);
   }
 
