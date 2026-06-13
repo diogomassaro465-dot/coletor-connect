@@ -22,6 +22,7 @@ import { Route as AuthenticatedAdminIdEditarRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminAssociacoesIdIndexRouteImport } from './routes/_authenticated/admin.associacoes.$id.index'
 import { Route as AuthenticatedAdminAssociacoesIdDiagnosticoNovoRouteImport } from './routes/_authenticated/admin.associacoes.$id.diagnostico.novo'
 import { Route as AuthenticatedAdminAssociacoesIdDiagnosticoAssessmentIdRouteImport } from './routes/_authenticated/admin.associacoes.$id.diagnostico.$assessmentId'
+import { Route as AuthenticatedAdminAssociacoesIdCatadoresNovoRouteImport } from './routes/_authenticated/admin.associacoes.$id.catadores.novo'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -94,6 +95,12 @@ const AuthenticatedAdminAssociacoesIdDiagnosticoAssessmentIdRoute =
     path: '/associacoes/$id/diagnostico/$assessmentId',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminAssociacoesIdCatadoresNovoRoute =
+  AuthenticatedAdminAssociacoesIdCatadoresNovoRouteImport.update({
+    id: '/associacoes/$id/catadores/novo',
+    path: '/associacoes/$id/catadores/novo',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -106,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/admin/$id/': typeof AuthenticatedAdminIdIndexRoute
   '/admin/associacoes/': typeof AuthenticatedAdminAssociacoesIndexRoute
   '/admin/associacoes/$id/': typeof AuthenticatedAdminAssociacoesIdIndexRoute
+  '/admin/associacoes/$id/catadores/novo': typeof AuthenticatedAdminAssociacoesIdCatadoresNovoRoute
   '/admin/associacoes/$id/diagnostico/$assessmentId': typeof AuthenticatedAdminAssociacoesIdDiagnosticoAssessmentIdRoute
   '/admin/associacoes/$id/diagnostico/novo': typeof AuthenticatedAdminAssociacoesIdDiagnosticoNovoRoute
 }
@@ -119,6 +127,7 @@ export interface FileRoutesByTo {
   '/admin/$id': typeof AuthenticatedAdminIdIndexRoute
   '/admin/associacoes': typeof AuthenticatedAdminAssociacoesIndexRoute
   '/admin/associacoes/$id': typeof AuthenticatedAdminAssociacoesIdIndexRoute
+  '/admin/associacoes/$id/catadores/novo': typeof AuthenticatedAdminAssociacoesIdCatadoresNovoRoute
   '/admin/associacoes/$id/diagnostico/$assessmentId': typeof AuthenticatedAdminAssociacoesIdDiagnosticoAssessmentIdRoute
   '/admin/associacoes/$id/diagnostico/novo': typeof AuthenticatedAdminAssociacoesIdDiagnosticoNovoRoute
 }
@@ -135,6 +144,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/$id/': typeof AuthenticatedAdminIdIndexRoute
   '/_authenticated/admin/associacoes/': typeof AuthenticatedAdminAssociacoesIndexRoute
   '/_authenticated/admin/associacoes/$id/': typeof AuthenticatedAdminAssociacoesIdIndexRoute
+  '/_authenticated/admin/associacoes/$id/catadores/novo': typeof AuthenticatedAdminAssociacoesIdCatadoresNovoRoute
   '/_authenticated/admin/associacoes/$id/diagnostico/$assessmentId': typeof AuthenticatedAdminAssociacoesIdDiagnosticoAssessmentIdRoute
   '/_authenticated/admin/associacoes/$id/diagnostico/novo': typeof AuthenticatedAdminAssociacoesIdDiagnosticoNovoRoute
 }
@@ -151,6 +161,7 @@ export interface FileRouteTypes {
     | '/admin/$id/'
     | '/admin/associacoes/'
     | '/admin/associacoes/$id/'
+    | '/admin/associacoes/$id/catadores/novo'
     | '/admin/associacoes/$id/diagnostico/$assessmentId'
     | '/admin/associacoes/$id/diagnostico/novo'
   fileRoutesByTo: FileRoutesByTo
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/admin/$id'
     | '/admin/associacoes'
     | '/admin/associacoes/$id'
+    | '/admin/associacoes/$id/catadores/novo'
     | '/admin/associacoes/$id/diagnostico/$assessmentId'
     | '/admin/associacoes/$id/diagnostico/novo'
   id:
@@ -179,6 +191,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/$id/'
     | '/_authenticated/admin/associacoes/'
     | '/_authenticated/admin/associacoes/$id/'
+    | '/_authenticated/admin/associacoes/$id/catadores/novo'
     | '/_authenticated/admin/associacoes/$id/diagnostico/$assessmentId'
     | '/_authenticated/admin/associacoes/$id/diagnostico/novo'
   fileRoutesById: FileRoutesById
@@ -282,6 +295,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAssociacoesIdDiagnosticoAssessmentIdRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/associacoes/$id/catadores/novo': {
+      id: '/_authenticated/admin/associacoes/$id/catadores/novo'
+      path: '/associacoes/$id/catadores/novo'
+      fullPath: '/admin/associacoes/$id/catadores/novo'
+      preLoaderRoute: typeof AuthenticatedAdminAssociacoesIdCatadoresNovoRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
@@ -293,6 +313,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminIdIndexRoute: typeof AuthenticatedAdminIdIndexRoute
   AuthenticatedAdminAssociacoesIndexRoute: typeof AuthenticatedAdminAssociacoesIndexRoute
   AuthenticatedAdminAssociacoesIdIndexRoute: typeof AuthenticatedAdminAssociacoesIdIndexRoute
+  AuthenticatedAdminAssociacoesIdCatadoresNovoRoute: typeof AuthenticatedAdminAssociacoesIdCatadoresNovoRoute
   AuthenticatedAdminAssociacoesIdDiagnosticoAssessmentIdRoute: typeof AuthenticatedAdminAssociacoesIdDiagnosticoAssessmentIdRoute
   AuthenticatedAdminAssociacoesIdDiagnosticoNovoRoute: typeof AuthenticatedAdminAssociacoesIdDiagnosticoNovoRoute
 }
@@ -308,6 +329,8 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
     AuthenticatedAdminAssociacoesIndexRoute,
   AuthenticatedAdminAssociacoesIdIndexRoute:
     AuthenticatedAdminAssociacoesIdIndexRoute,
+  AuthenticatedAdminAssociacoesIdCatadoresNovoRoute:
+    AuthenticatedAdminAssociacoesIdCatadoresNovoRoute,
   AuthenticatedAdminAssociacoesIdDiagnosticoAssessmentIdRoute:
     AuthenticatedAdminAssociacoesIdDiagnosticoAssessmentIdRoute,
   AuthenticatedAdminAssociacoesIdDiagnosticoNovoRoute:
@@ -336,3 +359,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
