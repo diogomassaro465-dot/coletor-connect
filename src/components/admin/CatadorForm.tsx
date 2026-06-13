@@ -11,13 +11,34 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Recycle, Camera, Upload, Check, X, Building2, UserRound, FileText, WalletCards } from "lucide-react";
 import {
-  GENERO_OPTIONS, RACA_OPTIONS, ESCOLARIDADE_OPTIONS, MATERIAIS_OPTIONS,
-  NIVEL_GOV_BR_OPTIONS, isValidCPF, maskCPF, maskPhone,
+  Loader2,
+  Recycle,
+  Camera,
+  Upload,
+  Check,
+  X,
+  Building2,
+  UserRound,
+  FileText,
+  WalletCards,
+} from "lucide-react";
+import {
+  GENERO_OPTIONS,
+  RACA_OPTIONS,
+  ESCOLARIDADE_OPTIONS,
+  MATERIAIS_OPTIONS,
+  NIVEL_GOV_BR_OPTIONS,
+  isValidCPF,
+  maskCPF,
+  maskPhone,
 } from "@/lib/catador-constants";
 import { CameraCapture } from "./CameraCapture";
 
@@ -63,10 +84,14 @@ export function CatadorForm({
   defaultValues,
   catadorId,
   mode = "create",
+  associationId,
+  associationName,
 }: {
   defaultValues?: Partial<CatadorFormData> & Partial<Record<DocKey, string | null>>;
   catadorId?: string;
   mode?: "create" | "edit";
+  associationId?: string;
+  associationName?: string;
 }) {
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
@@ -79,14 +104,23 @@ export function CatadorForm({
     nis_foto_url: defaultValues?.nis_foto_url ?? null,
   });
   const [naoTem, setNaoTem] = useState({
-    email: false, telefone: false, comprovante_residencia: false,
-    cpf_foto: false, rg_foto: false, titulo_foto: false,
-    ctps_foto: false, nis_foto: false,
+    email: false,
+    telefone: false,
+    comprovante_residencia: false,
+    cpf_foto: false,
+    rg_foto: false,
+    titulo_foto: false,
+    ctps_foto: false,
+    nis_foto: false,
   });
   const { data: associations = [] } = useQuery({
     queryKey: ["associations-active"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("associations").select("id,nome").eq("ativa", true).order("nome");
+      const { data, error } = await supabase
+        .from("associations")
+        .select("id,nome")
+        .eq("ativa", true)
+        .order("nome");
       if (error) throw error;
       return data;
     },
@@ -95,7 +129,7 @@ export function CatadorForm({
   const form = useForm<CatadorFormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      association_id: "",
+      association_id: associationId ?? "",
       nome_cooperativa: "",
       nome_completo: "",
       genero: "nao_responder",
@@ -126,18 +160,29 @@ export function CatadorForm({
 
   useEffect(() => {
     if (mode !== "create") return;
-    const draft = localStorage.getItem("procate-catador-draft");
+    const draftKey = associationId
+      ? `procate-catador-draft-${associationId}`
+      : "procate-catador-draft";
+    const draft = localStorage.getItem(draftKey);
     if (draft) {
       try {
-        form.reset({ ...form.getValues(), ...JSON.parse(draft) });
-        toast.info("Rascunho recuperado", { description: "Os dados salvos neste aparelho foram restaurados." });
+        form.reset({
+          ...form.getValues(),
+          ...JSON.parse(draft),
+          ...(associationId ? { association_id: associationId } : {}),
+        });
+        toast.info("Rascunho recuperado", {
+          description: "Os dados salvos neste aparelho foram restaurados.",
+        });
       } catch {
-        localStorage.removeItem("procate-catador-draft");
+        localStorage.removeItem(draftKey);
       }
     }
-    const subscription = form.watch((values) => localStorage.setItem("procate-catador-draft", JSON.stringify(values)));
+    const subscription = form.watch((values) =>
+      localStorage.setItem(draftKey, JSON.stringify(values)),
+    );
     return () => subscription.unsubscribe();
-  }, [form, mode]);
+  }, [associationId, form, mode]);
 
   async function onSubmit(values: CatadorFormData) {
     setSubmitting(true);
@@ -147,7 +192,7 @@ export function CatadorForm({
       association_id: values.association_id,
       email: naoTem.email ? null : values.email || null,
       telefone: naoTem.telefone ? null : values.telefone || null,
-      nome_cooperativa: association?.nome ?? (values.nome_cooperativa || null),
+      nome_cooperativa: associationName ?? association?.nome ?? (values.nome_cooperativa || null),
       titulo_eleitor: values.titulo_eleitor || null,
       ctps: values.ctps || null,
       nis: values.nis || null,
@@ -155,7 +200,9 @@ export function CatadorForm({
       nivel_cadastro_gov_br: values.cadastro_gov_br ? values.nivel_cadastro_gov_br || null : null,
       tipo_carroca: values.possui_carroca ? values.tipo_carroca || null : null,
       area_atuacao: values.area_atuacao || null,
-      comprovante_residencia_url: naoTem.comprovante_residencia ? null : urls.comprovante_residencia_url,
+      comprovante_residencia_url: naoTem.comprovante_residencia
+        ? null
+        : urls.comprovante_residencia_url,
       cpf_foto_url: naoTem.cpf_foto ? null : urls.cpf_foto_url,
       rg_cin_foto_url: naoTem.rg_foto ? null : urls.rg_cin_foto_url,
       titulo_eleitor_foto_url: naoTem.titulo_foto ? null : urls.titulo_eleitor_foto_url,
@@ -177,28 +224,70 @@ export function CatadorForm({
       }
       return;
     }
-    localStorage.removeItem("procate-catador-draft");
+    localStorage.removeItem(
+      associationId ? `procate-catador-draft-${associationId}` : "procate-catador-draft",
+    );
     toast.success(mode === "edit" ? "Cadastro atualizado!" : "Catador cadastrado com sucesso!");
-    navigate({ to: "/admin" });
+    if (associationId) {
+      navigate({ to: "/admin/associacoes/$id", params: { id: associationId } });
+    } else {
+      navigate({ to: "/admin" });
+    }
   }
 
   const v = form.watch();
   const e = form.formState.errors;
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="mx-auto grid max-w-6xl items-start gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
+    <form
+      onSubmit={form.handleSubmit(onSubmit)}
+      className="mx-auto grid max-w-6xl items-start gap-6 lg:grid-cols-[280px_minmax(0,1fr)]"
+    >
       <aside className="rounded-3xl border border-border bg-card p-5 shadow-card lg:sticky lg:top-24">
         <div className="mb-6 flex items-center gap-3 border-b border-border pb-5">
-          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground"><Recycle className="size-5" /></span>
-          <div className="min-w-0"><p className="font-display font-bold">RecicladoresBR</p><p className="text-xs text-muted-foreground">Projeto PROCATE</p></div>
+          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground">
+            <Recycle className="size-5" />
+          </span>
+          <div className="min-w-0">
+            <p className="font-display font-bold">RecicladoresBR</p>
+            <p className="text-xs text-muted-foreground">Projeto PROCATE</p>
+          </div>
         </div>
-        <p className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">Blocos do cadastro</p>
+        <p className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">
+          Blocos do cadastro
+        </p>
         <nav className="space-y-2" aria-label="Seções do cadastro">
-          <StepLink href="#instituicao" n="01" label="Instituição" icon={<Building2 className="size-4" />} active />
-          <StepLink href="#identificacao" n="02" label="Dados pessoais" icon={<UserRound className="size-4" />} />
-          <StepLink href="#documentos" n="03" label="Documentação" icon={<FileText className="size-4" />} />
-          <StepLink href="#social" n="04" label="Situação social" icon={<WalletCards className="size-4" />} />
-          <StepLink href="#coleta" n="05" label="Atuação na coleta" icon={<Recycle className="size-4" />} />
+          <StepLink
+            href="#instituicao"
+            n="01"
+            label="Instituição"
+            icon={<Building2 className="size-4" />}
+            active
+          />
+          <StepLink
+            href="#identificacao"
+            n="02"
+            label="Dados pessoais"
+            icon={<UserRound className="size-4" />}
+          />
+          <StepLink
+            href="#documentos"
+            n="03"
+            label="Documentação"
+            icon={<FileText className="size-4" />}
+          />
+          <StepLink
+            href="#social"
+            n="04"
+            label="Situação social"
+            icon={<WalletCards className="size-4" />}
+          />
+          <StepLink
+            href="#coleta"
+            n="05"
+            label="Atuação na coleta"
+            icon={<Recycle className="size-4" />}
+          />
         </nav>
         <div className="mt-6 rounded-2xl border border-warning/40 bg-accent p-4 text-xs leading-relaxed text-accent-foreground">
           <strong className="block font-display">Proteção dos dados</strong>
@@ -208,224 +297,346 @@ export function CatadorForm({
 
       <div className="min-w-0 space-y-6">
         <header className="relative overflow-hidden rounded-3xl bg-gradient-hero p-7 text-primary-foreground shadow-soft md:p-9">
-          <div className="absolute inset-x-0 top-0 flex h-1.5"><span className="flex-1 bg-secondary" /><span className="flex-1 bg-warning" /><span className="flex-1 bg-primary" /></div>
-          <p className="mb-3 inline-flex rounded-full border border-primary-foreground/20 bg-primary-foreground/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em]">Projeto Catador Empreendedor</p>
+          <div className="absolute inset-x-0 top-0 flex h-1.5">
+            <span className="flex-1 bg-secondary" />
+            <span className="flex-1 bg-warning" />
+            <span className="flex-1 bg-primary" />
+          </div>
+          <p className="mb-3 inline-flex rounded-full border border-primary-foreground/20 bg-primary-foreground/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em]">
+            Projeto Catador Empreendedor
+          </p>
           <h2 className="text-2xl font-extrabold md:text-3xl">Cidadania na Economia Circular</h2>
-          <p className="mt-1 text-sm font-medium uppercase tracking-wider text-primary-foreground/75">Segmento da reciclagem</p>
+          <p className="mt-1 text-sm font-medium uppercase tracking-wider text-primary-foreground/75">
+            Segmento da reciclagem
+          </p>
         </header>
 
-        <section id="instituicao" className="scroll-mt-24 rounded-3xl border border-border bg-card p-6 shadow-card md:p-8">
-          <SectionTitle icon={<Building2 className="size-5" />} title="Instituição de origem" description="Vincule o cadastro à entidade correspondente." tone="red" />
+        <section
+          id="instituicao"
+          className="scroll-mt-24 rounded-3xl border border-border bg-card p-6 shadow-card md:p-8"
+        >
+          <SectionTitle
+            icon={<Building2 className="size-5" />}
+            title="Instituição de origem"
+            description="Vincule o cadastro à entidade correspondente."
+            tone="red"
+          />
           <Linha label="Cooperativa / Associação / Grupo">
-          <Select value={v.association_id} onValueChange={(value) => form.setValue("association_id", value, { shouldValidate: true })}>
-            <SelectTrigger><SelectValue placeholder="Selecione na lista oficial" /></SelectTrigger>
-            <SelectContent>{associations.map((item) => <SelectItem key={item.id} value={item.id}>{item.nome}</SelectItem>)}</SelectContent>
-          </Select>
-          {e.association_id?.message && <p className="text-xs text-destructive">{e.association_id.message}</p>}
+            {associationId ? (
+              <div className="flex min-h-10 items-center rounded-md border border-input bg-muted px-3 text-sm font-medium">
+                {associationName ?? "Entidade selecionada"}
+              </div>
+            ) : (
+              <Select
+                value={v.association_id}
+                onValueChange={(value) =>
+                  form.setValue("association_id", value, { shouldValidate: true })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione na lista oficial" />
+                </SelectTrigger>
+                <SelectContent>
+                  {associations.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.nome}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            {e.association_id?.message && (
+              <p className="text-xs text-destructive">{e.association_id.message}</p>
+            )}
           </Linha>
         </section>
 
-        <section id="identificacao" className="scroll-mt-24 space-y-7 rounded-3xl border border-border bg-card p-6 shadow-card md:p-8">
-          <SectionTitle icon={<UserRound className="size-5" />} title="Identificação e contato" description="Dados pessoais e informações para contato." tone="blue" />
-        <Item n={1} label="Nome completo do(a) Catador(a):" error={e.nome_completo?.message}>
-          <Input {...form.register("nome_completo")} />
-        </Item>
-
-        <Item n={2} label="Gênero:" error={e.genero?.message}>
-          <RadioGroup
-            value={v.genero}
-            onValueChange={(val) => form.setValue("genero", val as CatadorFormData["genero"])}
-            className="flex flex-wrap gap-x-6 gap-y-2"
-          >
-            {GENERO_OPTIONS.map((o) => (
-              <label key={o.value} className="flex items-center gap-2 cursor-pointer text-sm">
-                <RadioGroupItem value={o.value} />
-                <span>{o.label}</span>
-              </label>
-            ))}
-          </RadioGroup>
-        </Item>
-
-        <Item n={3} label="Autodeclaração racial:" error={e.autodeclaracao_racial?.message}>
-          <Select value={v.autodeclaracao_racial} onValueChange={(val) => form.setValue("autodeclaracao_racial", val)}>
-            <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-            <SelectContent>
-              {RACA_OPTIONS.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </Item>
-
-        <Item n={4} label="Escolaridade:" error={e.escolaridade?.message}>
-          <Select value={v.escolaridade} onValueChange={(val) => form.setValue("escolaridade", val)}>
-            <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-            <SelectContent>
-              {ESCOLARIDADE_OPTIONS.map((x) => <SelectItem key={x} value={x}>{x}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </Item>
-
-        <Item n={5} label="E-mail:" error={e.email?.message}>
-          <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
-            <Input
-              type="email"
-              {...form.register("email")}
-              disabled={naoTem.email}
-              className="flex-1"
-            />
-            <NaoTem checked={naoTem.email} onChange={(c) => setNaoTem((s) => ({ ...s, email: c }))} />
-          </div>
-        </Item>
-
-        <Item n={6} label="Número Telefone:">
-          <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
-            <Input
-              value={v.telefone ?? ""}
-              disabled={naoTem.telefone}
-              onChange={(ev) => form.setValue("telefone", maskPhone(ev.target.value))}
-              placeholder="(00) 00000-0000"
-              className="flex-1"
-            />
-            <NaoTem checked={naoTem.telefone} onChange={(c) => setNaoTem((s) => ({ ...s, telefone: c }))} />
-          </div>
-        </Item>
-
-        <Item
-          n={7}
-          label="Endereço residencial completo (logradouro, número, complemento, bairro, município):"
-          error={e.endereco_completo?.message}
+        <section
+          id="identificacao"
+          className="scroll-mt-24 space-y-7 rounded-3xl border border-border bg-card p-6 shadow-card md:p-8"
         >
-          <Textarea {...form.register("endereco_completo")} rows={3} />
-          <Anexo
-            label="Foto de comprovante de residência"
-            fieldKey="comprovante_residencia_url"
-            url={urls.comprovante_residencia_url}
-            onUpload={(u) => setUrls((s) => ({ ...s, comprovante_residencia_url: u }))}
-            checked={naoTem.comprovante_residencia}
-            onChange={(c) => setNaoTem((s) => ({ ...s, comprovante_residencia: c }))}
+          <SectionTitle
+            icon={<UserRound className="size-5" />}
+            title="Identificação e contato"
+            description="Dados pessoais e informações para contato."
+            tone="blue"
           />
-        </Item>
+          <Item n={1} label="Nome completo do(a) Catador(a):" error={e.nome_completo?.message}>
+            <Input {...form.register("nome_completo")} />
+          </Item>
 
-        </section>
-
-        <section id="documentos" className="scroll-mt-24 space-y-7 rounded-3xl border border-border bg-card p-6 shadow-card md:p-8">
-          <SectionTitle icon={<FileText className="size-5" />} title="Documentação" description="Documentos de identificação e respectivos anexos." tone="yellow" />
-        <Item n={8} label="CPF:" error={e.cpf?.message}>
-          <Input
-            value={v.cpf}
-            onChange={(ev) => form.setValue("cpf", maskCPF(ev.target.value), { shouldValidate: true })}
-            placeholder="000.000.000-00"
-          />
-          <Anexo
-            label="Foto do CPF (frente e verso)"
-            fieldKey="cpf_foto_url"
-            url={urls.cpf_foto_url}
-            onUpload={(u) => setUrls((s) => ({ ...s, cpf_foto_url: u }))}
-            checked={naoTem.cpf_foto}
-            onChange={(c) => setNaoTem((s) => ({ ...s, cpf_foto: c }))}
-          />
-        </Item>
-
-        <Item n={9} label="RG / CIN:" error={e.rg_cin?.message}>
-          <Input {...form.register("rg_cin")} />
-          <Anexo
-            label="Foto do RG / CIN (frente e verso)"
-            fieldKey="rg_cin_foto_url"
-            url={urls.rg_cin_foto_url}
-            onUpload={(u) => setUrls((s) => ({ ...s, rg_cin_foto_url: u }))}
-            checked={naoTem.rg_foto}
-            onChange={(c) => setNaoTem((s) => ({ ...s, rg_foto: c }))}
-          />
-        </Item>
-
-        <Item n={10} label="Título de Eleitor:">
-          <Input {...form.register("titulo_eleitor")} />
-          <Anexo
-            label="Foto do Título de Eleitor"
-            fieldKey="titulo_eleitor_foto_url"
-            url={urls.titulo_eleitor_foto_url}
-            onUpload={(u) => setUrls((s) => ({ ...s, titulo_eleitor_foto_url: u }))}
-            checked={naoTem.titulo_foto}
-            onChange={(c) => setNaoTem((s) => ({ ...s, titulo_foto: c }))}
-          />
-        </Item>
-
-        <Item n={11} label="CTPS:">
-          <Input {...form.register("ctps")} />
-          <Anexo
-            label="Foto da CTPS"
-            fieldKey="ctps_foto_url"
-            url={urls.ctps_foto_url}
-            onUpload={(u) => setUrls((s) => ({ ...s, ctps_foto_url: u }))}
-            checked={naoTem.ctps_foto}
-            onChange={(c) => setNaoTem((s) => ({ ...s, ctps_foto: c }))}
-          />
-        </Item>
-
-        <Item n={12} label="NIS:">
-          <Input {...form.register("nis")} />
-          <Anexo
-            label="Foto do NIS"
-            fieldKey="nis_foto_url"
-            url={urls.nis_foto_url}
-            onUpload={(u) => setUrls((s) => ({ ...s, nis_foto_url: u }))}
-            checked={naoTem.nis_foto}
-            onChange={(c) => setNaoTem((s) => ({ ...s, nis_foto: c }))}
-          />
-        </Item>
-        </section>
-
-        <section id="social" className="scroll-mt-24 space-y-7 rounded-3xl border border-border bg-card p-6 shadow-card md:p-8">
-          <SectionTitle icon={<WalletCards className="size-5" />} title="Situação socioeconômica" description="Renda, benefícios e acesso a serviços digitais." tone="red" />
-        <Item n={13} label="Qual a renda média mensal?" error={e.renda_media_mensal?.message}>
-          <Input type="number" step="0.01" min="0" {...form.register("renda_media_mensal")} placeholder="R$" />
-        </Item>
-
-        <SimNao n={14} label="Contribui com o INSS?" value={v.contribui_inss}
-          onChange={(b) => form.setValue("contribui_inss", b)} />
-        <SimNao n={15} label="Inscrito(a) no CadÚnico?" value={v.inscrito_cadunico}
-          onChange={(b) => form.setValue("inscrito_cadunico", b)} />
-        <SimNao n={16} label="Possui Bolsa Família?" value={v.possui_bolsa_familia}
-          onChange={(b) => form.setValue("possui_bolsa_familia", b)} />
-
-        <Item n={17} label="Conta bancária digital (App Caixa Tem):">
-          <Input {...form.register("conta_bancaria_digital")} placeholder="(opcional)" />
-        </Item>
-
-        <SimNao n={18} label="Cadastro no gov.br?" value={v.cadastro_gov_br}
-          onChange={(b) => form.setValue("cadastro_gov_br", b)} />
-
-        {v.cadastro_gov_br && (
-          <Item n={19} label="Se tem cadastro no gov.br, qual Nível:">
+          <Item n={2} label="Gênero:" error={e.genero?.message}>
             <RadioGroup
-              value={v.nivel_cadastro_gov_br ?? ""}
-              onValueChange={(val) => form.setValue("nivel_cadastro_gov_br", val)}
+              value={v.genero}
+              onValueChange={(val) => form.setValue("genero", val as CatadorFormData["genero"])}
               className="flex flex-wrap gap-x-6 gap-y-2"
             >
-              {NIVEL_GOV_BR_OPTIONS.map((n) => (
-                <label key={n} className="flex items-center gap-2 cursor-pointer text-sm">
-                  <RadioGroupItem value={n} />
-                  <span>{n}</span>
+              {GENERO_OPTIONS.map((o) => (
+                <label key={o.value} className="flex items-center gap-2 cursor-pointer text-sm">
+                  <RadioGroupItem value={o.value} />
+                  <span>{o.label}</span>
                 </label>
               ))}
             </RadioGroup>
           </Item>
-        )}
+
+          <Item n={3} label="Autodeclaração racial:" error={e.autodeclaracao_racial?.message}>
+            <Select
+              value={v.autodeclaracao_racial}
+              onValueChange={(val) => form.setValue("autodeclaracao_racial", val)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione" />
+              </SelectTrigger>
+              <SelectContent>
+                {RACA_OPTIONS.map((r) => (
+                  <SelectItem key={r} value={r}>
+                    {r}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Item>
+
+          <Item n={4} label="Escolaridade:" error={e.escolaridade?.message}>
+            <Select
+              value={v.escolaridade}
+              onValueChange={(val) => form.setValue("escolaridade", val)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione" />
+              </SelectTrigger>
+              <SelectContent>
+                {ESCOLARIDADE_OPTIONS.map((x) => (
+                  <SelectItem key={x} value={x}>
+                    {x}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Item>
+
+          <Item n={5} label="E-mail:" error={e.email?.message}>
+            <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+              <Input
+                type="email"
+                {...form.register("email")}
+                disabled={naoTem.email}
+                className="flex-1"
+              />
+              <NaoTem
+                checked={naoTem.email}
+                onChange={(c) => setNaoTem((s) => ({ ...s, email: c }))}
+              />
+            </div>
+          </Item>
+
+          <Item n={6} label="Número Telefone:">
+            <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+              <Input
+                value={v.telefone ?? ""}
+                disabled={naoTem.telefone}
+                onChange={(ev) => form.setValue("telefone", maskPhone(ev.target.value))}
+                placeholder="(00) 00000-0000"
+                className="flex-1"
+              />
+              <NaoTem
+                checked={naoTem.telefone}
+                onChange={(c) => setNaoTem((s) => ({ ...s, telefone: c }))}
+              />
+            </div>
+          </Item>
+
+          <Item
+            n={7}
+            label="Endereço residencial completo (logradouro, número, complemento, bairro, município):"
+            error={e.endereco_completo?.message}
+          >
+            <Textarea {...form.register("endereco_completo")} rows={3} />
+            <Anexo
+              label="Foto de comprovante de residência"
+              fieldKey="comprovante_residencia_url"
+              url={urls.comprovante_residencia_url}
+              onUpload={(u) => setUrls((s) => ({ ...s, comprovante_residencia_url: u }))}
+              checked={naoTem.comprovante_residencia}
+              onChange={(c) => setNaoTem((s) => ({ ...s, comprovante_residencia: c }))}
+            />
+          </Item>
         </section>
 
-        <section id="coleta" className="scroll-mt-24 space-y-7 rounded-3xl border border-border bg-card p-6 shadow-card md:p-8">
-          <SectionTitle icon={<Recycle className="size-5" />} title="Atuação na coleta" description="Materiais, equipamentos e região de trabalho." tone="blue" />
+        <section
+          id="documentos"
+          className="scroll-mt-24 space-y-7 rounded-3xl border border-border bg-card p-6 shadow-card md:p-8"
+        >
+          <SectionTitle
+            icon={<FileText className="size-5" />}
+            title="Documentação"
+            description="Documentos de identificação e respectivos anexos."
+            tone="yellow"
+          />
+          <Item n={8} label="CPF:" error={e.cpf?.message}>
+            <Input
+              value={v.cpf}
+              onChange={(ev) =>
+                form.setValue("cpf", maskCPF(ev.target.value), { shouldValidate: true })
+              }
+              placeholder="000.000.000-00"
+            />
+            <Anexo
+              label="Foto do CPF (frente e verso)"
+              fieldKey="cpf_foto_url"
+              url={urls.cpf_foto_url}
+              onUpload={(u) => setUrls((s) => ({ ...s, cpf_foto_url: u }))}
+              checked={naoTem.cpf_foto}
+              onChange={(c) => setNaoTem((s) => ({ ...s, cpf_foto: c }))}
+            />
+          </Item>
+
+          <Item n={9} label="RG / CIN:" error={e.rg_cin?.message}>
+            <Input {...form.register("rg_cin")} />
+            <Anexo
+              label="Foto do RG / CIN (frente e verso)"
+              fieldKey="rg_cin_foto_url"
+              url={urls.rg_cin_foto_url}
+              onUpload={(u) => setUrls((s) => ({ ...s, rg_cin_foto_url: u }))}
+              checked={naoTem.rg_foto}
+              onChange={(c) => setNaoTem((s) => ({ ...s, rg_foto: c }))}
+            />
+          </Item>
+
+          <Item n={10} label="Título de Eleitor:">
+            <Input {...form.register("titulo_eleitor")} />
+            <Anexo
+              label="Foto do Título de Eleitor"
+              fieldKey="titulo_eleitor_foto_url"
+              url={urls.titulo_eleitor_foto_url}
+              onUpload={(u) => setUrls((s) => ({ ...s, titulo_eleitor_foto_url: u }))}
+              checked={naoTem.titulo_foto}
+              onChange={(c) => setNaoTem((s) => ({ ...s, titulo_foto: c }))}
+            />
+          </Item>
+
+          <Item n={11} label="CTPS:">
+            <Input {...form.register("ctps")} />
+            <Anexo
+              label="Foto da CTPS"
+              fieldKey="ctps_foto_url"
+              url={urls.ctps_foto_url}
+              onUpload={(u) => setUrls((s) => ({ ...s, ctps_foto_url: u }))}
+              checked={naoTem.ctps_foto}
+              onChange={(c) => setNaoTem((s) => ({ ...s, ctps_foto: c }))}
+            />
+          </Item>
+
+          <Item n={12} label="NIS:">
+            <Input {...form.register("nis")} />
+            <Anexo
+              label="Foto do NIS"
+              fieldKey="nis_foto_url"
+              url={urls.nis_foto_url}
+              onUpload={(u) => setUrls((s) => ({ ...s, nis_foto_url: u }))}
+              checked={naoTem.nis_foto}
+              onChange={(c) => setNaoTem((s) => ({ ...s, nis_foto: c }))}
+            />
+          </Item>
+        </section>
+
+        <section
+          id="social"
+          className="scroll-mt-24 space-y-7 rounded-3xl border border-border bg-card p-6 shadow-card md:p-8"
+        >
+          <SectionTitle
+            icon={<WalletCards className="size-5" />}
+            title="Situação socioeconômica"
+            description="Renda, benefícios e acesso a serviços digitais."
+            tone="red"
+          />
+          <Item n={13} label="Qual a renda média mensal?" error={e.renda_media_mensal?.message}>
+            <Input
+              type="number"
+              step="0.01"
+              min="0"
+              {...form.register("renda_media_mensal")}
+              placeholder="R$"
+            />
+          </Item>
+
+          <SimNao
+            n={14}
+            label="Contribui com o INSS?"
+            value={v.contribui_inss}
+            onChange={(b) => form.setValue("contribui_inss", b)}
+          />
+          <SimNao
+            n={15}
+            label="Inscrito(a) no CadÚnico?"
+            value={v.inscrito_cadunico}
+            onChange={(b) => form.setValue("inscrito_cadunico", b)}
+          />
+          <SimNao
+            n={16}
+            label="Possui Bolsa Família?"
+            value={v.possui_bolsa_familia}
+            onChange={(b) => form.setValue("possui_bolsa_familia", b)}
+          />
+
+          <Item n={17} label="Conta bancária digital (App Caixa Tem):">
+            <Input {...form.register("conta_bancaria_digital")} placeholder="(opcional)" />
+          </Item>
+
+          <SimNao
+            n={18}
+            label="Cadastro no gov.br?"
+            value={v.cadastro_gov_br}
+            onChange={(b) => form.setValue("cadastro_gov_br", b)}
+          />
+
+          {v.cadastro_gov_br && (
+            <Item n={19} label="Se tem cadastro no gov.br, qual Nível:">
+              <RadioGroup
+                value={v.nivel_cadastro_gov_br ?? ""}
+                onValueChange={(val) => form.setValue("nivel_cadastro_gov_br", val)}
+                className="flex flex-wrap gap-x-6 gap-y-2"
+              >
+                {NIVEL_GOV_BR_OPTIONS.map((n) => (
+                  <label key={n} className="flex items-center gap-2 cursor-pointer text-sm">
+                    <RadioGroupItem value={n} />
+                    <span>{n}</span>
+                  </label>
+                ))}
+              </RadioGroup>
+            </Item>
+          )}
+        </section>
+
+        <section
+          id="coleta"
+          className="scroll-mt-24 space-y-7 rounded-3xl border border-border bg-card p-6 shadow-card md:p-8"
+        >
+          <SectionTitle
+            icon={<Recycle className="size-5" />}
+            title="Atuação na coleta"
+            description="Materiais, equipamentos e região de trabalho."
+            tone="blue"
+          />
           <Item n={20} label="Materiais coletados:" error={e.materiais_coletados?.message}>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {MATERIAIS_OPTIONS.map((m) => {
                 const checked = v.materiais_coletados.includes(m);
                 return (
-                  <label key={m} className="flex items-center gap-2 border border-border rounded-md px-3 py-2 cursor-pointer hover:bg-muted/50 text-sm">
+                  <label
+                    key={m}
+                    className="flex items-center gap-2 border border-border rounded-md px-3 py-2 cursor-pointer hover:bg-muted/50 text-sm"
+                  >
                     <Checkbox
                       checked={checked}
                       onCheckedChange={(c) => {
                         const set = new Set(v.materiais_coletados);
-                        if (c) set.add(m); else set.delete(m);
-                        form.setValue("materiais_coletados", Array.from(set), { shouldValidate: true });
+                        if (c) set.add(m);
+                        else set.delete(m);
+                        form.setValue("materiais_coletados", Array.from(set), {
+                          shouldValidate: true,
+                        });
                       }}
                     />
                     <span>{m}</span>
@@ -435,20 +646,36 @@ export function CatadorForm({
             </div>
           </Item>
 
-          <SimNao n={21} label="Possui carroça?" value={v.possui_carroca}
-            onChange={(b) => form.setValue("possui_carroca", b)} />
+          <SimNao
+            n={21}
+            label="Possui carroça?"
+            value={v.possui_carroca}
+            onChange={(b) => form.setValue("possui_carroca", b)}
+          />
 
           {v.possui_carroca && (
             <Item n={22} label="Tipo de carroça:">
-              <RadioGroup value={v.tipo_carroca ?? ""} onValueChange={(val) => form.setValue("tipo_carroca", val)} className="flex gap-6">
-                <label className="flex items-center gap-2 text-sm"><RadioGroupItem value="Manual" /> Manual</label>
-                <label className="flex items-center gap-2 text-sm"><RadioGroupItem value="Motorizada" /> Motorizada</label>
+              <RadioGroup
+                value={v.tipo_carroca ?? ""}
+                onValueChange={(val) => form.setValue("tipo_carroca", val)}
+                className="flex gap-6"
+              >
+                <label className="flex items-center gap-2 text-sm">
+                  <RadioGroupItem value="Manual" /> Manual
+                </label>
+                <label className="flex items-center gap-2 text-sm">
+                  <RadioGroupItem value="Motorizada" /> Motorizada
+                </label>
               </RadioGroup>
             </Item>
           )}
 
           <Item n={23} label="Área de atuação:">
-            <Textarea {...form.register("area_atuacao")} rows={2} placeholder="Bairros, regiões, pontos de coleta..." />
+            <Textarea
+              {...form.register("area_atuacao")}
+              rows={2}
+              placeholder="Bairros, regiões, pontos de coleta..."
+            />
           </Item>
         </section>
 
@@ -466,28 +693,78 @@ export function CatadorForm({
   );
 }
 
-function StepLink({ href, n, label, icon, active = false }: { href: string; n: string; label: string; icon: React.ReactNode; active?: boolean }) {
+function StepLink({
+  href,
+  n,
+  label,
+  icon,
+  active = false,
+}: {
+  href: string;
+  n: string;
+  label: string;
+  icon: React.ReactNode;
+  active?: boolean;
+}) {
   return (
-    <a href={href} className={`grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 rounded-2xl border px-3 py-3 text-sm transition-colors ${active ? "border-primary/20 bg-primary-soft text-primary" : "border-transparent text-muted-foreground hover:border-border hover:bg-muted/60 hover:text-foreground"}`}>
-      <span className={`grid size-8 shrink-0 place-items-center rounded-full ${active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>{icon}</span>
-      <span className="min-w-0"><span className="mr-2 text-[10px] font-bold opacity-60">{n}</span><span className="font-semibold">{label}</span></span>
+    <a
+      href={href}
+      className={`grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 rounded-2xl border px-3 py-3 text-sm transition-colors ${active ? "border-primary/20 bg-primary-soft text-primary" : "border-transparent text-muted-foreground hover:border-border hover:bg-muted/60 hover:text-foreground"}`}
+    >
+      <span
+        className={`grid size-8 shrink-0 place-items-center rounded-full ${active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+      >
+        {icon}
+      </span>
+      <span className="min-w-0">
+        <span className="mr-2 text-[10px] font-bold opacity-60">{n}</span>
+        <span className="font-semibold">{label}</span>
+      </span>
     </a>
   );
 }
 
-function SectionTitle({ icon, title, description, tone }: { icon: React.ReactNode; title: string; description: string; tone: "red" | "blue" | "yellow" }) {
-  const toneClass = tone === "red" ? "bg-secondary text-secondary-foreground" : tone === "yellow" ? "bg-warning text-warning-foreground" : "bg-primary text-primary-foreground";
+function SectionTitle({
+  icon,
+  title,
+  description,
+  tone,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  tone: "red" | "blue" | "yellow";
+}) {
+  const toneClass =
+    tone === "red"
+      ? "bg-secondary text-secondary-foreground"
+      : tone === "yellow"
+        ? "bg-warning text-warning-foreground"
+        : "bg-primary text-primary-foreground";
   return (
     <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 border-b border-border pb-5">
-      <span className={`grid size-10 shrink-0 place-items-center rounded-xl ${toneClass}`}>{icon}</span>
-      <div className="min-w-0"><h3 className="font-display text-lg font-bold text-foreground">{title}</h3><p className="text-xs leading-relaxed text-muted-foreground">{description}</p></div>
+      <span className={`grid size-10 shrink-0 place-items-center rounded-xl ${toneClass}`}>
+        {icon}
+      </span>
+      <div className="min-w-0">
+        <h3 className="font-display text-lg font-bold text-foreground">{title}</h3>
+        <p className="text-xs leading-relaxed text-muted-foreground">{description}</p>
+      </div>
     </div>
   );
 }
 
 function Item({
-  n, label, error, children,
-}: { n: number; label: string; error?: string; children: React.ReactNode }) {
+  n,
+  label,
+  error,
+  children,
+}: {
+  n: number;
+  label: string;
+  error?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="space-y-2">
       <label className="flex gap-2 text-sm font-semibold text-foreground leading-snug">
@@ -510,8 +787,16 @@ function Linha({ label, children }: { label: string; children: React.ReactNode }
 }
 
 function SimNao({
-  n, label, value, onChange,
-}: { n: number; label: string; value: boolean; onChange: (v: boolean) => void }) {
+  n,
+  label,
+  value,
+  onChange,
+}: {
+  n: number;
+  label: string;
+  value: boolean;
+  onChange: (v: boolean) => void;
+}) {
   return (
     <div className="space-y-2">
       <label className="flex flex-wrap items-center gap-4 text-sm font-semibold">
@@ -521,11 +806,21 @@ function SimNao({
         </span>
         <div className="flex gap-4 pl-6 sm:pl-0">
           <label className="flex items-center gap-2 cursor-pointer font-normal">
-            <input type="radio" checked={value === true} onChange={() => onChange(true)} className="accent-primary" />
+            <input
+              type="radio"
+              checked={value === true}
+              onChange={() => onChange(true)}
+              className="accent-primary"
+            />
             <span>SIM</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer font-normal">
-            <input type="radio" checked={value === false} onChange={() => onChange(false)} className="accent-primary" />
+            <input
+              type="radio"
+              checked={value === false}
+              onChange={() => onChange(false)}
+              className="accent-primary"
+            />
             <span>NÃO</span>
           </label>
         </div>
@@ -535,7 +830,12 @@ function SimNao({
 }
 
 function Anexo({
-  label, fieldKey, url, onUpload, checked, onChange,
+  label,
+  fieldKey,
+  url,
+  onUpload,
+  checked,
+  onChange,
 }: {
   label: string;
   fieldKey: DocKey;
@@ -623,7 +923,11 @@ function Anexo({
           {hasFile && (
             <span className="flex items-center gap-1 text-success">
               <Check className="size-3" /> Anexado
-              <button type="button" onClick={handleRemove} className="ml-1 text-muted-foreground hover:text-destructive">
+              <button
+                type="button"
+                onClick={handleRemove}
+                className="ml-1 text-muted-foreground hover:text-destructive"
+              >
                 <X className="size-3" />
               </button>
             </span>

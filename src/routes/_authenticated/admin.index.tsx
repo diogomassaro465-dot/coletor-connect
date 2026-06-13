@@ -7,24 +7,58 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
-  DropdownMenuSeparator, DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Users, UserCheck, UserCog, Search, Download, MoreHorizontal, Eye, Pencil, Trash2, Filter,
+  Users,
+  UserCheck,
+  UserCog,
+  Search,
+  Download,
+  MoreHorizontal,
+  Eye,
+  Pencil,
+  Trash2,
+  Filter,
 } from "lucide-react";
 import { toast } from "sonner";
-import { MATERIAIS_OPTIONS, STATUS_OPTIONS, STATUS_LABEL, GENERO_LABEL } from "@/lib/catador-constants";
+import {
+  MATERIAIS_OPTIONS,
+  STATUS_OPTIONS,
+  STATUS_LABEL,
+  GENERO_LABEL,
+} from "@/lib/catador-constants";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   head: () => ({ meta: [{ title: "Painel — RecicladoresBR" }] }),
@@ -59,7 +93,9 @@ function AdminDashboard() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("catadores")
-        .select("id,nome_completo,cpf,genero,escolaridade,renda_media_mensal,materiais_coletados,status,data_cadastro,nome_cooperativa,contribui_inss,inscrito_cadunico,possui_bolsa_familia")
+        .select(
+          "id,nome_completo,cpf,genero,escolaridade,renda_media_mensal,materiais_coletados,status,data_cadastro,nome_cooperativa,contribui_inss,inscrito_cadunico,possui_bolsa_familia",
+        )
         .order("data_cadastro", { ascending: false });
       if (error) throw error;
       return data as Catador[];
@@ -72,7 +108,8 @@ function AdminDashboard() {
     if (!catadores) return [];
     return catadores.filter((c) => {
       if (statusFilter !== "todos" && c.status !== statusFilter) return false;
-      if (materialFilter !== "todos" && !c.materiais_coletados.includes(materialFilter)) return false;
+      if (materialFilter !== "todos" && !c.materiais_coletados.includes(materialFilter))
+        return false;
       if (rendaFilter === "menor" && !(c.renda_media_mensal < RENDA_THRESHOLD)) return false;
       if (rendaFilter === "maior" && !(c.renda_media_mensal >= RENDA_THRESHOLD)) return false;
       if (search.trim()) {
@@ -142,7 +179,11 @@ function AdminDashboard() {
       { header: "Status", key: "status" },
       { header: "Data Cadastro", key: "data", numFmt: "dd/mm/yyyy hh:mm" },
     ];
-    ws.columns = columns.map((c) => ({ header: c.header, key: c.key, style: c.numFmt ? { numFmt: c.numFmt } : undefined }));
+    ws.columns = columns.map((c) => ({
+      header: c.header,
+      key: c.key,
+      style: c.numFmt ? { numFmt: c.numFmt } : undefined,
+    }));
 
     filtered.forEach((c) => {
       ws.addRow({
@@ -204,7 +245,9 @@ function AdminDashboard() {
     });
 
     const buf = await wb.xlsx.writeBuffer();
-    const blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const blob = new Blob([buf], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -225,8 +268,8 @@ function AdminDashboard() {
           <Button variant="outline" onClick={exportXLSX}>
             <Download className="size-4" /> Exportar Excel
           </Button>
-          <Link to="/admin/novo">
-            <Button>Novo cadastro</Button>
+          <Link to="/admin/associacoes">
+            <Button>Escolher entidade</Button>
           </Link>
         </div>
       </div>
@@ -252,25 +295,35 @@ function AdminDashboard() {
         <div className="flex items-center gap-2">
           <Filter className="size-4 text-muted-foreground" />
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[150px]"><SelectValue placeholder="Status" /></SelectTrigger>
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="todos">Todos status</SelectItem>
               {STATUS_OPTIONS.map((s) => (
-                <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                <SelectItem key={s.value} value={s.value}>
+                  {s.label}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
           <Select value={materialFilter} onValueChange={setMaterialFilter}>
-            <SelectTrigger className="w-[170px]"><SelectValue placeholder="Material" /></SelectTrigger>
+            <SelectTrigger className="w-[170px]">
+              <SelectValue placeholder="Material" />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="todos">Todos materiais</SelectItem>
               {MATERIAIS_OPTIONS.map((m) => (
-                <SelectItem key={m} value={m}>{m}</SelectItem>
+                <SelectItem key={m} value={m}>
+                  {m}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
           <Select value={rendaFilter} onValueChange={setRendaFilter}>
-            <SelectTrigger className="w-[180px]"><SelectValue placeholder="Renda" /></SelectTrigger>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Renda" />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="todos">Todas as rendas</SelectItem>
               <SelectItem value="menor">Menor que R$ 1.412</SelectItem>
@@ -295,14 +348,18 @@ function AdminDashboard() {
           </TableHeader>
           <TableBody>
             {isLoading && (
-              <TableRow><TableCell colSpan={6} className="text-center py-12 text-muted-foreground">Carregando...</TableCell></TableRow>
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
+                  Carregando...
+                </TableCell>
+              </TableRow>
             )}
             {!isLoading && filtered.length === 0 && (
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-16">
                   <p className="text-muted-foreground">Nenhum catador encontrado.</p>
-                  <Link to="/admin/novo" className="inline-block mt-4">
-                    <Button size="sm">Criar primeiro cadastro</Button>
+                  <Link to="/admin/associacoes" className="inline-block mt-4">
+                    <Button size="sm">Escolher entidade</Button>
                   </Link>
                 </TableCell>
               </TableRow>
@@ -310,39 +367,59 @@ function AdminDashboard() {
             {filtered.map((c) => (
               <TableRow key={c.id} className="hover:bg-muted/40">
                 <TableCell>
-                  <Link to="/admin/$id" params={{ id: c.id }} className="font-medium hover:underline">
+                  <Link
+                    to="/admin/$id"
+                    params={{ id: c.id }}
+                    className="font-medium hover:underline"
+                  >
                     {c.nome_completo}
                   </Link>
                   <div className="md:hidden text-xs text-muted-foreground mt-0.5">{c.cpf}</div>
                 </TableCell>
                 <TableCell className="hidden md:table-cell text-sm tabular-nums">{c.cpf}</TableCell>
-                <TableCell className="hidden lg:table-cell text-sm">{c.nome_cooperativa ?? "—"}</TableCell>
+                <TableCell className="hidden lg:table-cell text-sm">
+                  {c.nome_cooperativa ?? "—"}
+                </TableCell>
                 <TableCell className="hidden md:table-cell">
                   <div className="flex flex-wrap gap-1 max-w-[280px]">
                     {c.materiais_coletados.slice(0, 3).map((m) => (
-                      <Badge key={m} variant="secondary" className="text-xs">{m}</Badge>
+                      <Badge key={m} variant="secondary" className="text-xs">
+                        {m}
+                      </Badge>
                     ))}
                     {c.materiais_coletados.length > 3 && (
-                      <Badge variant="outline" className="text-xs">+{c.materiais_coletados.length - 3}</Badge>
+                      <Badge variant="outline" className="text-xs">
+                        +{c.materiais_coletados.length - 3}
+                      </Badge>
                     )}
                   </div>
                 </TableCell>
-                <TableCell><StatusBadge status={c.status} /></TableCell>
+                <TableCell>
+                  <StatusBadge status={c.status} />
+                </TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon"><MoreHorizontal className="size-4" /></Button>
+                      <Button variant="ghost" size="icon">
+                        <MoreHorizontal className="size-4" />
+                      </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Ações</DropdownMenuLabel>
                       <Link to="/admin/$id" params={{ id: c.id }}>
-                        <DropdownMenuItem><Eye className="size-4" /> Ver detalhes</DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Eye className="size-4" /> Ver detalhes
+                        </DropdownMenuItem>
                       </Link>
                       <Link to="/admin/$id/editar" params={{ id: c.id }}>
-                        <DropdownMenuItem><Pencil className="size-4" /> Editar</DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Pencil className="size-4" /> Editar
+                        </DropdownMenuItem>
                       </Link>
                       <DropdownMenuSeparator />
-                      <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Status</DropdownMenuLabel>
+                      <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                        Status
+                      </DropdownMenuLabel>
                       {STATUS_OPTIONS.map((s) => (
                         <DropdownMenuItem
                           key={s.value}
@@ -366,7 +443,8 @@ function AdminDashboard() {
                           <AlertDialogHeader>
                             <AlertDialogTitle>Excluir cadastro?</AlertDialogTitle>
                             <AlertDialogDescription>
-                              Esta ação é irreversível. O cadastro de <strong>{c.nome_completo}</strong> será removido permanentemente.
+                              Esta ação é irreversível. O cadastro de{" "}
+                              <strong>{c.nome_completo}</strong> será removido permanentemente.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
@@ -392,7 +470,17 @@ function AdminDashboard() {
   );
 }
 
-function StatCard({ icon: Icon, label, value, tone }: { icon: typeof Users; label: string; value: number; tone: "primary" | "success" | "warning" }) {
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+  tone,
+}: {
+  icon: typeof Users;
+  label: string;
+  value: number;
+  tone: "primary" | "success" | "warning";
+}) {
   const tones = {
     primary: "bg-primary-soft text-primary",
     success: "bg-success/15 text-success",
