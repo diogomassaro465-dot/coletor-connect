@@ -14,7 +14,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2, Recycle, Camera, Upload, Check, X } from "lucide-react";
+import { Loader2, Recycle, Camera, Upload, Check, X, Building2, UserRound, FileText, WalletCards } from "lucide-react";
 import {
   GENERO_OPTIONS, RACA_OPTIONS, ESCOLARIDADE_OPTIONS, MATERIAIS_OPTIONS,
   NIVEL_GOV_BR_OPTIONS, isValidCPF, maskCPF, maskPhone,
@@ -186,35 +186,47 @@ export function CatadorForm({
   const e = form.formState.errors;
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-3xl mx-auto">
-      {/* Cabeçalho estilo formulário oficial */}
-      <div className="bg-card border border-border rounded-t-2xl px-6 md:px-10 py-8 text-center">
-        <div className="inline-flex items-center gap-2 text-primary mb-3">
-          <div className="size-10 rounded-full bg-primary-soft grid place-items-center">
-            <Recycle className="size-5" />
-          </div>
-          <span className="font-bold text-sm tracking-wide">PROCATE · Projeto Catador Empreendedor</span>
+    <form onSubmit={form.handleSubmit(onSubmit)} className="mx-auto grid max-w-6xl items-start gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
+      <aside className="rounded-3xl border border-border bg-card p-5 shadow-card lg:sticky lg:top-24">
+        <div className="mb-6 flex items-center gap-3 border-b border-border pb-5">
+          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground"><Recycle className="size-5" /></span>
+          <div className="min-w-0"><p className="font-display font-bold">RecicladoresBR</p><p className="text-xs text-muted-foreground">Projeto PROCATE</p></div>
         </div>
-        <h1 className="text-xl md:text-2xl font-bold leading-snug">
-          CIDADANIA NA ECONOMIA CIRCULAR<br />
-          <span className="text-primary">SEGMENTO DA RECICLAGEM</span>
-        </h1>
-        <p className="text-sm text-muted-foreground mt-3 max-w-xl mx-auto">
-          Anamnese socioeconômica para regularização/validação documental e cadastral
-          de integrantes de grupos de Catadores(as).
-        </p>
-      </div>
+        <p className="mb-3 text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">Blocos do cadastro</p>
+        <nav className="space-y-2" aria-label="Seções do cadastro">
+          <StepLink href="#instituicao" n="01" label="Instituição" icon={<Building2 className="size-4" />} active />
+          <StepLink href="#identificacao" n="02" label="Dados pessoais" icon={<UserRound className="size-4" />} />
+          <StepLink href="#documentos" n="03" label="Documentação" icon={<FileText className="size-4" />} />
+          <StepLink href="#social" n="04" label="Situação social" icon={<WalletCards className="size-4" />} />
+          <StepLink href="#coleta" n="05" label="Atuação na coleta" icon={<Recycle className="size-4" />} />
+        </nav>
+        <div className="mt-6 rounded-2xl border border-warning/40 bg-accent p-4 text-xs leading-relaxed text-accent-foreground">
+          <strong className="block font-display">Proteção dos dados</strong>
+          As informações são usadas exclusivamente pelo projeto e protegidas conforme a LGPD.
+        </div>
+      </aside>
 
-      <div className="bg-card border-x border-b border-border rounded-b-2xl px-6 md:px-10 py-8 shadow-card space-y-7">
-        {/* Cooperativa */}
-        <Linha label="Cooperativa/Associação/Grupo:">
+      <div className="min-w-0 space-y-6">
+        <header className="relative overflow-hidden rounded-3xl bg-gradient-hero p-7 text-primary-foreground shadow-soft md:p-9">
+          <div className="absolute inset-x-0 top-0 flex h-1.5"><span className="flex-1 bg-secondary" /><span className="flex-1 bg-warning" /><span className="flex-1 bg-primary" /></div>
+          <p className="mb-3 inline-flex rounded-full border border-primary-foreground/20 bg-primary-foreground/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em]">Projeto Catador Empreendedor</p>
+          <h2 className="text-2xl font-extrabold md:text-3xl">Cidadania na Economia Circular</h2>
+          <p className="mt-1 text-sm font-medium uppercase tracking-wider text-primary-foreground/75">Segmento da reciclagem</p>
+        </header>
+
+        <section id="instituicao" className="scroll-mt-24 rounded-3xl border border-border bg-card p-6 shadow-card md:p-8">
+          <SectionTitle icon={<Building2 className="size-5" />} title="Instituição de origem" description="Vincule o cadastro à entidade correspondente." tone="red" />
+          <Linha label="Cooperativa / Associação / Grupo">
           <Select value={v.association_id} onValueChange={(value) => form.setValue("association_id", value, { shouldValidate: true })}>
             <SelectTrigger><SelectValue placeholder="Selecione na lista oficial" /></SelectTrigger>
             <SelectContent>{associations.map((item) => <SelectItem key={item.id} value={item.id}>{item.nome}</SelectItem>)}</SelectContent>
           </Select>
           {e.association_id?.message && <p className="text-xs text-destructive">{e.association_id.message}</p>}
-        </Linha>
+          </Linha>
+        </section>
 
+        <section id="identificacao" className="scroll-mt-24 space-y-7 rounded-3xl border border-border bg-card p-6 shadow-card md:p-8">
+          <SectionTitle icon={<UserRound className="size-5" />} title="Identificação e contato" description="Dados pessoais e informações para contato." tone="blue" />
         <Item n={1} label="Nome completo do(a) Catador(a):" error={e.nome_completo?.message}>
           <Input {...form.register("nome_completo")} />
         </Item>
@@ -293,6 +305,10 @@ export function CatadorForm({
           />
         </Item>
 
+        </section>
+
+        <section id="documentos" className="scroll-mt-24 space-y-7 rounded-3xl border border-border bg-card p-6 shadow-card md:p-8">
+          <SectionTitle icon={<FileText className="size-5" />} title="Documentação" description="Documentos de identificação e respectivos anexos." tone="yellow" />
         <Item n={8} label="CPF:" error={e.cpf?.message}>
           <Input
             value={v.cpf}
