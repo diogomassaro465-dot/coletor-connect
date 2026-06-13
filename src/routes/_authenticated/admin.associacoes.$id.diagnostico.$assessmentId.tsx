@@ -583,17 +583,26 @@ function AssessmentDetails() {
         </TabsContent>
         <TabsContent value="precos">
           <Collection title="Compradores e preços por quilograma">
-            {canEditFieldData && <form
-              onSubmit={(event) => addPrice.mutate(event)}
-              className="grid gap-3 md:grid-cols-[1fr_1fr_160px_auto]"
-            >
-              <Input name="material" required maxLength={80} placeholder="Material" />
-              <Input name="comprador" maxLength={150} placeholder="Comprador" />
-              <Input name="preco" required type="number" min="0" step="0.01" placeholder="R$/kg" />
-              <Button type="submit">
-                <Plus className="size-4" /> Adicionar
-              </Button>
-            </form>}
+            {canEditFieldData && (
+              <form
+                onSubmit={(event) => addPrice.mutate(event)}
+                className="grid gap-3 md:grid-cols-[1fr_1fr_160px_auto]"
+              >
+                <Input name="material" required maxLength={80} placeholder="Material" />
+                <Input name="comprador" maxLength={150} placeholder="Comprador" />
+                <Input
+                  name="preco"
+                  required
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="R$/kg"
+                />
+                <Button type="submit">
+                  <Plus className="size-4" /> Adicionar
+                </Button>
+              </form>
+            )}
             <Rows
               rows={data.prices.map((x) => [
                 x.material,
@@ -608,21 +617,23 @@ function AssessmentDetails() {
         </TabsContent>
         <TabsContent value="equipamentos">
           <Collection title="Veículos e máquinas">
-            {canEditFieldData && <form
-              onSubmit={(event) => addEquipment.mutate(event)}
-              className="grid gap-3 md:grid-cols-[1fr_180px_auto]"
-            >
-              <Input
-                name="tipo"
-                required
-                maxLength={100}
-                placeholder="Caminhão, prensa, balança..."
-              />
-              <Input name="quantidade" required type="number" min="0" defaultValue="1" />
-              <Button type="submit">
-                <Plus className="size-4" /> Adicionar
-              </Button>
-            </form>}
+            {canEditFieldData && (
+              <form
+                onSubmit={(event) => addEquipment.mutate(event)}
+                className="grid gap-3 md:grid-cols-[1fr_180px_auto]"
+              >
+                <Input
+                  name="tipo"
+                  required
+                  maxLength={100}
+                  placeholder="Caminhão, prensa, balança..."
+                />
+                <Input name="quantidade" required type="number" min="0" defaultValue="1" />
+                <Button type="submit">
+                  <Plus className="size-4" /> Adicionar
+                </Button>
+              </form>
+            )}
             <Rows rows={data.equipment.map((x) => [x.tipo, x.quantidade])} />
           </Collection>
         </TabsContent>
@@ -693,46 +704,48 @@ function AssessmentDetails() {
               Para concluir: frente, sala administrativa, reunião/entrevista, uma lista ou livro e
               assinatura do representante.
             </p>
-            {canEditFieldData && <div className="mb-5 flex flex-wrap gap-3">
-              <Select value={module} onValueChange={(v) => setModule(v as typeof module)}>
-                <SelectTrigger className="w-44">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="social">Social</SelectItem>
-                  <SelectItem value="juridico">Jurídico</SelectItem>
-                  <SelectItem value="contabil">Contábil</SelectItem>
-                </SelectContent>
-              </Select>
-              {EVIDENCE.map((category) => (
-                <div key={category} className="flex items-center rounded-md border border-border">
-                  <span className="px-3 text-xs">{category}</span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    title="Tirar foto"
-                    onClick={() => setCameraCategory(category)}
-                  >
-                    <Camera className="size-4" />
-                  </Button>
-                  <Label className="cursor-pointer p-2" title="Enviar arquivo">
-                    <Upload className="size-4" />
-                    <Input
-                      type="file"
-                      accept="image/*,application/pdf"
-                      className="hidden"
-                      disabled={uploading}
-                      onChange={(event) => {
-                        const file = event.target.files?.[0];
-                        if (file) uploadEvidence(file, category);
-                        event.target.value = "";
-                      }}
-                    />
-                  </Label>
-                </div>
-              ))}
-            </div>}
+            {canEditFieldData && (
+              <div className="mb-5 flex flex-wrap gap-3">
+                <Select value={module} onValueChange={(v) => setModule(v as typeof module)}>
+                  <SelectTrigger className="w-44">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="social">Social</SelectItem>
+                    <SelectItem value="juridico">Jurídico</SelectItem>
+                    <SelectItem value="contabil">Contábil</SelectItem>
+                  </SelectContent>
+                </Select>
+                {EVIDENCE.map((category) => (
+                  <div key={category} className="flex items-center rounded-md border border-border">
+                    <span className="px-3 text-xs">{category}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      title="Tirar foto"
+                      onClick={() => setCameraCategory(category)}
+                    >
+                      <Camera className="size-4" />
+                    </Button>
+                    <Label className="cursor-pointer p-2" title="Enviar arquivo">
+                      <Upload className="size-4" />
+                      <Input
+                        type="file"
+                        accept="image/*,application/pdf"
+                        className="hidden"
+                        disabled={uploading}
+                        onChange={(event) => {
+                          const file = event.target.files?.[0];
+                          if (file) uploadEvidence(file, category);
+                          event.target.value = "";
+                        }}
+                      />
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            )}
             {uploading && (
               <p className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
                 <Loader2 className="size-4 animate-spin" /> Enviando evidência...
