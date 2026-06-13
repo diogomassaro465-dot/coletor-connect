@@ -14,7 +14,6 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
-import { Route as AuthenticatedAdminNovoRouteImport } from './routes/_authenticated/admin.novo'
 import { Route as AuthenticatedAdminAssociacoesIndexRouteImport } from './routes/_authenticated/admin.associacoes.index'
 import { Route as AuthenticatedAdminIdIndexRouteImport } from './routes/_authenticated/admin.$id.index'
 import { Route as AuthenticatedAdminAssociacoesNovaRouteImport } from './routes/_authenticated/admin.associacoes.nova'
@@ -46,11 +45,6 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AuthenticatedAdminRoute,
-} as any)
-const AuthenticatedAdminNovoRoute = AuthenticatedAdminNovoRouteImport.update({
-  id: '/novo',
-  path: '/novo',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
 const AuthenticatedAdminAssociacoesIndexRoute =
@@ -106,7 +100,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
-  '/admin/novo': typeof AuthenticatedAdminNovoRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/$id/editar': typeof AuthenticatedAdminIdEditarRoute
   '/admin/associacoes/nova': typeof AuthenticatedAdminAssociacoesNovaRoute
@@ -120,7 +113,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/admin/novo': typeof AuthenticatedAdminNovoRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/$id/editar': typeof AuthenticatedAdminIdEditarRoute
   '/admin/associacoes/nova': typeof AuthenticatedAdminAssociacoesNovaRoute
@@ -137,7 +129,6 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
-  '/_authenticated/admin/novo': typeof AuthenticatedAdminNovoRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/$id/editar': typeof AuthenticatedAdminIdEditarRoute
   '/_authenticated/admin/associacoes/nova': typeof AuthenticatedAdminAssociacoesNovaRoute
@@ -154,7 +145,6 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/admin'
-    | '/admin/novo'
     | '/admin/'
     | '/admin/$id/editar'
     | '/admin/associacoes/nova'
@@ -168,7 +158,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
-    | '/admin/novo'
     | '/admin'
     | '/admin/$id/editar'
     | '/admin/associacoes/nova'
@@ -184,7 +173,6 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/admin'
-    | '/_authenticated/admin/novo'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/$id/editar'
     | '/_authenticated/admin/associacoes/nova'
@@ -237,13 +225,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/novo': {
-      id: '/_authenticated/admin/novo'
-      path: '/novo'
-      fullPath: '/admin/novo'
-      preLoaderRoute: typeof AuthenticatedAdminNovoRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/associacoes/': {
@@ -306,7 +287,6 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
-  AuthenticatedAdminNovoRoute: typeof AuthenticatedAdminNovoRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminIdEditarRoute: typeof AuthenticatedAdminIdEditarRoute
   AuthenticatedAdminAssociacoesNovaRoute: typeof AuthenticatedAdminAssociacoesNovaRoute
@@ -319,7 +299,6 @@ interface AuthenticatedAdminRouteChildren {
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
-  AuthenticatedAdminNovoRoute: AuthenticatedAdminNovoRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedAdminIdEditarRoute: AuthenticatedAdminIdEditarRoute,
   AuthenticatedAdminAssociacoesNovaRoute:
