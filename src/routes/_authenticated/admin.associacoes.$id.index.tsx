@@ -41,7 +41,7 @@ function AssociationDetails() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("association_assessments")
-        .select("id,data_visita,horario_visita,consultant_name,status,created_at")
+        .select("id,data_visita,horario_visita,consultant_name,status,regularity_index,evidence_validated,created_at")
         .eq("association_id", id)
         .order("data_visita", { ascending: false });
       if (error) throw error;
@@ -179,7 +179,7 @@ function AssociationDetails() {
                     Consultor(a): {item.consultant_name}
                   </p>
                 </div>
-                <Badge
+                <div className="flex items-center gap-2"><strong className="tabular-nums">{Number(item.regularity_index).toLocaleString("pt-BR")}%</strong><Badge
                   variant="outline"
                   className={
                     item.status === "regular"
@@ -190,7 +190,7 @@ function AssociationDetails() {
                   }
                 >
                   {STATUS_LABEL[item.status]}
-                </Badge>
+                </Badge><Badge variant={item.evidence_validated ? "secondary" : "outline"}>{item.evidence_validated ? "Concluído" : "Evidências pendentes"}</Badge></div>
               </Link>
             ))
           )}
