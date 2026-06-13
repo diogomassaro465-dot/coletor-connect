@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useQuery } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate } from "@tanstack/react-router";
@@ -29,6 +30,7 @@ type DocKey =
   | "nis_foto_url";
 
 const schema = z.object({
+  association_id: z.string().uuid("Selecione uma entidade"),
   nome_cooperativa: z.string().trim().max(150).optional().or(z.literal("")),
   nome_completo: z.string().trim().min(2, "Nome obrigatório").max(150),
   genero: z.enum(["feminino", "masculino", "lgbtqia", "nao_responder"]),
@@ -81,10 +83,19 @@ export function CatadorForm({
     cpf_foto: false, rg_foto: false, titulo_foto: false,
     ctps_foto: false, nis_foto: false,
   });
+  const { data: associations = [] } = useQuery({
+    queryKey: ["associations-active"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("associations").select("id,nome").eq("ativa", true).order("nome");
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const form = useForm<CatadorFormData>({
     resolver: zodResolver(schema),
     defaultValues: {
+      association_id: "",
       nome_cooperativa: "",
       nome_completo: "",
       genero: "nao_responder",
@@ -113,13 +124,30 @@ export function CatadorForm({
     },
   });
 
+  useEffect(() => {
+    if (mode !== "create") return;
+    const draft = localStorage.getItem("procate-catador-draft");
+    if (draft) {
+      try {
+        form.reset({ ...form.getValues(), ...JSON.parse(draft) });
+        toast.info("Rascunho recuperado", { description: "Os dados salvos neste aparelho foram restaurados." });
+      } catch {
+        localStorage.removeItem("procate-catador-draft");
+      }
+    }
+    const subscription = form.watch((values) => localStorage.setItem("procate-catador-draft", JSON.stringify(values)));
+    return () => subscription.unsubscribe();
+  }, [form, mode]);
+
   async function onSubmit(values: CatadorFormData) {
     setSubmitting(true);
+    const association = associations.find((item) => item.id === values.association_id);
     const payload = {
       ...values,
+      association_id: values.association_id,
       email: naoTem.email ? null : values.email || null,
       telefone: naoTem.telefone ? null : values.telefone || null,
-      nome_cooperativa: values.nome_cooperativa || null,
+      nome_cooperativa: association?.nome ?? (values.nome_cooperativa || null),
       titulo_eleitor: values.titulo_eleitor || null,
       ctps: values.ctps || null,
       nis: values.nis || null,
@@ -149,6 +177,7 @@ export function CatadorForm({
       }
       return;
     }
+    localStorage.removeItem("procate-catador-draft");
     toast.success(mode === "edit" ? "Cadastro atualizado!" : "Catador cadastrado com sucesso!");
     navigate({ to: "/admin" });
   }
@@ -178,8 +207,12 @@ export function CatadorForm({
 
       <div className="bg-card border-x border-b border-border rounded-b-2xl px-6 md:px-10 py-8 shadow-card space-y-7">
         {/* Cooperativa */}
-        <Linha label="Nome da Cooperativa/Associação/Grupo:">
-          <Input {...form.register("nome_cooperativa")} placeholder="(opcional)" />
+        <Linha label="Cooperativa/Associação/Grupo:">
+          <Select value={v.association_id} onValueChange={(value) => form.setValue("association_id", value, { shouldValidate: true })}>
+            <SelectTrigger><SelectValue placeholder="Selecione na lista oficial" /></SelectTrigger>
+            <SelectContent>{associations.map((item) => <SelectItem key={item.id} value={item.id}>{item.nome}</SelectItem>)}</SelectContent>
+          </Select>
+          {e.association_id?.message && <p className="text-xs text-destructive">{e.association_id.message}</p>}
         </Linha>
 
         <Item n={1} label="Nome completo do(a) Catador(a):" error={e.nome_completo?.message}>

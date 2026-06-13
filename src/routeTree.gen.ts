@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminNovoRouteImport } from './routes/_authenticated/admin.novo'
 import { Route as AuthenticatedAdminAssociacoesIndexRouteImport } from './routes/_authenticated/admin.associacoes.index'
@@ -20,6 +21,7 @@ import { Route as AuthenticatedAdminAssociacoesNovaRouteImport } from './routes/
 import { Route as AuthenticatedAdminIdEditarRouteImport } from './routes/_authenticated/admin.$id.editar'
 import { Route as AuthenticatedAdminAssociacoesIdIndexRouteImport } from './routes/_authenticated/admin.associacoes.$id.index'
 import { Route as AuthenticatedAdminAssociacoesIdDiagnosticoNovoRouteImport } from './routes/_authenticated/admin.associacoes.$id.diagnostico.novo'
+import { Route as AuthenticatedAdminAssociacoesIdDiagnosticoAssessmentIdRouteImport } from './routes/_authenticated/admin.associacoes.$id.diagnostico.$assessmentId'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -35,56 +37,68 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
-  id: '/admin/',
-  path: '/admin/',
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const AuthenticatedAdminNovoRoute = AuthenticatedAdminNovoRouteImport.update({
-  id: '/admin/novo',
-  path: '/admin/novo',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  id: '/novo',
+  path: '/novo',
+  getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
 const AuthenticatedAdminAssociacoesIndexRoute =
   AuthenticatedAdminAssociacoesIndexRouteImport.update({
-    id: '/admin/associacoes/',
-    path: '/admin/associacoes/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/associacoes/',
+    path: '/associacoes/',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminIdIndexRoute =
   AuthenticatedAdminIdIndexRouteImport.update({
-    id: '/admin/$id/',
-    path: '/admin/$id/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/$id/',
+    path: '/$id/',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminAssociacoesNovaRoute =
   AuthenticatedAdminAssociacoesNovaRouteImport.update({
-    id: '/admin/associacoes/nova',
-    path: '/admin/associacoes/nova',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/associacoes/nova',
+    path: '/associacoes/nova',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminIdEditarRoute =
   AuthenticatedAdminIdEditarRouteImport.update({
-    id: '/admin/$id/editar',
-    path: '/admin/$id/editar',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/$id/editar',
+    path: '/$id/editar',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminAssociacoesIdIndexRoute =
   AuthenticatedAdminAssociacoesIdIndexRouteImport.update({
-    id: '/admin/associacoes/$id/',
-    path: '/admin/associacoes/$id/',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/associacoes/$id/',
+    path: '/associacoes/$id/',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminAssociacoesIdDiagnosticoNovoRoute =
   AuthenticatedAdminAssociacoesIdDiagnosticoNovoRouteImport.update({
-    id: '/admin/associacoes/$id/diagnostico/novo',
-    path: '/admin/associacoes/$id/diagnostico/novo',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/associacoes/$id/diagnostico/novo',
+    path: '/associacoes/$id/diagnostico/novo',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminAssociacoesIdDiagnosticoAssessmentIdRoute =
+  AuthenticatedAdminAssociacoesIdDiagnosticoAssessmentIdRouteImport.update({
+    id: '/associacoes/$id/diagnostico/$assessmentId',
+    path: '/associacoes/$id/diagnostico/$assessmentId',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/admin/novo': typeof AuthenticatedAdminNovoRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/$id/editar': typeof AuthenticatedAdminIdEditarRoute
@@ -92,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/admin/$id/': typeof AuthenticatedAdminIdIndexRoute
   '/admin/associacoes/': typeof AuthenticatedAdminAssociacoesIndexRoute
   '/admin/associacoes/$id/': typeof AuthenticatedAdminAssociacoesIdIndexRoute
+  '/admin/associacoes/$id/diagnostico/$assessmentId': typeof AuthenticatedAdminAssociacoesIdDiagnosticoAssessmentIdRoute
   '/admin/associacoes/$id/diagnostico/novo': typeof AuthenticatedAdminAssociacoesIdDiagnosticoNovoRoute
 }
 export interface FileRoutesByTo {
@@ -104,6 +119,7 @@ export interface FileRoutesByTo {
   '/admin/$id': typeof AuthenticatedAdminIdIndexRoute
   '/admin/associacoes': typeof AuthenticatedAdminAssociacoesIndexRoute
   '/admin/associacoes/$id': typeof AuthenticatedAdminAssociacoesIdIndexRoute
+  '/admin/associacoes/$id/diagnostico/$assessmentId': typeof AuthenticatedAdminAssociacoesIdDiagnosticoAssessmentIdRoute
   '/admin/associacoes/$id/diagnostico/novo': typeof AuthenticatedAdminAssociacoesIdDiagnosticoNovoRoute
 }
 export interface FileRoutesById {
@@ -111,6 +127,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/admin/novo': typeof AuthenticatedAdminNovoRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/$id/editar': typeof AuthenticatedAdminIdEditarRoute
@@ -118,6 +135,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/$id/': typeof AuthenticatedAdminIdIndexRoute
   '/_authenticated/admin/associacoes/': typeof AuthenticatedAdminAssociacoesIndexRoute
   '/_authenticated/admin/associacoes/$id/': typeof AuthenticatedAdminAssociacoesIdIndexRoute
+  '/_authenticated/admin/associacoes/$id/diagnostico/$assessmentId': typeof AuthenticatedAdminAssociacoesIdDiagnosticoAssessmentIdRoute
   '/_authenticated/admin/associacoes/$id/diagnostico/novo': typeof AuthenticatedAdminAssociacoesIdDiagnosticoNovoRoute
 }
 export interface FileRouteTypes {
@@ -125,6 +143,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/admin'
     | '/admin/novo'
     | '/admin/'
     | '/admin/$id/editar'
@@ -132,6 +151,7 @@ export interface FileRouteTypes {
     | '/admin/$id/'
     | '/admin/associacoes/'
     | '/admin/associacoes/$id/'
+    | '/admin/associacoes/$id/diagnostico/$assessmentId'
     | '/admin/associacoes/$id/diagnostico/novo'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -144,12 +164,14 @@ export interface FileRouteTypes {
     | '/admin/$id'
     | '/admin/associacoes'
     | '/admin/associacoes/$id'
+    | '/admin/associacoes/$id/diagnostico/$assessmentId'
     | '/admin/associacoes/$id/diagnostico/novo'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/admin'
     | '/_authenticated/admin/novo'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/$id/editar'
@@ -157,6 +179,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/$id/'
     | '/_authenticated/admin/associacoes/'
     | '/_authenticated/admin/associacoes/$id/'
+    | '/_authenticated/admin/associacoes/$id/diagnostico/$assessmentId'
     | '/_authenticated/admin/associacoes/$id/diagnostico/novo'
   fileRoutesById: FileRoutesById
 }
@@ -189,66 +212,80 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
-      path: '/admin'
+      path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/novo': {
       id: '/_authenticated/admin/novo'
-      path: '/admin/novo'
+      path: '/novo'
       fullPath: '/admin/novo'
       preLoaderRoute: typeof AuthenticatedAdminNovoRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/associacoes/': {
       id: '/_authenticated/admin/associacoes/'
-      path: '/admin/associacoes'
+      path: '/associacoes'
       fullPath: '/admin/associacoes/'
       preLoaderRoute: typeof AuthenticatedAdminAssociacoesIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/$id/': {
       id: '/_authenticated/admin/$id/'
-      path: '/admin/$id'
+      path: '/$id'
       fullPath: '/admin/$id/'
       preLoaderRoute: typeof AuthenticatedAdminIdIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/associacoes/nova': {
       id: '/_authenticated/admin/associacoes/nova'
-      path: '/admin/associacoes/nova'
+      path: '/associacoes/nova'
       fullPath: '/admin/associacoes/nova'
       preLoaderRoute: typeof AuthenticatedAdminAssociacoesNovaRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/$id/editar': {
       id: '/_authenticated/admin/$id/editar'
-      path: '/admin/$id/editar'
+      path: '/$id/editar'
       fullPath: '/admin/$id/editar'
       preLoaderRoute: typeof AuthenticatedAdminIdEditarRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/associacoes/$id/': {
       id: '/_authenticated/admin/associacoes/$id/'
-      path: '/admin/associacoes/$id'
+      path: '/associacoes/$id'
       fullPath: '/admin/associacoes/$id/'
       preLoaderRoute: typeof AuthenticatedAdminAssociacoesIdIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/associacoes/$id/diagnostico/novo': {
       id: '/_authenticated/admin/associacoes/$id/diagnostico/novo'
-      path: '/admin/associacoes/$id/diagnostico/novo'
+      path: '/associacoes/$id/diagnostico/novo'
       fullPath: '/admin/associacoes/$id/diagnostico/novo'
       preLoaderRoute: typeof AuthenticatedAdminAssociacoesIdDiagnosticoNovoRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/associacoes/$id/diagnostico/$assessmentId': {
+      id: '/_authenticated/admin/associacoes/$id/diagnostico/$assessmentId'
+      path: '/associacoes/$id/diagnostico/$assessmentId'
+      fullPath: '/admin/associacoes/$id/diagnostico/$assessmentId'
+      preLoaderRoute: typeof AuthenticatedAdminAssociacoesIdDiagnosticoAssessmentIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
     }
   }
 }
 
-interface AuthenticatedRouteRouteChildren {
+interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminNovoRoute: typeof AuthenticatedAdminNovoRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminIdEditarRoute: typeof AuthenticatedAdminIdEditarRoute
@@ -256,10 +293,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminIdIndexRoute: typeof AuthenticatedAdminIdIndexRoute
   AuthenticatedAdminAssociacoesIndexRoute: typeof AuthenticatedAdminAssociacoesIndexRoute
   AuthenticatedAdminAssociacoesIdIndexRoute: typeof AuthenticatedAdminAssociacoesIdIndexRoute
+  AuthenticatedAdminAssociacoesIdDiagnosticoAssessmentIdRoute: typeof AuthenticatedAdminAssociacoesIdDiagnosticoAssessmentIdRoute
   AuthenticatedAdminAssociacoesIdDiagnosticoNovoRoute: typeof AuthenticatedAdminAssociacoesIdDiagnosticoNovoRoute
 }
 
-const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminNovoRoute: AuthenticatedAdminNovoRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedAdminIdEditarRoute: AuthenticatedAdminIdEditarRoute,
@@ -270,8 +308,21 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedAdminAssociacoesIndexRoute,
   AuthenticatedAdminAssociacoesIdIndexRoute:
     AuthenticatedAdminAssociacoesIdIndexRoute,
+  AuthenticatedAdminAssociacoesIdDiagnosticoAssessmentIdRoute:
+    AuthenticatedAdminAssociacoesIdDiagnosticoAssessmentIdRoute,
   AuthenticatedAdminAssociacoesIdDiagnosticoNovoRoute:
     AuthenticatedAdminAssociacoesIdDiagnosticoNovoRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =

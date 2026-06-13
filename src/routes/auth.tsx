@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Recycle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -38,25 +37,6 @@ function AuthPage() {
     }
     toast.success("Bem-vindo!");
     navigate({ to: "/admin/novo" });
-  }
-
-  async function handleSignup(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { emailRedirectTo: `${window.location.origin}/admin/novo` },
-    });
-    setLoading(false);
-    if (error) {
-      toast.error("Falha no cadastro", { description: error.message });
-      return;
-    }
-    toast.success("Conta criada!", { description: "Você já pode entrar." });
-    // Auto sign in (email confirm is auto)
-    const { error: e2 } = await supabase.auth.signInWithPassword({ email, password });
-    if (!e2) navigate({ to: "/admin/novo" });
   }
 
   return (
@@ -93,14 +73,7 @@ function AuthPage() {
             Acesso restrito para administradores e atendentes.
           </p>
 
-          <Tabs defaultValue="login" className="mt-8">
-            <TabsList className="grid grid-cols-2 w-full">
-              <TabsTrigger value="login">Entrar</TabsTrigger>
-              <TabsTrigger value="signup">Criar conta</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="login">
-              <form onSubmit={handleLogin} className="space-y-4 mt-6">
+              <form onSubmit={handleLogin} className="mt-8 space-y-4">
                 <div>
                   <Label htmlFor="email">E-mail</Label>
                   <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
@@ -113,25 +86,7 @@ function AuthPage() {
                   {loading && <Loader2 className="size-4 animate-spin" />} Entrar
                 </Button>
               </form>
-            </TabsContent>
-
-            <TabsContent value="signup">
-              <form onSubmit={handleSignup} className="space-y-4 mt-6">
-                <div>
-                  <Label htmlFor="emailS">E-mail</Label>
-                  <Input id="emailS" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
-                </div>
-                <div>
-                  <Label htmlFor="passwordS">Senha</Label>
-                  <Input id="passwordS" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" />
-                  <p className="text-xs text-muted-foreground mt-1">Mínimo 6 caracteres.</p>
-                </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading && <Loader2 className="size-4 animate-spin" />} Criar conta
-                </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
+          <p className="mt-5 text-center text-xs text-muted-foreground">Contas são fornecidas exclusivamente pela administração do projeto.</p>
         </div>
       </div>
     </div>
