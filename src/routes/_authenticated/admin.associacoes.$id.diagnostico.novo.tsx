@@ -393,9 +393,13 @@ function NewAssessment() {
                     choice={choice}
                     setChoice={setChoice}
                   />
+                  <div className="space-y-4 rounded-xl border border-border bg-card p-5">
+                    <label className="flex items-start gap-3 text-sm"><Checkbox name="consentimento_dados" required /><span>Autorizo o tratamento dos dados coletados para as finalidades do diagnóstico e acompanhamento institucional.</span></label>
+                    <label className="flex items-start gap-3 text-sm"><Checkbox name="declaracao_veracidade" required /><span>Declaro que as informações prestadas são verdadeiras e correspondem à realidade observada na visita.</span></label>
+                  </div>
                 </div>
               )}
-              <div className="hidden">
+              <fieldset disabled className="hidden">
               <Module title="Módulo Social / Cadastral" tone="border-destructive/40">
                 <Grid>
                   <Field label="Nome do presidente">
@@ -681,7 +685,7 @@ function NewAssessment() {
                   </div>
                 </Grid>
               </Module>
-              </div>
+              </fieldset>
             </TabsContent>
             <TabsContent value="juridico">
               <Module title="Módulo Jurídico" tone="border-blue-500/40">
