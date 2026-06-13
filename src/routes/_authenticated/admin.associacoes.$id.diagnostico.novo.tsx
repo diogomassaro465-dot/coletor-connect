@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useState, type FormEvent, type ReactNode } from "react";
 import { ArrowLeft, Calculator, Loader2, Scale, Users } from "lucide-react";
 import { toast } from "sonner";
@@ -7,7 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
@@ -28,10 +35,24 @@ function NewAssessment() {
   const [saving, setSaving] = useState(false);
   const [materials, setMaterials] = useState<string[]>([]);
   const [choices, setChoices] = useState<Record<string, string>>({});
+  const { data: association, isLoading: loadingAssociation } = useQuery({
+    queryKey: ["association-social-form", id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("associations").select("*").eq("id", id).single();
+      if (error) throw error;
+      return data;
+    },
+  });
 
-  function choice(name: string, fallback = "Não") { return choices[name] ?? fallback; }
-  function setChoice(name: string, value: string) { setChoices((current) => ({ ...current, [name]: value })); }
-  function bool(name: string) { return choice(name) === "Sim"; }
+  function choice(name: string, fallback = "Não") {
+    return choices[name] ?? fallback;
+  }
+  function setChoice(name: string, value: string) {
+    setChoices((current) => ({ ...current, [name]: value }));
+  }
+  function bool(name: string) {
+    return choice(name) === "Sim";
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -42,53 +63,1582 @@ function NewAssessment() {
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) return toast.error("Sua sessão expirou.");
     setSaving(true);
-    const { error } = await supabase.from("association_assessments").insert({
-      association_id: id,
-      consultant_id: auth.user.id,
-      consultant_name: String(values.get("consultant_name") ?? "").trim(),
-      data_visita: String(values.get("data_visita") ?? ""),
-      horario_visita: String(values.get("horario_visita") ?? ""),
-      homens: Number(values.get("homens") ?? 0), mulheres: Number(values.get("mulheres") ?? 0),
-      possui_pessoas_trans: bool("possui_pessoas_trans"), pessoas_trans_detalhes: text(values, "pessoas_trans_detalhes"),
-      autodeclaracao_racial: text(values, "autodeclaracao_racial"), faixa_etaria_predominante: choice("faixa_etaria_predominante", "Até 25 anos"),
-      escolaridade_predominante: choice("escolaridade_predominante", "Não alfabetizado"), media_moradores_casa: numberOrNull(values, "media_moradores_casa"),
-      presidente_nome: text(values, "presidente_nome"), presidente_telefone: text(values, "presidente_telefone"), vice_presidente_nome: text(values, "vice_presidente_nome"), vice_presidente_telefone: text(values, "vice_presidente_telefone"),
-      criancas_adolescentes_dependentes: bool("criancas_adolescentes_dependentes"), contribuicao_inss: choice("contribuicao_inss"), inscritos_cadunico: choice("inscritos_cadunico"),
-      uso_epis: choice("uso_epis", "Não"), cooperativa_fornece_epis: choice("cooperativa_fornece_epis", "Não"), acidentes_ultimo_ano: bool("acidentes_ultimo_ano"), acidentes_tipo: text(values, "acidentes_tipo"), problemas_saude: text(values, "problemas_saude"),
-      media_horas_trabalhadas: choice("media_horas_trabalhadas", "8h"), aumento_trabalho_festividades: bool("aumento_trabalho_festividades"),
-      necessita_documentos: bool("necessita_documentos"), documentos_necessarios: text(values, "documentos_necessarios"), recebe_beneficios: bool("recebe_beneficios"), quantidade_beneficiarios: numberOrNull(values, "quantidade_beneficiarios"),
-      reconhecimento_sociedade: choice("reconhecimento_sociedade"), relatos_preconceito: bool("relatos_preconceito"), preconceito_detalhes: text(values, "preconceito_detalhes"),
-      motivos_entrada_reciclagem: text(values, "motivos_entrada_reciclagem"), historico_trabalho_infantil: bool("historico_trabalho_infantil"), quantidade_trabalho_infantil: numberOrNull(values, "quantidade_trabalho_infantil"), interesse_capacitacao: bool("interesse_capacitacao"), capacitacoes_interesse: text(values, "capacitacoes_interesse"),
-      tipo_coleta: choice("tipo_coleta", "Mista"), materiais_coletados: materials, realiza_triagem: bool("realiza_triagem"), volumetria_toneladas_mes: numberOrNull(values, "volumetria_toneladas_mes"), renda_media_mensal: numberOrNull(values, "renda_media_mensal"), possui_parcerias: choice("possui_parcerias"), parcerias_detalhes: text(values, "parcerias_detalhes"), destino_venda: choice("destino_venda", "Indústria"), tipo_galpao: choice("tipo_galpao", "Não possui"), possui_veiculos_maquinas: bool("possui_veiculos_maquinas"), recebeu_apoio_programas: bool("recebeu_apoio_programas"), participa_movimentos: bool("participa_movimentos"), movimento_qual: text(values, "movimento_qual"),
-      diretoria_conselho: bool("diretoria_conselho"), diretoria_nomes: text(values, "diretoria_nomes"), mandato_em_dia: choice("mandato_em_dia"), conselho_fiscal: choice("conselho_fiscal"), cargos_por_eleicao: choice("cargos_por_eleicao"), data_ultima_eleicao: text(values, "data_ultima_eleicao"), ata_registrada_cartorio: choice("ata_registrada_cartorio"), realiza_assembleias: choice("realiza_assembleias"), frequencia_assembleias: text(values, "frequencia_assembleias"), possui_registro_atas: choice("possui_registro_atas"), assessoria_juridica: bool("assessoria_juridica"), apoio_instituicoes: bool("apoio_instituicoes"), apoio_instituicoes_quais: text(values, "apoio_instituicoes_quais"), processos_judiciais: bool("processos_judiciais"), processos_judiciais_quais: text(values, "processos_judiciais_quais"), todos_sao_cooperados: bool("todos_sao_cooperados"), lista_cooperados_atualizada: choice("lista_cooperados_atualizada"), lista_nao_cooperados_atualizada: choice("lista_nao_cooperados_atualizada"), regras_entrada: text(values, "regras_entrada"), regras_saida_exclusao: text(values, "regras_saida_exclusao"), fluxo_trabalho_diario: text(values, "fluxo_trabalho_diario"), divisao_tarefas: text(values, "divisao_tarefas"), coordenacao_gerencia: text(values, "coordenacao_gerencia"), controle_jornada: bool("controle_jornada"), problemas_juridicos_atuais: text(values, "problemas_juridicos_atuais"), melhorias_juridicas_necessarias: text(values, "melhorias_juridicas_necessarias"), contrato_remunerado: bool("contrato_remunerado"), contrato_tipo: choice("contrato_tipo", "Não se aplica"), contrato_detalhes: text(values, "contrato_detalhes"), participa_coleta_seletiva_municipal: bool("participa_coleta_seletiva_municipal"), apoio_poder_publico: choice("apoio_poder_publico"), pendencias_juridicas: text(values, "pendencias_juridicas"), orientacao_regularizacao_aceita: values.has("orientacao_regularizacao_aceita"), orientacao_documentos_aceita: values.has("orientacao_documentos_aceita"), classificacao_juridica: choice("classificacao_juridica", "Irregular"),
-      estatuto_registrado: choice("estatuto_registrado"), alvara_funcionamento: choice("alvara_funcionamento"), licenca_ambiental_status: choice("licenca_ambiental_status", "Nenhum"), avcb: choice("avcb"), extintores: choice("extintores"), registro_ocb: choice("registro_ocb"), empregados_registrados: Number(values.get("empregados_registrados") ?? 0), empregados_sem_registro: Number(values.get("empregados_sem_registro") ?? 0), autonomos: Number(values.get("autonomos") ?? 0), livro_ficha_trabalho: bool("livro_ficha_trabalho"), livro_ficha_trabalho_qual: text(values, "livro_ficha_trabalho_qual"), livro_inspecao_trabalho: bool("livro_inspecao_trabalho"), filiacao_sindical: bool("filiacao_sindical"), filiacao_sindical_qual: text(values, "filiacao_sindical_qual"), contrato_sst: choice("contrato_sst"), contrato_sst_responsavel: text(values, "contrato_sst_responsavel"), controle_frequencia: choice("controle_frequencia"), controle_frequencia_tipo: choice("controle_frequencia_tipo", "Não se aplica"), possui_contador: choice("possui_contador"), contador_tipo: choice("contador_tipo", "Não tem contador"), contador_nome: text(values, "contador_nome"), contador_telefone: text(values, "contador_telefone"), contador_email: text(values, "contador_email"), contabilidade_regular: choice("contabilidade_regular"), possui_conta_bancaria: choice("possui_conta_bancaria"), possui_maquineta: choice("possui_maquineta"), emite_notas_fiscais: choice("emite_notas_fiscais"), controle_estoque: choice("controle_estoque"), sistema_financeiro: choice("sistema_financeiro"), sistema_financeiro_qual: text(values, "sistema_financeiro_qual"), ano_ultimo_balanco: numberOrNull(values, "ano_ultimo_balanco"), divisao_resultados_criterio: text(values, "divisao_resultados_criterio"), divisao_resultados_procedimento: text(values, "divisao_resultados_procedimento"), pagamento_fixo_mensal: bool("pagamento_fixo_mensal"), renda_media_cooperado: numberOrNull(values, "renda_media_cooperado"), pendencias_contabeis: text(values, "pendencias_contabeis"), classificacao_contabil: choice("classificacao_contabil", "Irregular"), evidencia_frente_confirmada: values.has("evidencia_frente_confirmada"), evidencia_administrativo_confirmada: values.has("evidencia_administrativo_confirmada"), evidencia_reuniao_confirmada: values.has("evidencia_reuniao_confirmada"), evidencia_livro_trabalho_confirmada: values.has("evidencia_livro_trabalho_confirmada"), consentimento_dados: true, declaracao_veracidade: true,
-    });
+    const { data: assessment, error } = await supabase
+      .from("association_assessments")
+      .insert({
+        association_id: id,
+        consultant_id: auth.user.id,
+        consultant_name: String(values.get("consultant_name") ?? "").trim(),
+        data_visita: String(values.get("data_visita") ?? ""),
+        horario_visita: String(values.get("horario_visita") ?? ""),
+        homens: Number(values.get("homens") ?? 0),
+        mulheres: Number(values.get("mulheres") ?? 0),
+        possui_pessoas_trans: bool("possui_pessoas_trans"),
+        pessoas_trans_detalhes: text(values, "pessoas_trans_detalhes"),
+        autodeclaracao_racial: text(values, "autodeclaracao_racial"),
+        faixa_etaria_predominante: choice("faixa_etaria_predominante", "Até 25 anos"),
+        escolaridade_predominante: choice("escolaridade_predominante", "Não alfabetizado"),
+        media_moradores_casa: numberOrNull(values, "media_moradores_casa"),
+        presidente_nome: text(values, "presidente_nome"),
+        presidente_telefone: text(values, "presidente_telefone"),
+        presidente_email: text(values, "presidente_email"),
+        vice_presidente_nome: text(values, "vice_presidente_nome"),
+        vice_presidente_telefone: text(values, "vice_presidente_telefone"),
+        vice_presidente_email: text(values, "vice_presidente_email"),
+        criancas_adolescentes_dependentes: bool("criancas_adolescentes_dependentes"),
+        contribuicao_inss: choice("contribuicao_inss"),
+        inscritos_cadunico: choice("inscritos_cadunico"),
+        uso_epis: choice("uso_epis", "Não"),
+        cooperativa_fornece_epis: choice("cooperativa_fornece_epis", "Não"),
+        acidentes_ultimo_ano: bool("acidentes_ultimo_ano"),
+        acidentes_tipo: text(values, "acidentes_tipo"),
+        problemas_saude: text(values, "problemas_saude"),
+        media_horas_trabalhadas: choice("media_horas_trabalhadas", "8h"),
+        aumento_trabalho_festividades: bool("aumento_trabalho_festividades"),
+        necessita_documentos: bool("necessita_documentos"),
+        documentos_necessarios: text(values, "documentos_necessarios"),
+        recebe_beneficios: bool("recebe_beneficios"),
+        quantidade_beneficiarios: numberOrNull(values, "quantidade_beneficiarios"),
+        reconhecimento_sociedade: choice("reconhecimento_sociedade"),
+        relatos_preconceito: bool("relatos_preconceito"),
+        preconceito_detalhes: text(values, "preconceito_detalhes"),
+        motivos_entrada_reciclagem: text(values, "motivos_entrada_reciclagem"),
+        historico_trabalho_infantil: bool("historico_trabalho_infantil"),
+        quantidade_trabalho_infantil: numberOrNull(values, "quantidade_trabalho_infantil"),
+        interesse_capacitacao: bool("interesse_capacitacao"),
+        capacitacoes_interesse: text(values, "capacitacoes_interesse"),
+        tipo_coleta: choice("tipo_coleta", "Mista"),
+        materiais_coletados: materials,
+        realiza_triagem: bool("realiza_triagem"),
+        volumetria_toneladas_mes: numberOrNull(values, "volumetria_toneladas_mes"),
+        renda_media_mensal: numberOrNull(values, "renda_media_mensal"),
+        possui_parcerias: choice("possui_parcerias"),
+        parcerias_detalhes: text(values, "parcerias_detalhes"),
+        destino_venda: choice("destino_venda", "Indústria"),
+        tipo_galpao: choice("tipo_galpao", "Não possui"),
+        possui_veiculos_maquinas: bool("possui_veiculos_maquinas"),
+        equipamentos_outros: text(values, "equipamentos_outros"),
+        recebeu_apoio_programas: bool("recebeu_apoio_programas"),
+        participa_movimentos: bool("participa_movimentos"),
+        movimento_qual: text(values, "movimento_qual"),
+        diretoria_conselho: bool("diretoria_conselho"),
+        diretoria_nomes: text(values, "diretoria_nomes"),
+        mandato_em_dia: choice("mandato_em_dia"),
+        conselho_fiscal: choice("conselho_fiscal"),
+        cargos_por_eleicao: choice("cargos_por_eleicao"),
+        data_ultima_eleicao: text(values, "data_ultima_eleicao"),
+        ata_registrada_cartorio: choice("ata_registrada_cartorio"),
+        realiza_assembleias: choice("realiza_assembleias"),
+        frequencia_assembleias: text(values, "frequencia_assembleias"),
+        possui_registro_atas: choice("possui_registro_atas"),
+        assessoria_juridica: bool("assessoria_juridica"),
+        apoio_instituicoes: bool("apoio_instituicoes"),
+        apoio_instituicoes_quais: text(values, "apoio_instituicoes_quais"),
+        processos_judiciais: bool("processos_judiciais"),
+        processos_judiciais_quais: text(values, "processos_judiciais_quais"),
+        todos_sao_cooperados: bool("todos_sao_cooperados"),
+        lista_cooperados_atualizada: choice("lista_cooperados_atualizada"),
+        lista_nao_cooperados_atualizada: choice("lista_nao_cooperados_atualizada"),
+        regras_entrada: text(values, "regras_entrada"),
+        regras_saida_exclusao: text(values, "regras_saida_exclusao"),
+        fluxo_trabalho_diario: text(values, "fluxo_trabalho_diario"),
+        divisao_tarefas: text(values, "divisao_tarefas"),
+        coordenacao_gerencia: text(values, "coordenacao_gerencia"),
+        controle_jornada: bool("controle_jornada"),
+        problemas_juridicos_atuais: text(values, "problemas_juridicos_atuais"),
+        melhorias_juridicas_necessarias: text(values, "melhorias_juridicas_necessarias"),
+        contrato_remunerado: bool("contrato_remunerado"),
+        contrato_tipo: choice("contrato_tipo", "Não se aplica"),
+        contrato_detalhes: text(values, "contrato_detalhes"),
+        participa_coleta_seletiva_municipal: bool("participa_coleta_seletiva_municipal"),
+        apoio_poder_publico: choice("apoio_poder_publico"),
+        pendencias_juridicas: text(values, "pendencias_juridicas"),
+        orientacao_regularizacao_aceita: values.has("orientacao_regularizacao_aceita"),
+        orientacao_documentos_aceita: values.has("orientacao_documentos_aceita"),
+        classificacao_juridica: choice("classificacao_juridica", "Irregular"),
+        estatuto_registrado: choice("estatuto_registrado"),
+        alvara_funcionamento: choice("alvara_funcionamento"),
+        licenca_ambiental_status: choice("licenca_ambiental_status", "Nenhum"),
+        avcb: choice("avcb"),
+        extintores: choice("extintores"),
+        registro_ocb: choice("registro_ocb"),
+        empregados_registrados: Number(values.get("empregados_registrados") ?? 0),
+        empregados_sem_registro: Number(values.get("empregados_sem_registro") ?? 0),
+        autonomos: Number(values.get("autonomos") ?? 0),
+        livro_ficha_trabalho: bool("livro_ficha_trabalho"),
+        livro_ficha_trabalho_qual: text(values, "livro_ficha_trabalho_qual"),
+        livro_inspecao_trabalho: bool("livro_inspecao_trabalho"),
+        filiacao_sindical: bool("filiacao_sindical"),
+        filiacao_sindical_qual: text(values, "filiacao_sindical_qual"),
+        contrato_sst: choice("contrato_sst"),
+        contrato_sst_responsavel: text(values, "contrato_sst_responsavel"),
+        controle_frequencia: choice("controle_frequencia"),
+        controle_frequencia_tipo: choice("controle_frequencia_tipo", "Não se aplica"),
+        possui_contador: choice("possui_contador"),
+        contador_tipo: choice("contador_tipo", "Não tem contador"),
+        contador_nome: text(values, "contador_nome"),
+        contador_telefone: text(values, "contador_telefone"),
+        contador_email: text(values, "contador_email"),
+        contabilidade_regular: choice("contabilidade_regular"),
+        possui_conta_bancaria: choice("possui_conta_bancaria"),
+        possui_maquineta: choice("possui_maquineta"),
+        emite_notas_fiscais: choice("emite_notas_fiscais"),
+        controle_estoque: choice("controle_estoque"),
+        sistema_financeiro: choice("sistema_financeiro"),
+        sistema_financeiro_qual: text(values, "sistema_financeiro_qual"),
+        ano_ultimo_balanco: numberOrNull(values, "ano_ultimo_balanco"),
+        divisao_resultados_criterio: text(values, "divisao_resultados_criterio"),
+        divisao_resultados_procedimento: text(values, "divisao_resultados_procedimento"),
+        pagamento_fixo_mensal: bool("pagamento_fixo_mensal"),
+        renda_media_cooperado: numberOrNull(values, "renda_media_cooperado"),
+        pendencias_contabeis: text(values, "pendencias_contabeis"),
+        classificacao_contabil: choice("classificacao_contabil", "Irregular"),
+        evidencia_frente_confirmada: values.has("evidencia_frente_confirmada"),
+        evidencia_administrativo_confirmada: values.has("evidencia_administrativo_confirmada"),
+        evidencia_reuniao_confirmada: values.has("evidencia_reuniao_confirmada"),
+        evidencia_livro_trabalho_confirmada: values.has("evidencia_livro_trabalho_confirmada"),
+        consentimento_dados: true,
+        declaracao_veracidade: true,
+      })
+      .select("id")
+      .single();
+    if (error) {
+      setSaving(false);
+      return toast.error("Erro ao salvar diagnóstico", { description: error.message });
+    }
+    if (modulo === "social" && assessment) {
+      const associationUpdate = supabase
+        .from("associations")
+        .update({
+          nome: String(values.get("association_nome") ?? "").trim(),
+          cnpj: text(values, "association_cnpj"),
+          municipio: String(values.get("association_municipio") ?? "").trim(),
+          inscricao_municipal: text(values, "association_inscricao_municipal"),
+          inscricao_estadual: text(values, "association_inscricao_estadual"),
+          endereco_sede: text(values, "association_endereco_sede") ?? "",
+          telefone: text(values, "association_telefone"),
+          email: text(values, "association_email"),
+          numero_associados_inicial: Number(values.get("association_numero_inicial") ?? 0),
+          numero_associados_atual: Number(values.get("association_numero_atual") ?? 0),
+        })
+        .eq("id", id);
+      const priceRows = SOCIAL_MATERIALS.flatMap((material) => {
+        const comprador = text(values, `comprador_${material.key}`);
+        const preco = numberOrNull(values, `preco_${material.key}`);
+        return comprador || preco !== null
+          ? [
+              {
+                assessment_id: assessment.id,
+                material: material.label,
+                comprador,
+                preco_por_kg: preco ?? undefined,
+              },
+            ]
+          : [];
+      });
+      const equipmentRows = SOCIAL_EQUIPMENT.flatMap((equipment) => {
+        const quantidade = numberOrNull(values, `equipamento_${equipment.key}`);
+        return quantidade !== null && quantidade > 0
+          ? [{ assessment_id: assessment.id, tipo: equipment.label, quantidade }]
+          : [];
+      });
+      const [associationResult, pricesResult, equipmentResult] = await Promise.all([
+        associationUpdate,
+        priceRows.length
+          ? supabase.from("material_prices").insert(priceRows)
+          : Promise.resolve({ error: null }),
+        equipmentRows.length
+          ? supabase.from("association_equipment").insert(equipmentRows)
+          : Promise.resolve({ error: null }),
+      ]);
+      if (associationResult.error || pricesResult.error || equipmentResult.error) {
+        setSaving(false);
+        return toast.error(
+          "Diagnóstico salvo, mas houve erro nos detalhes de materiais ou equipamentos.",
+        );
+      }
+    }
     setSaving(false);
-    if (error) return toast.error("Erro ao salvar diagnóstico", { description: error.message });
     toast.success("Diagnóstico salvo e classificação calculada.");
     navigate({ to: "/admin/associacoes/$id", params: { id } });
   }
 
-  return <AdminShell>
-    <Link to="/admin/associacoes/$id" params={{ id }}><Button variant="ghost" size="sm" className="mb-5"><ArrowLeft className="size-4" /> Voltar à entidade</Button></Link>
-    <div className="mx-auto max-w-5xl"><p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">3 tipos de cadastro de campo</p><h1 className="mt-1 text-3xl font-bold">Social, Jurídico e Contábil</h1><p className="mt-2 text-muted-foreground">Selecione o tipo de cadastro e preencha o formulário correspondente ao documento de campo.</p>
-    <form onSubmit={submit} className="mt-7">
-      <div className="mb-6 grid gap-4 rounded-xl border border-border bg-card p-5 shadow-card md:grid-cols-3"><Field label="Nome do consultor"><Input name="consultant_name" required /></Field><Field label="Data da visita"><Input name="data_visita" type="date" required /></Field><Field label="Horário da visita"><Input name="horario_visita" type="time" required /></Field></div>
-      <Tabs defaultValue={modulo}><TabsList className="grid h-auto w-full grid-cols-3 rounded-2xl p-1"><TabsTrigger value="social" className="min-w-0 py-3 data-[state=active]:text-destructive"><Users className="mr-2 size-4 shrink-0" /><span className="truncate">1. Social</span></TabsTrigger><TabsTrigger value="juridico" className="min-w-0 py-3 data-[state=active]:text-primary"><Scale className="mr-2 size-4 shrink-0" /><span className="truncate">2. Jurídico</span></TabsTrigger><TabsTrigger value="contabil" className="min-w-0 py-3 data-[state=active]:text-warning-foreground"><Calculator className="mr-2 size-4 shrink-0" /><span className="truncate">3. Contábil</span></TabsTrigger></TabsList>
-        <TabsContent value="social"><Module title="Módulo Social / Cadastral" tone="border-destructive/40"><Grid><Field label="Nome do presidente"><Input name="presidente_nome" maxLength={150} /></Field><Field label="Telefone do presidente"><Input name="presidente_telefone" type="tel" maxLength={30} /></Field><Field label="Nome do vice-presidente"><Input name="vice_presidente_nome" maxLength={150} /></Field><Field label="Telefone do vice-presidente"><Input name="vice_presidente_telefone" type="tel" maxLength={30} /></Field><NumberField name="homens" label="Quantidade de homens" /><NumberField name="mulheres" label="Quantidade de mulheres" /><Choice name="possui_pessoas_trans" label="Possui pessoas trans?" options={YN} value={choice("possui_pessoas_trans")} onChange={setChoice} /><Field label="Identidades e quantidade"><Input name="pessoas_trans_detalhes" maxLength={300} /></Field><Field label="Relação da autodeclaração racial" wide><Textarea name="autodeclaracao_racial" maxLength={1000} /></Field><Choice name="faixa_etaria_predominante" label="Faixa etária predominante" options={["Até 25 anos","26 a 40 anos","41 a 60 anos","Acima de 60 anos"]} value={choice("faixa_etaria_predominante", "Até 25 anos")} onChange={setChoice} /><Choice name="escolaridade_predominante" label="Escolaridade predominante" options={["Não alfabetizado","Ensino fundamental incompleto","Ensino fundamental completo","Ensino médio","Ensino superior"]} value={choice("escolaridade_predominante", "Não alfabetizado")} onChange={setChoice} /><NumberField name="media_moradores_casa" label="Média de moradores por casa" /><Choice name="criancas_adolescentes_dependentes" label="Possui crianças ou adolescentes dependentes?" options={YN} value={choice("criancas_adolescentes_dependentes")} onChange={setChoice} /><Choice name="contribuicao_inss" label="Contribuição INSS" options={YNSOME} value={choice("contribuicao_inss")} onChange={setChoice} /><Choice name="inscritos_cadunico" label="Inscritos no CadÚnico" options={YNK} value={choice("inscritos_cadunico")} onChange={setChoice} /><Choice name="uso_epis" label="Utilização de EPIs" options={["Sim todos","Parcialmente","Não"]} value={choice("uso_epis")} onChange={setChoice} /><Choice name="cooperativa_fornece_epis" label="A entidade fornece EPIs?" options={["Todos","Parcialmente","Não"]} value={choice("cooperativa_fornece_epis")} onChange={setChoice} /><Choice name="acidentes_ultimo_ano" label="Acidentes no último ano?" options={YN} value={choice("acidentes_ultimo_ano")} onChange={setChoice} /><Field label="Tipo de acidentes"><Textarea name="acidentes_tipo" maxLength={1000} /></Field><Field label="Principais problemas de saúde"><Textarea name="problemas_saude" maxLength={1000} /></Field><Choice name="media_horas_trabalhadas" label="Média de horas trabalhadas por dia" options={["Até 4h","6h","8h","Mais de 8h"]} value={choice("media_horas_trabalhadas", "8h")} onChange={setChoice} /><Choice name="aumento_trabalho_festividades" label="O trabalho aumenta em festividades?" options={YN} value={choice("aumento_trabalho_festividades")} onChange={setChoice} /><Choice name="necessita_documentos" label="Há necessidade de emitir documentos?" options={YN} value={choice("necessita_documentos")} onChange={setChoice} /><Field label="Documentos necessários"><Textarea name="documentos_necessarios" maxLength={1000} /></Field><Choice name="recebe_beneficios" label="Recebe benefícios sociais?" options={YN} value={choice("recebe_beneficios")} onChange={setChoice} /><NumberField name="quantidade_beneficiarios" label="Quantidade de beneficiários" /><Choice name="reconhecimento_sociedade" label="Há reconhecimento pela sociedade?" options={YNK} value={choice("reconhecimento_sociedade")} onChange={setChoice} /><Choice name="relatos_preconceito" label="Há relatos de preconceito ou discriminação?" options={YN} value={choice("relatos_preconceito")} onChange={setChoice} /><Field label="Detalhes dos relatos"><Textarea name="preconceito_detalhes" maxLength={1000} /></Field><Field label="Motivos de entrada na reciclagem" wide><Textarea name="motivos_entrada_reciclagem" maxLength={1500} /></Field><Choice name="historico_trabalho_infantil" label="Há histórico de trabalho infantil?" options={YN} value={choice("historico_trabalho_infantil")} onChange={setChoice} /><NumberField name="quantidade_trabalho_infantil" label="Quantidade relacionada ao trabalho infantil" /><Choice name="interesse_capacitacao" label="Há interesse em capacitações?" options={YN} value={choice("interesse_capacitacao")} onChange={setChoice} /><Field label="Capacitações de interesse"><Textarea name="capacitacoes_interesse" maxLength={1000} /></Field><Choice name="tipo_coleta" label="Tipo de coleta" options={["Ruas","Domicílios","Mista","Outro"]} value={choice("tipo_coleta", "Mista")} onChange={setChoice} /><Choice name="realiza_triagem" label="Realiza triagem dos materiais?" options={YN} value={choice("realiza_triagem")} onChange={setChoice} /><NumberField name="volumetria_toneladas_mes" label="Toneladas por mês" step="0.001" /><NumberField name="renda_media_mensal" label="Renda média mensal" step="0.01" /><Field label="Materiais coletados (selecione todos os aplicáveis)" wide><div className="grid grid-cols-2 gap-2 sm:grid-cols-3">{MATERIAIS_OPTIONS.map((m) => <label key={m} className="flex items-center gap-2 rounded-md border border-border p-2 text-sm"><Checkbox checked={materials.includes(m)} onCheckedChange={(checked) => setMaterials((current) => checked ? [...current, m] : current.filter((x) => x !== m))} />{m}</label>)}</div></Field><Choice name="possui_parcerias" label="Possui parcerias?" options={["Sim — poder público","Sim — instituições privadas","Sim — outras","Não"]} value={choice("possui_parcerias")} onChange={setChoice} /><Field label="Detalhes das parcerias"><Textarea name="parcerias_detalhes" maxLength={1000} /></Field><Choice name="destino_venda" label="Destino da venda" options={["Indústria","Intermediários/Atravessadores","Outro"]} value={choice("destino_venda", "Indústria")} onChange={setChoice} /><Choice name="tipo_galpao" label="Situação do galpão" options={["Próprio","Alugado","Cedido","Não possui","Outro"]} value={choice("tipo_galpao", "Não possui")} onChange={setChoice} /><Choice name="possui_veiculos_maquinas" label="Possui veículos ou máquinas?" options={YN} value={choice("possui_veiculos_maquinas")} onChange={setChoice} /><Choice name="recebeu_apoio_programas" label="Recebeu apoio de programas ou projetos?" options={YN} value={choice("recebeu_apoio_programas")} onChange={setChoice} /><Choice name="participa_movimentos" label="Participa de movimentos ou redes?" options={YN} value={choice("participa_movimentos")} onChange={setChoice} /><Field label="Qual movimento ou rede?"><Input name="movimento_qual" maxLength={300} /></Field><div className="space-y-4 md:col-span-2"><label className="flex items-start gap-3 rounded-lg border border-border p-4 text-sm"><Checkbox name="consentimento_dados" required /><span>Autorizo o tratamento dos dados coletados para as finalidades do diagnóstico e acompanhamento institucional.</span></label><label className="flex items-start gap-3 rounded-lg border border-border p-4 text-sm"><Checkbox name="declaracao_veracidade" required /><span>Declaro que as informações prestadas são verdadeiras e correspondem à realidade observada na visita.</span></label></div></Grid></Module></TabsContent>
-        <TabsContent value="juridico"><Module title="Módulo Jurídico" tone="border-blue-500/40"><Grid><Choice name="diretoria_conselho" label="Possui diretoria/conselho?" options={YN} value={choice("diretoria_conselho")} onChange={setChoice} /><Field label="Nomes da diretoria"><Textarea name="diretoria_nomes" maxLength={1500} /></Field><Choice name="mandato_em_dia" label="Mandato em dia?" options={YNK} value={choice("mandato_em_dia")} onChange={setChoice} /><Choice name="conselho_fiscal" label="Conselho fiscal?" options={YNK} value={choice("conselho_fiscal")} onChange={setChoice} /><Choice name="cargos_por_eleicao" label="Cargos definidos por eleição?" options={YNK} value={choice("cargos_por_eleicao")} onChange={setChoice} /><Field label="Data da última eleição"><Input name="data_ultima_eleicao" type="date" /></Field><Choice name="ata_registrada_cartorio" label="Ata registrada em cartório?" options={YNK} value={choice("ata_registrada_cartorio")} onChange={setChoice} /><Choice name="realiza_assembleias" label="Realiza assembleias?" options={YNK} value={choice("realiza_assembleias")} onChange={setChoice} /><Field label="Frequência das assembleias"><Input name="frequencia_assembleias" maxLength={200} /></Field><Choice name="possui_registro_atas" label="Possui registro em atas?" options={YNK} value={choice("possui_registro_atas")} onChange={setChoice} /><Choice name="assessoria_juridica" label="Possui assessoria jurídica?" options={YN} value={choice("assessoria_juridica")} onChange={setChoice} /><Choice name="apoio_instituicoes" label="Recebe apoio institucional?" options={YN} value={choice("apoio_instituicoes")} onChange={setChoice} /><Field label="Instituições responsáveis pelo apoio"><Textarea name="apoio_instituicoes_quais" maxLength={1000} /></Field><Choice name="processos_judiciais" label="Possui processos judiciais?" options={YN} value={choice("processos_judiciais")} onChange={setChoice} /><Field label="Detalhes dos processos" wide><Textarea name="processos_judiciais_quais" maxLength={1500} /></Field><Choice name="todos_sao_cooperados" label="Todos são cooperados?" options={YN} value={choice("todos_sao_cooperados")} onChange={setChoice} /><Choice name="lista_cooperados_atualizada" label="Lista de cooperados está atualizada?" options={YNK} value={choice("lista_cooperados_atualizada")} onChange={setChoice} /><Choice name="lista_nao_cooperados_atualizada" label="Lista de não cooperados está atualizada?" options={YNK} value={choice("lista_nao_cooperados_atualizada")} onChange={setChoice} /><Field label="Regras de entrada"><Textarea name="regras_entrada" maxLength={1500} /></Field><Field label="Regras de saída ou exclusão"><Textarea name="regras_saida_exclusao" maxLength={1500} /></Field><Field label="Fluxo de trabalho diário" wide><Textarea name="fluxo_trabalho_diario" maxLength={1500} /></Field><Field label="Como ocorre a divisão de tarefas?"><Textarea name="divisao_tarefas" maxLength={1500} /></Field><Field label="Como ocorre a coordenação ou gerência?"><Textarea name="coordenacao_gerencia" maxLength={1500} /></Field><Choice name="controle_jornada" label="Há controle de jornada?" options={YN} value={choice("controle_jornada")} onChange={setChoice} /><Field label="Problemas jurídicos atuais"><Textarea name="problemas_juridicos_atuais" maxLength={1500} /></Field><Field label="Melhorias jurídicas necessárias"><Textarea name="melhorias_juridicas_necessarias" maxLength={1500} /></Field><Choice name="contrato_remunerado" label="Possui contrato remunerado?" options={YN} value={choice("contrato_remunerado")} onChange={setChoice} /><Choice name="contrato_tipo" label="Tipo de contrato" options={["Prefeitura","Órgão público","Instituição privada","Outro","Não se aplica"]} value={choice("contrato_tipo", "Não se aplica")} onChange={setChoice} /><Field label="Detalhes do contrato" wide><Textarea name="contrato_detalhes" maxLength={1500} /></Field><Choice name="participa_coleta_seletiva_municipal" label="Participa da coleta seletiva municipal?" options={YN} value={choice("participa_coleta_seletiva_municipal")} onChange={setChoice} /><Choice name="apoio_poder_publico" label="Apoio do poder público?" options={YNK} value={choice("apoio_poder_publico")} onChange={setChoice} /><Field label="Pendências jurídicas finais" wide><Textarea name="pendencias_juridicas" maxLength={2000} /></Field><Choice name="classificacao_juridica" label="Classificação final jurídica" options={["Regular","Parcialmente regular","Irregular"]} value={choice("classificacao_juridica", "Irregular")} onChange={setChoice} /><div className="space-y-4 md:col-span-2"><label className="flex items-start gap-3 rounded-lg border border-border p-4 text-sm"><Checkbox name="orientacao_regularizacao_aceita" /><span>Confirmo que foram apresentadas as orientações para regularização jurídica.</span></label><label className="flex items-start gap-3 rounded-lg border border-border p-4 text-sm"><Checkbox name="orientacao_documentos_aceita" /><span>Confirmo que foram apresentadas as orientações sobre documentos e registros necessários.</span></label></div></Grid></Module></TabsContent>
-        <TabsContent value="contabil"><Module title="Módulo Contábil" tone="border-primary/40"><Grid><Choice name="estatuto_registrado" label="Estatuto registrado?" options={YNK} value={choice("estatuto_registrado")} onChange={setChoice} /><Choice name="alvara_funcionamento" label="Alvará de funcionamento?" options={YNK} value={choice("alvara_funcionamento")} onChange={setChoice} /><Choice name="licenca_ambiental_status" label="Licença ambiental" options={["Licença","Dispensa","Nenhum","Não sabe informar"]} value={choice("licenca_ambiental_status", "Nenhum")} onChange={setChoice} /><Choice name="avcb" label="Atestado dos Bombeiros?" options={YNK} value={choice("avcb")} onChange={setChoice} /><Choice name="extintores" label="Possui extintores?" options={YNK} value={choice("extintores")} onChange={setChoice} /><Choice name="registro_ocb" label="Registro na OCB?" options={YNK} value={choice("registro_ocb")} onChange={setChoice} /><NumberField name="empregados_registrados" label="Empregados registrados" /><NumberField name="empregados_sem_registro" label="Empregados sem registro" /><NumberField name="autonomos" label="Autônomos" /><Choice name="livro_ficha_trabalho" label="Possui ficha/livro de trabalho?" options={YN} value={choice("livro_ficha_trabalho")} onChange={setChoice} /><Field label="Qual ficha/livro de trabalho?"><Input name="livro_ficha_trabalho_qual" maxLength={300} /></Field><Choice name="livro_inspecao_trabalho" label="Possui livro de inspeção do trabalho?" options={YN} value={choice("livro_inspecao_trabalho")} onChange={setChoice} /><Choice name="filiacao_sindical" label="Possui filiação sindical?" options={YN} value={choice("filiacao_sindical")} onChange={setChoice} /><Field label="Qual sindicato?"><Input name="filiacao_sindical_qual" maxLength={300} /></Field><Choice name="contrato_sst" label="Possui serviço ou contrato de SST?" options={YNK} value={choice("contrato_sst")} onChange={setChoice} /><Field label="Responsável pelo SST"><Input name="contrato_sst_responsavel" maxLength={300} /></Field><Choice name="controle_frequencia" label="Realiza controle de frequência?" options={YNK} value={choice("controle_frequencia")} onChange={setChoice} /><Choice name="controle_frequencia_tipo" label="Tipo de controle de frequência" options={["Livro/ficha","Sistema eletrônico","Outro","Não se aplica"]} value={choice("controle_frequencia_tipo", "Não se aplica")} onChange={setChoice} /><Choice name="possui_contador" label="Possui contador?" options={YNK} value={choice("possui_contador")} onChange={setChoice} /><Choice name="contador_tipo" label="Tipo de contador" options={["Terceirizado","Voluntário","Empregado","Cooperado","Não tem contador","Outro"]} value={choice("contador_tipo", "Não tem contador")} onChange={setChoice} /><Field label="Nome do contador"><Input name="contador_nome" maxLength={150} /></Field><Field label="Telefone do contador"><Input name="contador_telefone" type="tel" maxLength={30} /></Field><Field label="E-mail do contador"><Input name="contador_email" type="email" maxLength={255} /></Field><Choice name="contabilidade_regular" label="Contabilidade regular?" options={YNK} value={choice("contabilidade_regular")} onChange={setChoice} /><Choice name="possui_conta_bancaria" label="Possui conta bancária?" options={YNK} value={choice("possui_conta_bancaria")} onChange={setChoice} /><Choice name="possui_maquineta" label="Possui maquineta?" options={YNK} value={choice("possui_maquineta")} onChange={setChoice} /><Choice name="emite_notas_fiscais" label="Emite notas fiscais?" options={YNK} value={choice("emite_notas_fiscais")} onChange={setChoice} /><Choice name="controle_estoque" label="Faz controle de estoque?" options={YNK} value={choice("controle_estoque")} onChange={setChoice} /><Choice name="sistema_financeiro" label="Possui sistema financeiro?" options={YNK} value={choice("sistema_financeiro")} onChange={setChoice} /><Field label="Qual sistema?"><Input name="sistema_financeiro_qual" maxLength={300} /></Field><NumberField name="ano_ultimo_balanco" label="Ano do último balanço" /><Field label="Como são definidos os critérios de divisão dos resultados?" wide><Textarea name="divisao_resultados_criterio" maxLength={1500} /></Field><Field label="Como a divisão dos resultados é realizada?" wide><Textarea name="divisao_resultados_procedimento" maxLength={1500} /></Field><Choice name="pagamento_fixo_mensal" label="Existe pagamento fixo mensal?" options={YN} value={choice("pagamento_fixo_mensal")} onChange={setChoice} /><NumberField name="renda_media_cooperado" label="Renda média do cooperado" step="0.01" /><Field label="Pendências contábeis finais" wide><Textarea name="pendencias_contabeis" maxLength={2000} /></Field><Choice name="classificacao_contabil" label="Classificação final contábil" options={["Regular","Parcialmente regular","Irregular"]} value={choice("classificacao_contabil", "Irregular")} onChange={setChoice} /><div className="space-y-3 md:col-span-2"><p className="text-sm font-medium">Checklist obrigatório de evidências</p><label className="flex items-center gap-3 text-sm"><Checkbox name="evidencia_frente_confirmada" required /> Foto da frente da entidade</label><label className="flex items-center gap-3 text-sm"><Checkbox name="evidencia_administrativo_confirmada" required /> Foto da área administrativa/financeira/almoxarifado</label><label className="flex items-center gap-3 text-sm"><Checkbox name="evidencia_reuniao_confirmada" required /> Foto da reunião ou entrevista</label><label className="flex items-center gap-3 text-sm"><Checkbox name="evidencia_livro_trabalho_confirmada" required /> Foto da ficha ou livro de trabalho</label></div></Grid></Module></TabsContent>
-      </Tabs>
-      <div className="sticky bottom-4 mt-6 flex justify-end rounded-xl border border-border bg-background/95 p-4 shadow-card backdrop-blur"><Button type="submit" size="lg" disabled={saving}>{saving && <Loader2 className="size-4 animate-spin" />} Salvar e calcular diagnóstico</Button></div>
-    </form></div>
-  </AdminShell>;
+  if (modulo === "social") {
+    return (
+      <AdminShell>
+        <Link to="/admin/associacoes/$id" params={{ id }}>
+          <Button variant="ghost" size="sm" className="mb-5">
+            <ArrowLeft className="size-4" /> Voltar à entidade
+          </Button>
+        </Link>
+        <div className="mx-auto max-w-5xl">
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+            Equipe Social
+          </p>
+          <h1 className="mt-1 text-3xl font-bold">Cooperativa de Catadores de Recicláveis</h1>
+          <p className="mt-2 text-muted-foreground">
+            Formulário organizado conforme o roteiro de entrevista social.
+          </p>
+          <form onSubmit={submit} className="mt-7 space-y-5">
+            <div className="grid gap-4 rounded-xl border border-border bg-card p-5 shadow-card md:grid-cols-3">
+              <Field label="Nome do consultor">
+                <Input name="consultant_name" required />
+              </Field>
+              <Field label="Data da visita">
+                <Input name="data_visita" type="date" required />
+              </Field>
+              <Field label="Horário da visita">
+                <Input name="horario_visita" type="time" required />
+              </Field>
+            </div>
+            {loadingAssociation ? (
+              <p className="text-muted-foreground">Carregando dados da entidade...</p>
+            ) : (
+              <SocialFields
+                association={association}
+                materials={materials}
+                setMaterials={setMaterials}
+                choice={choice}
+                setChoice={setChoice}
+              />
+            )}
+            <div className="space-y-4 rounded-xl border border-border bg-card p-5">
+              <label className="flex items-start gap-3 text-sm">
+                <Checkbox name="consentimento_dados" required />
+                <span>
+                  Autorizo o tratamento dos dados coletados para as finalidades do diagnóstico e
+                  acompanhamento institucional.
+                </span>
+              </label>
+              <label className="flex items-start gap-3 text-sm">
+                <Checkbox name="declaracao_veracidade" required />
+                <span>
+                  Declaro que as informações prestadas são verdadeiras e correspondem à realidade
+                  observada na visita.
+                </span>
+              </label>
+            </div>
+            <div className="sticky bottom-4 flex justify-end rounded-xl border border-border bg-background/95 p-4 shadow-card backdrop-blur">
+              <Button type="submit" size="lg" disabled={saving || loadingAssociation}>
+                {saving && <Loader2 className="size-4 animate-spin" />} Salvar diagnóstico social
+              </Button>
+            </div>
+          </form>
+        </div>
+      </AdminShell>
+    );
+  }
+
+  return (
+    <AdminShell>
+      <Link to="/admin/associacoes/$id" params={{ id }}>
+        <Button variant="ghost" size="sm" className="mb-5">
+          <ArrowLeft className="size-4" /> Voltar à entidade
+        </Button>
+      </Link>
+      <div className="mx-auto max-w-5xl">
+        <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+          3 tipos de cadastro de campo
+        </p>
+        <h1 className="mt-1 text-3xl font-bold">Social, Jurídico e Contábil</h1>
+        <p className="mt-2 text-muted-foreground">
+          Selecione o tipo de cadastro e preencha o formulário correspondente ao documento de campo.
+        </p>
+        <form onSubmit={submit} className="mt-7">
+          <div className="mb-6 grid gap-4 rounded-xl border border-border bg-card p-5 shadow-card md:grid-cols-3">
+            <Field label="Nome do consultor">
+              <Input name="consultant_name" required />
+            </Field>
+            <Field label="Data da visita">
+              <Input name="data_visita" type="date" required />
+            </Field>
+            <Field label="Horário da visita">
+              <Input name="horario_visita" type="time" required />
+            </Field>
+          </div>
+          <Tabs defaultValue={modulo}>
+            <TabsList className="grid h-auto w-full grid-cols-3 rounded-2xl p-1">
+              <TabsTrigger
+                value="social"
+                className="min-w-0 py-3 data-[state=active]:text-destructive"
+              >
+                <Users className="mr-2 size-4 shrink-0" />
+                <span className="truncate">1. Social</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="juridico"
+                className="min-w-0 py-3 data-[state=active]:text-primary"
+              >
+                <Scale className="mr-2 size-4 shrink-0" />
+                <span className="truncate">2. Jurídico</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="contabil"
+                className="min-w-0 py-3 data-[state=active]:text-warning-foreground"
+              >
+                <Calculator className="mr-2 size-4 shrink-0" />
+                <span className="truncate">3. Contábil</span>
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="social">
+              <Module title="Módulo Social / Cadastral" tone="border-destructive/40">
+                <Grid>
+                  <Field label="Nome do presidente">
+                    <Input name="presidente_nome" maxLength={150} />
+                  </Field>
+                  <Field label="Telefone do presidente">
+                    <Input name="presidente_telefone" type="tel" maxLength={30} />
+                  </Field>
+                  <Field label="Nome do vice-presidente">
+                    <Input name="vice_presidente_nome" maxLength={150} />
+                  </Field>
+                  <Field label="Telefone do vice-presidente">
+                    <Input name="vice_presidente_telefone" type="tel" maxLength={30} />
+                  </Field>
+                  <NumberField name="homens" label="Quantidade de homens" />
+                  <NumberField name="mulheres" label="Quantidade de mulheres" />
+                  <Choice
+                    name="possui_pessoas_trans"
+                    label="Possui pessoas trans?"
+                    options={YN}
+                    value={choice("possui_pessoas_trans")}
+                    onChange={setChoice}
+                  />
+                  <Field label="Identidades e quantidade">
+                    <Input name="pessoas_trans_detalhes" maxLength={300} />
+                  </Field>
+                  <Field label="Relação da autodeclaração racial" wide>
+                    <Textarea name="autodeclaracao_racial" maxLength={1000} />
+                  </Field>
+                  <Choice
+                    name="faixa_etaria_predominante"
+                    label="Faixa etária predominante"
+                    options={["Até 25 anos", "26 a 40 anos", "41 a 60 anos", "Acima de 60 anos"]}
+                    value={choice("faixa_etaria_predominante", "Até 25 anos")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="escolaridade_predominante"
+                    label="Escolaridade predominante"
+                    options={[
+                      "Não alfabetizado",
+                      "Ensino fundamental incompleto",
+                      "Ensino fundamental completo",
+                      "Ensino médio",
+                      "Ensino superior",
+                    ]}
+                    value={choice("escolaridade_predominante", "Não alfabetizado")}
+                    onChange={setChoice}
+                  />
+                  <NumberField name="media_moradores_casa" label="Média de moradores por casa" />
+                  <Choice
+                    name="criancas_adolescentes_dependentes"
+                    label="Possui crianças ou adolescentes dependentes?"
+                    options={YN}
+                    value={choice("criancas_adolescentes_dependentes")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="contribuicao_inss"
+                    label="Contribuição INSS"
+                    options={YNSOME}
+                    value={choice("contribuicao_inss")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="inscritos_cadunico"
+                    label="Inscritos no CadÚnico"
+                    options={YNK}
+                    value={choice("inscritos_cadunico")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="uso_epis"
+                    label="Utilização de EPIs"
+                    options={["Sim todos", "Parcialmente", "Não"]}
+                    value={choice("uso_epis")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="cooperativa_fornece_epis"
+                    label="A entidade fornece EPIs?"
+                    options={["Todos", "Parcialmente", "Não"]}
+                    value={choice("cooperativa_fornece_epis")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="acidentes_ultimo_ano"
+                    label="Acidentes no último ano?"
+                    options={YN}
+                    value={choice("acidentes_ultimo_ano")}
+                    onChange={setChoice}
+                  />
+                  <Field label="Tipo de acidentes">
+                    <Textarea name="acidentes_tipo" maxLength={1000} />
+                  </Field>
+                  <Field label="Principais problemas de saúde">
+                    <Textarea name="problemas_saude" maxLength={1000} />
+                  </Field>
+                  <Choice
+                    name="media_horas_trabalhadas"
+                    label="Média de horas trabalhadas por dia"
+                    options={["Até 4h", "6h", "8h", "Mais de 8h"]}
+                    value={choice("media_horas_trabalhadas", "8h")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="aumento_trabalho_festividades"
+                    label="O trabalho aumenta em festividades?"
+                    options={YN}
+                    value={choice("aumento_trabalho_festividades")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="necessita_documentos"
+                    label="Há necessidade de emitir documentos?"
+                    options={YN}
+                    value={choice("necessita_documentos")}
+                    onChange={setChoice}
+                  />
+                  <Field label="Documentos necessários">
+                    <Textarea name="documentos_necessarios" maxLength={1000} />
+                  </Field>
+                  <Choice
+                    name="recebe_beneficios"
+                    label="Recebe benefícios sociais?"
+                    options={YN}
+                    value={choice("recebe_beneficios")}
+                    onChange={setChoice}
+                  />
+                  <NumberField
+                    name="quantidade_beneficiarios"
+                    label="Quantidade de beneficiários"
+                  />
+                  <Choice
+                    name="reconhecimento_sociedade"
+                    label="Há reconhecimento pela sociedade?"
+                    options={YNK}
+                    value={choice("reconhecimento_sociedade")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="relatos_preconceito"
+                    label="Há relatos de preconceito ou discriminação?"
+                    options={YN}
+                    value={choice("relatos_preconceito")}
+                    onChange={setChoice}
+                  />
+                  <Field label="Detalhes dos relatos">
+                    <Textarea name="preconceito_detalhes" maxLength={1000} />
+                  </Field>
+                  <Field label="Motivos de entrada na reciclagem" wide>
+                    <Textarea name="motivos_entrada_reciclagem" maxLength={1500} />
+                  </Field>
+                  <Choice
+                    name="historico_trabalho_infantil"
+                    label="Há histórico de trabalho infantil?"
+                    options={YN}
+                    value={choice("historico_trabalho_infantil")}
+                    onChange={setChoice}
+                  />
+                  <NumberField
+                    name="quantidade_trabalho_infantil"
+                    label="Quantidade relacionada ao trabalho infantil"
+                  />
+                  <Choice
+                    name="interesse_capacitacao"
+                    label="Há interesse em capacitações?"
+                    options={YN}
+                    value={choice("interesse_capacitacao")}
+                    onChange={setChoice}
+                  />
+                  <Field label="Capacitações de interesse">
+                    <Textarea name="capacitacoes_interesse" maxLength={1000} />
+                  </Field>
+                  <Choice
+                    name="tipo_coleta"
+                    label="Tipo de coleta"
+                    options={["Ruas", "Domicílios", "Mista", "Outro"]}
+                    value={choice("tipo_coleta", "Mista")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="realiza_triagem"
+                    label="Realiza triagem dos materiais?"
+                    options={YN}
+                    value={choice("realiza_triagem")}
+                    onChange={setChoice}
+                  />
+                  <NumberField
+                    name="volumetria_toneladas_mes"
+                    label="Toneladas por mês"
+                    step="0.001"
+                  />
+                  <NumberField name="renda_media_mensal" label="Renda média mensal" step="0.01" />
+                  <Field label="Materiais coletados (selecione todos os aplicáveis)" wide>
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                      {MATERIAIS_OPTIONS.map((m) => (
+                        <label
+                          key={m}
+                          className="flex items-center gap-2 rounded-md border border-border p-2 text-sm"
+                        >
+                          <Checkbox
+                            checked={materials.includes(m)}
+                            onCheckedChange={(checked) =>
+                              setMaterials((current) =>
+                                checked ? [...current, m] : current.filter((x) => x !== m),
+                              )
+                            }
+                          />
+                          {m}
+                        </label>
+                      ))}
+                    </div>
+                  </Field>
+                  <Choice
+                    name="possui_parcerias"
+                    label="Possui parcerias?"
+                    options={[
+                      "Sim — poder público",
+                      "Sim — instituições privadas",
+                      "Sim — outras",
+                      "Não",
+                    ]}
+                    value={choice("possui_parcerias")}
+                    onChange={setChoice}
+                  />
+                  <Field label="Detalhes das parcerias">
+                    <Textarea name="parcerias_detalhes" maxLength={1000} />
+                  </Field>
+                  <Choice
+                    name="destino_venda"
+                    label="Destino da venda"
+                    options={["Indústria", "Intermediários/Atravessadores", "Outro"]}
+                    value={choice("destino_venda", "Indústria")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="tipo_galpao"
+                    label="Situação do galpão"
+                    options={["Próprio", "Alugado", "Cedido", "Não possui", "Outro"]}
+                    value={choice("tipo_galpao", "Não possui")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="possui_veiculos_maquinas"
+                    label="Possui veículos ou máquinas?"
+                    options={YN}
+                    value={choice("possui_veiculos_maquinas")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="recebeu_apoio_programas"
+                    label="Recebeu apoio de programas ou projetos?"
+                    options={YN}
+                    value={choice("recebeu_apoio_programas")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="participa_movimentos"
+                    label="Participa de movimentos ou redes?"
+                    options={YN}
+                    value={choice("participa_movimentos")}
+                    onChange={setChoice}
+                  />
+                  <Field label="Qual movimento ou rede?">
+                    <Input name="movimento_qual" maxLength={300} />
+                  </Field>
+                  <div className="space-y-4 md:col-span-2">
+                    <label className="flex items-start gap-3 rounded-lg border border-border p-4 text-sm">
+                      <Checkbox name="consentimento_dados" required />
+                      <span>
+                        Autorizo o tratamento dos dados coletados para as finalidades do diagnóstico
+                        e acompanhamento institucional.
+                      </span>
+                    </label>
+                    <label className="flex items-start gap-3 rounded-lg border border-border p-4 text-sm">
+                      <Checkbox name="declaracao_veracidade" required />
+                      <span>
+                        Declaro que as informações prestadas são verdadeiras e correspondem à
+                        realidade observada na visita.
+                      </span>
+                    </label>
+                  </div>
+                </Grid>
+              </Module>
+            </TabsContent>
+            <TabsContent value="juridico">
+              <Module title="Módulo Jurídico" tone="border-blue-500/40">
+                <Grid>
+                  <Choice
+                    name="diretoria_conselho"
+                    label="Possui diretoria/conselho?"
+                    options={YN}
+                    value={choice("diretoria_conselho")}
+                    onChange={setChoice}
+                  />
+                  <Field label="Nomes da diretoria">
+                    <Textarea name="diretoria_nomes" maxLength={1500} />
+                  </Field>
+                  <Choice
+                    name="mandato_em_dia"
+                    label="Mandato em dia?"
+                    options={YNK}
+                    value={choice("mandato_em_dia")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="conselho_fiscal"
+                    label="Conselho fiscal?"
+                    options={YNK}
+                    value={choice("conselho_fiscal")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="cargos_por_eleicao"
+                    label="Cargos definidos por eleição?"
+                    options={YNK}
+                    value={choice("cargos_por_eleicao")}
+                    onChange={setChoice}
+                  />
+                  <Field label="Data da última eleição">
+                    <Input name="data_ultima_eleicao" type="date" />
+                  </Field>
+                  <Choice
+                    name="ata_registrada_cartorio"
+                    label="Ata registrada em cartório?"
+                    options={YNK}
+                    value={choice("ata_registrada_cartorio")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="realiza_assembleias"
+                    label="Realiza assembleias?"
+                    options={YNK}
+                    value={choice("realiza_assembleias")}
+                    onChange={setChoice}
+                  />
+                  <Field label="Frequência das assembleias">
+                    <Input name="frequencia_assembleias" maxLength={200} />
+                  </Field>
+                  <Choice
+                    name="possui_registro_atas"
+                    label="Possui registro em atas?"
+                    options={YNK}
+                    value={choice("possui_registro_atas")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="assessoria_juridica"
+                    label="Possui assessoria jurídica?"
+                    options={YN}
+                    value={choice("assessoria_juridica")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="apoio_instituicoes"
+                    label="Recebe apoio institucional?"
+                    options={YN}
+                    value={choice("apoio_instituicoes")}
+                    onChange={setChoice}
+                  />
+                  <Field label="Instituições responsáveis pelo apoio">
+                    <Textarea name="apoio_instituicoes_quais" maxLength={1000} />
+                  </Field>
+                  <Choice
+                    name="processos_judiciais"
+                    label="Possui processos judiciais?"
+                    options={YN}
+                    value={choice("processos_judiciais")}
+                    onChange={setChoice}
+                  />
+                  <Field label="Detalhes dos processos" wide>
+                    <Textarea name="processos_judiciais_quais" maxLength={1500} />
+                  </Field>
+                  <Choice
+                    name="todos_sao_cooperados"
+                    label="Todos são cooperados?"
+                    options={YN}
+                    value={choice("todos_sao_cooperados")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="lista_cooperados_atualizada"
+                    label="Lista de cooperados está atualizada?"
+                    options={YNK}
+                    value={choice("lista_cooperados_atualizada")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="lista_nao_cooperados_atualizada"
+                    label="Lista de não cooperados está atualizada?"
+                    options={YNK}
+                    value={choice("lista_nao_cooperados_atualizada")}
+                    onChange={setChoice}
+                  />
+                  <Field label="Regras de entrada">
+                    <Textarea name="regras_entrada" maxLength={1500} />
+                  </Field>
+                  <Field label="Regras de saída ou exclusão">
+                    <Textarea name="regras_saida_exclusao" maxLength={1500} />
+                  </Field>
+                  <Field label="Fluxo de trabalho diário" wide>
+                    <Textarea name="fluxo_trabalho_diario" maxLength={1500} />
+                  </Field>
+                  <Field label="Como ocorre a divisão de tarefas?">
+                    <Textarea name="divisao_tarefas" maxLength={1500} />
+                  </Field>
+                  <Field label="Como ocorre a coordenação ou gerência?">
+                    <Textarea name="coordenacao_gerencia" maxLength={1500} />
+                  </Field>
+                  <Choice
+                    name="controle_jornada"
+                    label="Há controle de jornada?"
+                    options={YN}
+                    value={choice("controle_jornada")}
+                    onChange={setChoice}
+                  />
+                  <Field label="Problemas jurídicos atuais">
+                    <Textarea name="problemas_juridicos_atuais" maxLength={1500} />
+                  </Field>
+                  <Field label="Melhorias jurídicas necessárias">
+                    <Textarea name="melhorias_juridicas_necessarias" maxLength={1500} />
+                  </Field>
+                  <Choice
+                    name="contrato_remunerado"
+                    label="Possui contrato remunerado?"
+                    options={YN}
+                    value={choice("contrato_remunerado")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="contrato_tipo"
+                    label="Tipo de contrato"
+                    options={[
+                      "Prefeitura",
+                      "Órgão público",
+                      "Instituição privada",
+                      "Outro",
+                      "Não se aplica",
+                    ]}
+                    value={choice("contrato_tipo", "Não se aplica")}
+                    onChange={setChoice}
+                  />
+                  <Field label="Detalhes do contrato" wide>
+                    <Textarea name="contrato_detalhes" maxLength={1500} />
+                  </Field>
+                  <Choice
+                    name="participa_coleta_seletiva_municipal"
+                    label="Participa da coleta seletiva municipal?"
+                    options={YN}
+                    value={choice("participa_coleta_seletiva_municipal")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="apoio_poder_publico"
+                    label="Apoio do poder público?"
+                    options={YNK}
+                    value={choice("apoio_poder_publico")}
+                    onChange={setChoice}
+                  />
+                  <Field label="Pendências jurídicas finais" wide>
+                    <Textarea name="pendencias_juridicas" maxLength={2000} />
+                  </Field>
+                  <Choice
+                    name="classificacao_juridica"
+                    label="Classificação final jurídica"
+                    options={["Regular", "Parcialmente regular", "Irregular"]}
+                    value={choice("classificacao_juridica", "Irregular")}
+                    onChange={setChoice}
+                  />
+                  <div className="space-y-4 md:col-span-2">
+                    <label className="flex items-start gap-3 rounded-lg border border-border p-4 text-sm">
+                      <Checkbox name="orientacao_regularizacao_aceita" />
+                      <span>
+                        Confirmo que foram apresentadas as orientações para regularização jurídica.
+                      </span>
+                    </label>
+                    <label className="flex items-start gap-3 rounded-lg border border-border p-4 text-sm">
+                      <Checkbox name="orientacao_documentos_aceita" />
+                      <span>
+                        Confirmo que foram apresentadas as orientações sobre documentos e registros
+                        necessários.
+                      </span>
+                    </label>
+                  </div>
+                </Grid>
+              </Module>
+            </TabsContent>
+            <TabsContent value="contabil">
+              <Module title="Módulo Contábil" tone="border-primary/40">
+                <Grid>
+                  <Choice
+                    name="estatuto_registrado"
+                    label="Estatuto registrado?"
+                    options={YNK}
+                    value={choice("estatuto_registrado")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="alvara_funcionamento"
+                    label="Alvará de funcionamento?"
+                    options={YNK}
+                    value={choice("alvara_funcionamento")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="licenca_ambiental_status"
+                    label="Licença ambiental"
+                    options={["Licença", "Dispensa", "Nenhum", "Não sabe informar"]}
+                    value={choice("licenca_ambiental_status", "Nenhum")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="avcb"
+                    label="Atestado dos Bombeiros?"
+                    options={YNK}
+                    value={choice("avcb")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="extintores"
+                    label="Possui extintores?"
+                    options={YNK}
+                    value={choice("extintores")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="registro_ocb"
+                    label="Registro na OCB?"
+                    options={YNK}
+                    value={choice("registro_ocb")}
+                    onChange={setChoice}
+                  />
+                  <NumberField name="empregados_registrados" label="Empregados registrados" />
+                  <NumberField name="empregados_sem_registro" label="Empregados sem registro" />
+                  <NumberField name="autonomos" label="Autônomos" />
+                  <Choice
+                    name="livro_ficha_trabalho"
+                    label="Possui ficha/livro de trabalho?"
+                    options={YN}
+                    value={choice("livro_ficha_trabalho")}
+                    onChange={setChoice}
+                  />
+                  <Field label="Qual ficha/livro de trabalho?">
+                    <Input name="livro_ficha_trabalho_qual" maxLength={300} />
+                  </Field>
+                  <Choice
+                    name="livro_inspecao_trabalho"
+                    label="Possui livro de inspeção do trabalho?"
+                    options={YN}
+                    value={choice("livro_inspecao_trabalho")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="filiacao_sindical"
+                    label="Possui filiação sindical?"
+                    options={YN}
+                    value={choice("filiacao_sindical")}
+                    onChange={setChoice}
+                  />
+                  <Field label="Qual sindicato?">
+                    <Input name="filiacao_sindical_qual" maxLength={300} />
+                  </Field>
+                  <Choice
+                    name="contrato_sst"
+                    label="Possui serviço ou contrato de SST?"
+                    options={YNK}
+                    value={choice("contrato_sst")}
+                    onChange={setChoice}
+                  />
+                  <Field label="Responsável pelo SST">
+                    <Input name="contrato_sst_responsavel" maxLength={300} />
+                  </Field>
+                  <Choice
+                    name="controle_frequencia"
+                    label="Realiza controle de frequência?"
+                    options={YNK}
+                    value={choice("controle_frequencia")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="controle_frequencia_tipo"
+                    label="Tipo de controle de frequência"
+                    options={["Livro/ficha", "Sistema eletrônico", "Outro", "Não se aplica"]}
+                    value={choice("controle_frequencia_tipo", "Não se aplica")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="possui_contador"
+                    label="Possui contador?"
+                    options={YNK}
+                    value={choice("possui_contador")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="contador_tipo"
+                    label="Tipo de contador"
+                    options={[
+                      "Terceirizado",
+                      "Voluntário",
+                      "Empregado",
+                      "Cooperado",
+                      "Não tem contador",
+                      "Outro",
+                    ]}
+                    value={choice("contador_tipo", "Não tem contador")}
+                    onChange={setChoice}
+                  />
+                  <Field label="Nome do contador">
+                    <Input name="contador_nome" maxLength={150} />
+                  </Field>
+                  <Field label="Telefone do contador">
+                    <Input name="contador_telefone" type="tel" maxLength={30} />
+                  </Field>
+                  <Field label="E-mail do contador">
+                    <Input name="contador_email" type="email" maxLength={255} />
+                  </Field>
+                  <Choice
+                    name="contabilidade_regular"
+                    label="Contabilidade regular?"
+                    options={YNK}
+                    value={choice("contabilidade_regular")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="possui_conta_bancaria"
+                    label="Possui conta bancária?"
+                    options={YNK}
+                    value={choice("possui_conta_bancaria")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="possui_maquineta"
+                    label="Possui maquineta?"
+                    options={YNK}
+                    value={choice("possui_maquineta")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="emite_notas_fiscais"
+                    label="Emite notas fiscais?"
+                    options={YNK}
+                    value={choice("emite_notas_fiscais")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="controle_estoque"
+                    label="Faz controle de estoque?"
+                    options={YNK}
+                    value={choice("controle_estoque")}
+                    onChange={setChoice}
+                  />
+                  <Choice
+                    name="sistema_financeiro"
+                    label="Possui sistema financeiro?"
+                    options={YNK}
+                    value={choice("sistema_financeiro")}
+                    onChange={setChoice}
+                  />
+                  <Field label="Qual sistema?">
+                    <Input name="sistema_financeiro_qual" maxLength={300} />
+                  </Field>
+                  <NumberField name="ano_ultimo_balanco" label="Ano do último balanço" />
+                  <Field label="Como são definidos os critérios de divisão dos resultados?" wide>
+                    <Textarea name="divisao_resultados_criterio" maxLength={1500} />
+                  </Field>
+                  <Field label="Como a divisão dos resultados é realizada?" wide>
+                    <Textarea name="divisao_resultados_procedimento" maxLength={1500} />
+                  </Field>
+                  <Choice
+                    name="pagamento_fixo_mensal"
+                    label="Existe pagamento fixo mensal?"
+                    options={YN}
+                    value={choice("pagamento_fixo_mensal")}
+                    onChange={setChoice}
+                  />
+                  <NumberField
+                    name="renda_media_cooperado"
+                    label="Renda média do cooperado"
+                    step="0.01"
+                  />
+                  <Field label="Pendências contábeis finais" wide>
+                    <Textarea name="pendencias_contabeis" maxLength={2000} />
+                  </Field>
+                  <Choice
+                    name="classificacao_contabil"
+                    label="Classificação final contábil"
+                    options={["Regular", "Parcialmente regular", "Irregular"]}
+                    value={choice("classificacao_contabil", "Irregular")}
+                    onChange={setChoice}
+                  />
+                  <div className="space-y-3 md:col-span-2">
+                    <p className="text-sm font-medium">Checklist obrigatório de evidências</p>
+                    <label className="flex items-center gap-3 text-sm">
+                      <Checkbox name="evidencia_frente_confirmada" required /> Foto da frente da
+                      entidade
+                    </label>
+                    <label className="flex items-center gap-3 text-sm">
+                      <Checkbox name="evidencia_administrativo_confirmada" required /> Foto da área
+                      administrativa/financeira/almoxarifado
+                    </label>
+                    <label className="flex items-center gap-3 text-sm">
+                      <Checkbox name="evidencia_reuniao_confirmada" required /> Foto da reunião ou
+                      entrevista
+                    </label>
+                    <label className="flex items-center gap-3 text-sm">
+                      <Checkbox name="evidencia_livro_trabalho_confirmada" required /> Foto da ficha
+                      ou livro de trabalho
+                    </label>
+                  </div>
+                </Grid>
+              </Module>
+            </TabsContent>
+          </Tabs>
+          <div className="sticky bottom-4 mt-6 flex justify-end rounded-xl border border-border bg-background/95 p-4 shadow-card backdrop-blur">
+            <Button type="submit" size="lg" disabled={saving}>
+              {saving && <Loader2 className="size-4 animate-spin" />} Salvar e calcular diagnóstico
+            </Button>
+          </div>
+        </form>
+      </div>
+    </AdminShell>
+  );
 }
 
-const YN = ["Sim", "Não"]; const YNK = ["Sim", "Não", "Não sabe"]; const YNSOME = ["Sim", "Não", "Alguns"];
-function text(data: FormData, key: string) { const value = String(data.get(key) ?? "").trim(); return value || null; }
-function numberOrNull(data: FormData, key: string) { const value = String(data.get(key) ?? ""); return value === "" ? null : Number(value); }
-function Module({ title, tone, children }: { title: string; tone: string; children: ReactNode }) { return <section className={`mt-5 rounded-xl border bg-card p-5 shadow-card md:p-7 ${tone}`}><h2 className="mb-6 text-xl font-bold">{title}</h2>{children}</section>; }
-function Grid({ children }: { children: ReactNode }) { return <div className="grid gap-5 md:grid-cols-2">{children}</div>; }
-function Field({ label, wide, children }: { label: string; wide?: boolean; children: ReactNode }) { return <div className={wide ? "md:col-span-2" : ""}><Label className="mb-2 block">{label}</Label>{children}</div>; }
-function NumberField({ name, label, step = "1" }: { name: string; label: string; step?: string }) { return <Field label={label}><Input name={name} type="number" min="0" step={step} defaultValue="0" /></Field>; }
-function Choice({ name, label, options, value, onChange }: { name: string; label: string; options: string[]; value: string; onChange: (name: string, value: string) => void }) { return <Field label={label}><Select value={value} onValueChange={(next) => onChange(name, next)}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{options.map((option) => <SelectItem key={option} value={option}>{option}</SelectItem>)}</SelectContent></Select></Field>; }
+const YN = ["Sim", "Não"];
+const YNK = ["Sim", "Não", "Não sabe"];
+const YNSOME = ["Sim", "Não", "Alguns"];
+const SOCIAL_MATERIALS = [
+  { key: "vidro", label: "Vidro" },
+  { key: "pet", label: "Plástico PET" },
+  { key: "outros_plasticos", label: "Outros plásticos" },
+  { key: "ferro", label: "Ferro" },
+  { key: "aluminio", label: "Alumínio" },
+  { key: "papelao", label: "Papelão" },
+  { key: "papel", label: "Papel" },
+  { key: "outros", label: "Outros materiais" },
+] as const;
+const SOCIAL_EQUIPMENT = [
+  { key: "caminhao", label: "Caminhão" },
+  { key: "prensa", label: "Prensa" },
+  { key: "balanca", label: "Balança" },
+  { key: "elevador", label: "Elevador" },
+] as const;
+type SocialAssociation = {
+  nome: string;
+  cnpj: string | null;
+  municipio: string;
+  inscricao_municipal: string | null;
+  inscricao_estadual: string | null;
+  endereco_sede: string;
+  telefone: string | null;
+  email: string | null;
+  numero_associados_inicial: number;
+  numero_associados_atual: number;
+};
+type SocialFieldsProps = {
+  association?: SocialAssociation;
+  materials: string[];
+  setMaterials: React.Dispatch<React.SetStateAction<string[]>>;
+  choice: (name: string, fallback?: string) => string;
+  setChoice: (name: string, value: string) => void;
+};
+
+function SocialFields({
+  association,
+  materials,
+  setMaterials,
+  choice,
+  setChoice,
+}: SocialFieldsProps) {
+  return (
+    <>
+      <SocialSection
+        number="1"
+        title="Identificação inicial da associação/cooperativa"
+        subtitle="Preencher logo no início da entrevista"
+      >
+        <Grid>
+          <Field label="Nome completo da associação/cooperativa">
+            <Input name="association_nome" defaultValue={association?.nome} required />
+          </Field>
+          <Field label="CNPJ (se tiver)">
+            <Input name="association_cnpj" defaultValue={association?.cnpj ?? ""} />
+          </Field>
+          <Field label="Município">
+            <Input name="association_municipio" defaultValue={association?.municipio} required />
+          </Field>
+          <Field label="Inscrição Municipal (se tiver)">
+            <Input
+              name="association_inscricao_municipal"
+              defaultValue={association?.inscricao_municipal ?? ""}
+            />
+          </Field>
+          <Field label="Inscrição Estadual (se tiver)">
+            <Input
+              name="association_inscricao_estadual"
+              defaultValue={association?.inscricao_estadual ?? ""}
+            />
+          </Field>
+          <Field label="Endereço completo da sede">
+            <Input name="association_endereco_sede" defaultValue={association?.endereco_sede} />
+          </Field>
+          <Field label="Telefone">
+            <Input
+              name="association_telefone"
+              type="tel"
+              defaultValue={association?.telefone ?? ""}
+            />
+          </Field>
+          <Field label="E-mail">
+            <Input name="association_email" type="email" defaultValue={association?.email ?? ""} />
+          </Field>
+          <NumberField
+            name="association_numero_inicial"
+            label="Número inicial de associados/cooperados"
+            defaultValue={association?.numero_associados_inicial}
+          />
+          <NumberField
+            name="association_numero_atual"
+            label="Número atual de associados/cooperados"
+            defaultValue={association?.numero_associados_atual}
+          />
+          <NumberField name="homens" label="Quantos homens?" />
+          <NumberField name="mulheres" label="Quantas mulheres?" />
+          <Choice
+            name="possui_pessoas_trans"
+            label="Possui pessoas trans?"
+            options={YN}
+            value={choice("possui_pessoas_trans")}
+            onChange={setChoice}
+          />
+          <Field label="Se sim, quantas e quais suas identidades?">
+            <Textarea name="pessoas_trans_detalhes" />
+          </Field>
+          <Field label="Relação da autodeclaração racial dos associados" wide>
+            <Textarea name="autodeclaracao_racial" />
+          </Field>
+        </Grid>
+      </SocialSection>
+      <SocialSection number="2" title="Gestão e organização">
+        <Grid>
+          <Field label="Nome do Presidente atual">
+            <Input name="presidente_nome" />
+          </Field>
+          <Field label="Telefone">
+            <Input name="presidente_telefone" type="tel" />
+          </Field>
+          <Field label="E-mail">
+            <Input name="presidente_email" type="email" />
+          </Field>
+          <Field label="Nome do Vice-Presidente (se houver)">
+            <Input name="vice_presidente_nome" />
+          </Field>
+          <Field label="Telefone">
+            <Input name="vice_presidente_telefone" type="tel" />
+          </Field>
+          <Field label="E-mail">
+            <Input name="vice_presidente_email" type="email" />
+          </Field>
+        </Grid>
+      </SocialSection>
+      <SocialSection number="3" title="Perfil socioeconômico e condições de vida dos catadores">
+        <Grid>
+          <Choice
+            name="faixa_etaria_predominante"
+            label="Qual a faixa etária predominante dos catadores?"
+            options={["Até 25 anos", "26 a 40 anos", "41 a 60 anos", "Acima de 60 anos"]}
+            value={choice("faixa_etaria_predominante", "Até 25 anos")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="escolaridade_predominante"
+            label="Qual o nível de escolaridade predominante?"
+            options={[
+              "Não alfabetizado",
+              "Ensino fundamental incompleto",
+              "Ensino fundamental completo",
+              "Ensino médio",
+              "Ensino superior",
+            ]}
+            value={choice("escolaridade_predominante", "Não alfabetizado")}
+            onChange={setChoice}
+          />
+          <NumberField
+            name="media_moradores_casa"
+            label="Em média, quantas pessoas moram na casa dos catadores?"
+          />
+          <Choice
+            name="criancas_adolescentes_dependentes"
+            label="Há crianças ou adolescentes dependentes da renda?"
+            options={YN}
+            value={choice("criancas_adolescentes_dependentes")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="contribuicao_inss"
+            label="Os catadores contribuem com o INSS?"
+            options={YNSOME}
+            value={choice("contribuicao_inss")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="inscritos_cadunico"
+            label="Estão inscritos no CadÚnico?"
+            options={YNK}
+            value={choice("inscritos_cadunico")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="uso_epis"
+            label="Utilizam Equipamentos de Proteção Individual (EPIs)?"
+            options={["Sim, todos", "Parcialmente", "Não"]}
+            value={choice("uso_epis")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="cooperativa_fornece_epis"
+            label="A cooperativa fornece esses equipamentos?"
+            options={YN}
+            value={choice("cooperativa_fornece_epis")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="acidentes_ultimo_ano"
+            label="Houve acidentes de trabalho no último ano?"
+            options={YN}
+            value={choice("acidentes_ultimo_ano")}
+            onChange={setChoice}
+          />
+          <Field label="Se sim, qual o tipo de acidente?">
+            <Textarea name="acidentes_tipo" />
+          </Field>
+          <Field label="Principais problemas de saúde identificados" wide>
+            <Textarea name="problemas_saude" />
+          </Field>
+        </Grid>
+      </SocialSection>
+      <SocialSection number="4" title="Quanto ao trabalho e percepção">
+        <Grid>
+          <Choice
+            name="media_horas_trabalhadas"
+            label="Quantas horas por dia, em média, trabalham?"
+            options={["Menos de 6 horas", "6 horas", "8 horas", "Mais de 8 horas"]}
+            value={choice("media_horas_trabalhadas", "8 horas")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="aumento_trabalho_festividades"
+            label="O trabalho aumenta em períodos como Carnaval, São João e festas?"
+            options={YN}
+            value={choice("aumento_trabalho_festividades")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="necessita_documentos"
+            label="Algum associado precisa de atualização ou emissão de documentos?"
+            options={YN}
+            value={choice("necessita_documentos")}
+            onChange={setChoice}
+          />
+          <Field label="Se sim, quais?">
+            <Textarea name="documentos_necessarios" />
+          </Field>
+          <Choice
+            name="recebe_beneficios"
+            label="Algum associado possui Bolsa Família ou outro benefício?"
+            options={YN}
+            value={choice("recebe_beneficios")}
+            onChange={setChoice}
+          />
+          <NumberField name="quantidade_beneficiarios" label="Se sim, quantos?" />
+          <Choice
+            name="reconhecimento_sociedade"
+            label="Os catadores se sentem reconhecidos pela sociedade?"
+            options={["Sim", "Não", "Parcialmente"]}
+            value={choice("reconhecimento_sociedade")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="relatos_preconceito"
+            label="Relatam situações de preconceito?"
+            options={YN}
+            value={choice("relatos_preconceito")}
+            onChange={setChoice}
+          />
+          <Field label="Se sim, quais?" wide>
+            <Textarea name="preconceito_detalhes" />
+          </Field>
+        </Grid>
+      </SocialSection>
+      <SocialSection number="5" title="Trajetória e futuro">
+        <Grid>
+          <Field label="Principais motivos de entrada na reciclagem" wide>
+            <Textarea name="motivos_entrada_reciclagem" />
+          </Field>
+          <Choice
+            name="historico_trabalho_infantil"
+            label="Há histórico de trabalho infantil entre os catadores?"
+            options={YN}
+            value={choice("historico_trabalho_infantil")}
+            onChange={setChoice}
+          />
+          <NumberField name="quantidade_trabalho_infantil" label="Se sim, quantos?" />
+          <Choice
+            name="interesse_capacitacao"
+            label="Há interesse em capacitação ou cursos?"
+            options={YN}
+            value={choice("interesse_capacitacao")}
+            onChange={setChoice}
+          />
+          <Field label="Se sim, quais?">
+            <Textarea name="capacitacoes_interesse" />
+          </Field>
+        </Grid>
+      </SocialSection>
+      <SocialSection number="6" title="Coleta e venda">
+        <Grid>
+          <Choice
+            name="tipo_coleta"
+            label="A cooperativa faz coleta nas ruas ou em domicílios?"
+            options={["Sim", "Não", "Faz coleta mista"]}
+            value={choice("tipo_coleta", "Faz coleta mista")}
+            onChange={setChoice}
+          />
+          <Field label="Qual o tipo de material coletado?" wide>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {MATERIAIS_OPTIONS.map((material) => (
+                <label
+                  key={material}
+                  className="flex items-center gap-2 rounded-md border border-border p-3 text-sm"
+                >
+                  <Checkbox
+                    checked={materials.includes(material)}
+                    onCheckedChange={(checked) =>
+                      setMaterials((current) =>
+                        checked
+                          ? [...current, material]
+                          : current.filter((item) => item !== material),
+                      )
+                    }
+                  />
+                  {material}
+                </label>
+              ))}
+            </div>
+          </Field>
+          <Choice
+            name="realiza_triagem"
+            label="Há separação/triagem dos materiais?"
+            options={YN}
+            value={choice("realiza_triagem")}
+            onChange={setChoice}
+          />
+          <NumberField
+            name="volumetria_toneladas_mes"
+            label="Quantidade coletada (toneladas/mês)"
+            step="0.001"
+          />
+          <NumberField
+            name="renda_media_mensal"
+            label="Renda média mensal dos catadores(as)"
+            step="0.01"
+          />
+          <Choice
+            name="possui_parcerias"
+            label="Possui parceria com empresa ou instituição?"
+            options={["Sim", "Não", "Outro"]}
+            value={choice("possui_parcerias")}
+            onChange={setChoice}
+          />
+          <Field label="Qual parceria?">
+            <Textarea name="parcerias_detalhes" />
+          </Field>
+          <Choice
+            name="destino_venda"
+            label="Vende os materiais recicláveis para quem?"
+            options={[
+              "Diretamente para a indústria recicladora",
+              "Intermediários / atravessadores",
+              "Outro",
+            ]}
+            value={choice("destino_venda", "Diretamente para a indústria recicladora")}
+            onChange={setChoice}
+          />
+        </Grid>
+      </SocialSection>
+      <SocialSection number="7" title="Principais compradores dos materiais recicláveis">
+        <Grid>
+          {SOCIAL_MATERIALS.map((material) => (
+            <Field key={material.key} label={`Compradores de ${material.label}`}>
+              <Textarea name={`comprador_${material.key}`} />
+            </Field>
+          ))}
+        </Grid>
+      </SocialSection>
+      <SocialSection number="8" title="Preços de venda dos materiais recicláveis (valor do kg)">
+        <Grid>
+          {SOCIAL_MATERIALS.map((material) => (
+            <NumberField
+              key={material.key}
+              name={`preco_${material.key}`}
+              label={material.label}
+              step="0.01"
+            />
+          ))}
+        </Grid>
+      </SocialSection>
+      <SocialSection number="9" title="Estrutura e logística">
+        <Grid>
+          <Choice
+            name="tipo_galpao"
+            label="A associação/cooperativa possui galpão"
+            options={["Próprio", "Alugado", "Cedido pela prefeitura", "Não possui galpão"]}
+            value={choice("tipo_galpao", "Não possui galpão")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="possui_veiculos_maquinas"
+            label="Possui veículos, máquinas e equipamentos?"
+            options={YN}
+            value={choice("possui_veiculos_maquinas")}
+            onChange={setChoice}
+          />
+          {SOCIAL_EQUIPMENT.map((equipment) => (
+            <NumberField
+              key={equipment.key}
+              name={`equipamento_${equipment.key}`}
+              label={`Quantidade de ${equipment.label}`}
+            />
+          ))}
+          <Field label="Outros, quais?" wide>
+            <Textarea name="equipamentos_outros" />
+          </Field>
+        </Grid>
+      </SocialSection>
+      <SocialSection number="10" title="Programas e apoios">
+        <Grid>
+          <Choice
+            name="recebeu_apoio_programas"
+            label="Já recebeu apoio dos programas Pró-catador ou Cataforte?"
+            options={YN}
+            value={choice("recebeu_apoio_programas")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="participa_movimentos"
+            label="Participa dos movimentos nacionais, MNRC ou MESC?"
+            options={YN}
+            value={choice("participa_movimentos")}
+            onChange={setChoice}
+          />
+          <Field label="Se sim, qual?">
+            <Input name="movimento_qual" />
+          </Field>
+        </Grid>
+      </SocialSection>
+    </>
+  );
+}
+
+function SocialSection({
+  number,
+  title,
+  subtitle,
+  children,
+}: {
+  number: string;
+  title: string;
+  subtitle?: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="rounded-xl border border-destructive/30 bg-card p-5 shadow-card md:p-7">
+      <div className="mb-6 flex gap-3">
+        <span className="grid size-8 shrink-0 place-items-center rounded-full bg-destructive text-destructive-foreground font-bold">
+          {number}
+        </span>
+        <div>
+          <h2 className="text-lg font-bold uppercase tracking-tight">{title}</h2>
+          {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
+        </div>
+      </div>
+      {children}
+    </section>
+  );
+}
+function text(data: FormData, key: string) {
+  const value = String(data.get(key) ?? "").trim();
+  return value || null;
+}
+function numberOrNull(data: FormData, key: string) {
+  const value = String(data.get(key) ?? "");
+  return value === "" ? null : Number(value);
+}
+function Module({ title, tone, children }: { title: string; tone: string; children: ReactNode }) {
+  return (
+    <section className={`mt-5 rounded-xl border bg-card p-5 shadow-card md:p-7 ${tone}`}>
+      <h2 className="mb-6 text-xl font-bold">{title}</h2>
+      {children}
+    </section>
+  );
+}
+function Grid({ children }: { children: ReactNode }) {
+  return <div className="grid gap-5 md:grid-cols-2">{children}</div>;
+}
+function Field({ label, wide, children }: { label: string; wide?: boolean; children: ReactNode }) {
+  return (
+    <div className={wide ? "md:col-span-2" : ""}>
+      <Label className="mb-2 block">{label}</Label>
+      {children}
+    </div>
+  );
+}
+function NumberField({
+  name,
+  label,
+  step = "1",
+  defaultValue = 0,
+}: {
+  name: string;
+  label: string;
+  step?: string;
+  defaultValue?: number;
+}) {
+  return (
+    <Field label={label}>
+      <Input name={name} type="number" min="0" step={step} defaultValue={defaultValue} />
+    </Field>
+  );
+}
+function Choice({
+  name,
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  name: string;
+  label: string;
+  options: string[];
+  value: string;
+  onChange: (name: string, value: string) => void;
+}) {
+  return (
+    <Field label={label}>
+      <Select value={value} onValueChange={(next) => onChange(name, next)}>
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((option) => (
+            <SelectItem key={option} value={option}>
+              {option}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </Field>
+  );
+}

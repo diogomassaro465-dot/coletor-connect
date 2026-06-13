@@ -115,6 +115,7 @@ export type Database = {
           emite_notas_fiscais: string | null
           empregados_registrados: number
           empregados_sem_registro: number
+          equipamentos_outros: string | null
           escolaridade_predominante: string | null
           estatuto_registrado: string | null
           evidencia_administrativo_confirmada: boolean
@@ -167,6 +168,7 @@ export type Database = {
           possui_registro_atas: string | null
           possui_veiculos_maquinas: boolean | null
           preconceito_detalhes: string | null
+          presidente_email: string | null
           presidente_nome: string | null
           presidente_telefone: string | null
           problemas_juridicos_atuais: string | null
@@ -196,6 +198,7 @@ export type Database = {
           todos_sao_cooperados: boolean | null
           updated_at: string
           uso_epis: string | null
+          vice_presidente_email: string | null
           vice_presidente_nome: string | null
           vice_presidente_telefone: string | null
           volumetria_toneladas_mes: number | null
@@ -256,6 +259,7 @@ export type Database = {
           emite_notas_fiscais?: string | null
           empregados_registrados?: number
           empregados_sem_registro?: number
+          equipamentos_outros?: string | null
           escolaridade_predominante?: string | null
           estatuto_registrado?: string | null
           evidencia_administrativo_confirmada?: boolean
@@ -308,6 +312,7 @@ export type Database = {
           possui_registro_atas?: string | null
           possui_veiculos_maquinas?: boolean | null
           preconceito_detalhes?: string | null
+          presidente_email?: string | null
           presidente_nome?: string | null
           presidente_telefone?: string | null
           problemas_juridicos_atuais?: string | null
@@ -337,6 +342,7 @@ export type Database = {
           todos_sao_cooperados?: boolean | null
           updated_at?: string
           uso_epis?: string | null
+          vice_presidente_email?: string | null
           vice_presidente_nome?: string | null
           vice_presidente_telefone?: string | null
           volumetria_toneladas_mes?: number | null
@@ -397,6 +403,7 @@ export type Database = {
           emite_notas_fiscais?: string | null
           empregados_registrados?: number
           empregados_sem_registro?: number
+          equipamentos_outros?: string | null
           escolaridade_predominante?: string | null
           estatuto_registrado?: string | null
           evidencia_administrativo_confirmada?: boolean
@@ -449,6 +456,7 @@ export type Database = {
           possui_registro_atas?: string | null
           possui_veiculos_maquinas?: boolean | null
           preconceito_detalhes?: string | null
+          presidente_email?: string | null
           presidente_nome?: string | null
           presidente_telefone?: string | null
           problemas_juridicos_atuais?: string | null
@@ -478,6 +486,7 @@ export type Database = {
           todos_sao_cooperados?: boolean | null
           updated_at?: string
           uso_epis?: string | null
+          vice_presidente_email?: string | null
           vice_presidente_nome?: string | null
           vice_presidente_telefone?: string | null
           volumetria_toneladas_mes?: number | null
