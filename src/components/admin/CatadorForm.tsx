@@ -63,10 +63,14 @@ export function CatadorForm({
   defaultValues,
   catadorId,
   mode = "create",
+  associationId,
+  associationName,
 }: {
   defaultValues?: Partial<CatadorFormData> & Partial<Record<DocKey, string | null>>;
   catadorId?: string;
   mode?: "create" | "edit";
+  associationId?: string;
+  associationName?: string;
 }) {
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
@@ -95,7 +99,7 @@ export function CatadorForm({
   const form = useForm<CatadorFormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      association_id: "",
+      association_id: associationId ?? "",
       nome_cooperativa: "",
       nome_completo: "",
       genero: "nao_responder",
@@ -126,18 +130,25 @@ export function CatadorForm({
 
   useEffect(() => {
     if (mode !== "create") return;
-    const draft = localStorage.getItem("procate-catador-draft");
+    const draftKey = associationId
+      ? `procate-catador-draft-${associationId}`
+      : "procate-catador-draft";
+    const draft = localStorage.getItem(draftKey);
     if (draft) {
       try {
-        form.reset({ ...form.getValues(), ...JSON.parse(draft) });
+        form.reset({
+          ...form.getValues(),
+          ...JSON.parse(draft),
+          ...(associationId ? { association_id: associationId } : {}),
+        });
         toast.info("Rascunho recuperado", { description: "Os dados salvos neste aparelho foram restaurados." });
       } catch {
-        localStorage.removeItem("procate-catador-draft");
+        localStorage.removeItem(draftKey);
       }
     }
-    const subscription = form.watch((values) => localStorage.setItem("procate-catador-draft", JSON.stringify(values)));
+    const subscription = form.watch((values) => localStorage.setItem(draftKey, JSON.stringify(values)));
     return () => subscription.unsubscribe();
-  }, [form, mode]);
+  }, [associationId, form, mode]);
 
   async function onSubmit(values: CatadorFormData) {
     setSubmitting(true);
@@ -147,7 +158,7 @@ export function CatadorForm({
       association_id: values.association_id,
       email: naoTem.email ? null : values.email || null,
       telefone: naoTem.telefone ? null : values.telefone || null,
-      nome_cooperativa: association?.nome ?? (values.nome_cooperativa || null),
+      nome_cooperativa: associationName ?? association?.nome ?? (values.nome_cooperativa || null),
       titulo_eleitor: values.titulo_eleitor || null,
       ctps: values.ctps || null,
       nis: values.nis || null,
@@ -177,9 +188,15 @@ export function CatadorForm({
       }
       return;
     }
-    localStorage.removeItem("procate-catador-draft");
+    localStorage.removeItem(
+      associationId ? `procate-catador-draft-${associationId}` : "procate-catador-draft",
+    );
     toast.success(mode === "edit" ? "Cadastro atualizado!" : "Catador cadastrado com sucesso!");
-    navigate({ to: "/admin" });
+    if (associationId) {
+      navigate({ to: "/admin/associacoes/$id", params: { id: associationId } });
+    } else {
+      navigate({ to: "/admin" });
+    }
   }
 
   const v = form.watch();
@@ -217,10 +234,16 @@ export function CatadorForm({
         <section id="instituicao" className="scroll-mt-24 rounded-3xl border border-border bg-card p-6 shadow-card md:p-8">
           <SectionTitle icon={<Building2 className="size-5" />} title="Instituição de origem" description="Vincule o cadastro à entidade correspondente." tone="red" />
           <Linha label="Cooperativa / Associação / Grupo">
-          <Select value={v.association_id} onValueChange={(value) => form.setValue("association_id", value, { shouldValidate: true })}>
-            <SelectTrigger><SelectValue placeholder="Selecione na lista oficial" /></SelectTrigger>
-            <SelectContent>{associations.map((item) => <SelectItem key={item.id} value={item.id}>{item.nome}</SelectItem>)}</SelectContent>
-          </Select>
+          {associationId ? (
+            <div className="flex min-h-10 items-center rounded-md border border-input bg-muted px-3 text-sm font-medium">
+              {associationName ?? "Entidade selecionada"}
+            </div>
+          ) : (
+            <Select value={v.association_id} onValueChange={(value) => form.setValue("association_id", value, { shouldValidate: true })}>
+              <SelectTrigger><SelectValue placeholder="Selecione na lista oficial" /></SelectTrigger>
+              <SelectContent>{associations.map((item) => <SelectItem key={item.id} value={item.id}>{item.nome}</SelectItem>)}</SelectContent>
+            </Select>
+          )}
           {e.association_id?.message && <p className="text-xs text-destructive">{e.association_id.message}</p>}
           </Linha>
         </section>
