@@ -264,7 +264,7 @@ function NewAssessment() {
     navigate({ to: "/admin/associacoes/$id", params: { id } });
   }
 
-  if (false && modulo === "social") {
+  if (modulo === "social" && activeModule !== "social") {
     return (
       <AdminShell>
         <Link to="/admin/associacoes/$id" params={{ id }}>
