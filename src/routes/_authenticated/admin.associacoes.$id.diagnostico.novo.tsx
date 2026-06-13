@@ -903,8 +903,18 @@ function NewAssessment() {
               </fieldset>
             </TabsContent>
             <TabsContent value="contabil">
-              <Module title="Módulo Contábil" tone="border-primary/40">
-                <Grid>
+              {loadingAssociation ? (
+                <p className="mt-5 text-muted-foreground">Carregando dados da entidade...</p>
+              ) : (
+                <div className="mt-5 space-y-5">
+                  <AccountingFields association={association} choice={choice} setChoice={setChoice} />
+                  <div className="space-y-4 rounded-xl border border-border bg-card p-5">
+                    <label className="flex items-start gap-3 text-sm"><Checkbox name="consentimento_dados" required /><span>Autorizo o tratamento dos dados coletados para as finalidades do diagnóstico e acompanhamento institucional.</span></label>
+                    <label className="flex items-start gap-3 text-sm"><Checkbox name="declaracao_veracidade" required /><span>Declaro que as informações prestadas são verdadeiras e correspondem à realidade observada na visita.</span></label>
+                  </div>
+                </div>
+              )}
+              <fieldset disabled className="hidden"><Module title="Módulo Contábil" tone="border-primary/40"><Grid>
                   <Choice
                     name="estatuto_registrado"
                     label="Estatuto registrado?"
@@ -1124,8 +1134,7 @@ function NewAssessment() {
                       ou livro de trabalho
                     </label>
                   </div>
-                </Grid>
-              </Module>
+                </Grid></Module></fieldset>
             </TabsContent>
           </Tabs>
           <div className="sticky bottom-4 mt-6 flex justify-end rounded-xl border border-border bg-background/95 p-4 shadow-card backdrop-blur">
