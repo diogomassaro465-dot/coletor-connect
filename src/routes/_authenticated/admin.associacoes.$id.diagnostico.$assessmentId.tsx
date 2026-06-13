@@ -478,7 +478,12 @@ function AssessmentDetails() {
                   {a.regularity_compliant_count}/{a.regularity_total_count} critérios
                 </span>
               </div>
-              <progress className="mt-3 h-2 w-full accent-current" max="100" value={Number(a.regularity_index)} aria-label="Índice de regularidade" />
+              <progress
+                className="mt-3 h-2 w-full accent-current"
+                max="100"
+                value={Number(a.regularity_index)}
+                aria-label="Índice de regularidade"
+              />
             </>
           ) : (
             <p className="mt-3 font-semibold">Aguardando evidências e assinatura</p>
