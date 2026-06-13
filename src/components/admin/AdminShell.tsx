@@ -1,5 +1,5 @@
-import { Link, useNavigate } from "@tanstack/react-router";
-import { LogOut, LayoutDashboard, Building2, BarChart3 } from "lucide-react";
+import { Link, useNavigate, useRouteContext } from "@tanstack/react-router";
+import { LogOut, LayoutDashboard, Building2, BarChart3, ClipboardPenLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -8,6 +8,8 @@ import procateLogo from "@/assets/procate-logo.png";
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const { role } = useRouteContext({ from: "/_authenticated" });
+  const isAdmin = role === "admin";
 
   async function signOut() {
     await qc.cancelQueries();
@@ -21,7 +23,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       <header className="bg-card/95 backdrop-blur border-b border-border sticky top-0 z-30">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <Link
-            to="/admin"
+            to={isAdmin ? "/admin" : "/admin/associacoes"}
             className="flex items-center gap-2"
             aria-label="PROCATE — Painel administrativo"
           >
@@ -31,28 +33,32 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               className="h-10 w-auto sm:h-11"
             />
             <span className="hidden sm:inline-block text-xs font-medium uppercase tracking-wider text-muted-foreground ml-2 px-2 py-0.5 rounded bg-muted">
-              Admin
+              {isAdmin ? "Administrador UCIP" : "Consultor"}
             </span>
           </Link>
           <nav className="flex items-center gap-1">
-            <Link to="/admin">
-              <Button variant="ghost" size="sm">
-                <LayoutDashboard className="size-4" />{" "}
-                <span className="hidden sm:inline">Catadores</span>
-              </Button>
-            </Link>
+            {isAdmin && (
+              <Link to="/admin">
+                <Button variant="ghost" size="sm">
+                  <LayoutDashboard className="size-4" />{" "}
+                  <span className="hidden sm:inline">Catadores</span>
+                </Button>
+              </Link>
+            )}
             <Link to="/admin/associacoes">
               <Button variant="ghost" size="sm">
-                <Building2 className="size-4" />{" "}
-                <span className="hidden md:inline">Associações e diagnósticos</span>
+                {isAdmin ? <Building2 className="size-4" /> : <ClipboardPenLine className="size-4" />} {" "}
+                <span className="hidden md:inline">{isAdmin ? "Associações" : "Cadastros de campo"}</span>
               </Button>
             </Link>
-            <Link to="/admin/diagnosticos">
-              <Button variant="ghost" size="sm">
-                <BarChart3 className="size-4" />{" "}
-                <span className="hidden lg:inline">Regularidade</span>
-              </Button>
-            </Link>
+            {isAdmin && (
+              <Link to="/admin/diagnosticos">
+                <Button variant="ghost" size="sm">
+                  <BarChart3 className="size-4" />{" "}
+                  <span className="hidden lg:inline">Regularidade</span>
+                </Button>
+              </Link>
+            )}
             <Button variant="ghost" size="sm" onClick={signOut} title="Sair">
               <LogOut className="size-4" />
             </Button>

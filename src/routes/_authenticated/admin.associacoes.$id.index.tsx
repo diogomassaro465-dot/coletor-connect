@@ -28,6 +28,8 @@ const STATUS_LABEL = {
 
 function AssociationDetails() {
   const { id } = Route.useParams();
+  const { role } = Route.useRouteContext();
+  const isConsultant = role === "consultor";
   const { data: association, isLoading } = useQuery({
     queryKey: ["association", id],
     queryFn: async () => {
@@ -86,7 +88,7 @@ function AssociationDetails() {
             <MapPin className="size-4" /> {association.municipio}
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        {isConsultant && <div className="flex flex-wrap gap-2">
           <Link to="/admin/associacoes/$id/catadores/novo" params={{ id }}>
             <Button size="lg">
               <UserPlus className="size-4" /> Cadastrar catador
@@ -101,10 +103,10 @@ function AssociationDetails() {
               <ClipboardPlus className="size-4" /> Novo cadastro de campo
             </Button>
           </Link>
-        </div>
+        </div>}
       </div>
 
-      <section className="mb-8 rounded-3xl border border-border bg-card p-6 shadow-card">
+      {isConsultant && <section className="mb-8 rounded-3xl border border-border bg-card p-6 shadow-card">
         <div className="mb-5">
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
             Formulários de campo
@@ -141,7 +143,7 @@ function AssociationDetails() {
             tone="warning"
           />
         </div>
-      </section>
+      </section>}
 
       <div className="mb-10 grid gap-4 sm:grid-cols-3">
         <Info

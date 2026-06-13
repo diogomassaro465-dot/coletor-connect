@@ -15,6 +15,8 @@ export const Route = createFileRoute("/_authenticated/admin/associacoes/")({
 });
 
 function AssociationsPage() {
+  const { role } = Route.useRouteContext();
+  const isAdmin = role === "admin";
   const [search, setSearch] = useState("");
   const { data = [], isLoading } = useQuery({
     queryKey: ["associations"],
@@ -55,9 +57,11 @@ function AssociationsPage() {
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Associações e cooperativas</h1>
-          <p className="mt-1 text-muted-foreground">Base oficial de entidades vinculadas ao PROCATE.</p>
+          <p className="mt-1 text-muted-foreground">
+            {isAdmin ? "Base oficial de entidades vinculadas ao PROCATE." : "Selecione uma entidade para iniciar o cadastro assistido em campo."}
+          </p>
         </div>
-        <div className="flex gap-2"><Button variant="outline" size="lg" onClick={exportAssociations}><Download className="size-4" /> Exportar Excel</Button><Link to="/admin/associacoes/nova"><Button size="lg"><Plus className="size-4" /> Nova entidade</Button></Link></div>
+        {isAdmin && <div className="flex gap-2"><Button variant="outline" size="lg" onClick={exportAssociations}><Download className="size-4" /> Exportar Excel</Button><Link to="/admin/associacoes/nova"><Button size="lg"><Plus className="size-4" /> Nova entidade</Button></Link></div>}
       </div>
 
       <div className="mb-6 flex items-center gap-3 border-b border-border pb-6">
