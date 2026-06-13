@@ -693,7 +693,7 @@ function AssessmentDetails() {
               Para concluir: frente, sala administrativa, reunião/entrevista, uma lista ou livro e
               assinatura do representante.
             </p>
-            <div className="mb-5 flex flex-wrap gap-3">
+            {canEditFieldData && <div className="mb-5 flex flex-wrap gap-3">
               <Select value={module} onValueChange={(v) => setModule(v as typeof module)}>
                 <SelectTrigger className="w-44">
                   <SelectValue />
@@ -732,7 +732,7 @@ function AssessmentDetails() {
                   </Label>
                 </div>
               ))}
-            </div>
+            </div>}
             {uploading && (
               <p className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
                 <Loader2 className="size-4 animate-spin" /> Enviando evidência...
@@ -767,7 +767,7 @@ function AssessmentDetails() {
                     />
                   )}
                 </div>
-              ) : (
+              ) : canEditFieldData ? (
                 <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
                   <div>
                     <Label htmlFor="representative-name">Nome do representante</Label>
@@ -795,13 +795,19 @@ function AssessmentDetails() {
                     Validar evidências e concluir diagnóstico
                   </Button>
                 </div>
+              ) : (
+                <p className="rounded-lg border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+                  A coleta da assinatura e a validação das evidências são realizadas pelo consultor responsável.
+                </p>
               )}
             </div>
-            <CameraCapture
-              open={!!cameraCategory}
-              onOpenChange={(open) => !open && setCameraCategory(null)}
-              onCapture={(file) => cameraCategory && uploadEvidence(file, cameraCategory)}
-            />
+            {canEditFieldData && (
+              <CameraCapture
+                open={!!cameraCategory}
+                onOpenChange={(open) => !open && setCameraCategory(null)}
+                onCapture={(file) => cameraCategory && uploadEvidence(file, cameraCategory)}
+              />
+            )}
           </Collection>
         </TabsContent>
       </Tabs>
