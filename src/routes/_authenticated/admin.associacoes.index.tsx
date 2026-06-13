@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Building2, MapPin, Plus, Search } from "lucide-react";
+import { Building2, Download, MapPin, Plus, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { Badge } from "@/components/ui/badge";
@@ -32,6 +32,23 @@ function AssociationsPage() {
     );
   }, [data, search]);
 
+  async function exportAssociations() {
+    if (!filtered.length) return toast.info("Nenhuma entidade para exportar.");
+    const ExcelJS = (await import("exceljs")).default;
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet("Entidades", { views: [{ state: "frozen", ySplit: 1 }] });
+    sheet.columns = [
+      { header: "Nome", key: "nome" }, { header: "Tipo", key: "tipo" }, { header: "CNPJ", key: "cnpj" },
+      { header: "Município", key: "municipio" }, { header: "Endereço", key: "endereco" }, { header: "Telefone", key: "telefone" },
+      { header: "E-mail", key: "email" }, { header: "Associados iniciais", key: "iniciais" }, { header: "Associados atuais", key: "atuais" },
+    ];
+    filtered.forEach((item) => sheet.addRow({ nome: item.nome, tipo: item.tipo, cnpj: item.cnpj ?? "", municipio: item.municipio, endereco: item.endereco_sede, telefone: item.telefone ?? "", email: item.email ?? "", iniciais: item.numero_associados_inicial, atuais: item.numero_associados_atual }));
+    sheet.getRow(1).eachCell((cell) => { cell.font = { bold: true, color: { argb: "FFFFFFFF" } }; cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF15803D" } }; cell.alignment = { horizontal: "center", vertical: "middle" }; });
+    sheet.columns.forEach((column) => { let width = 12; column.eachCell?.({ includeEmpty: false }, (cell) => { width = Math.max(width, String(cell.value ?? "").length + 2); }); column.width = Math.min(width, 60); });
+    sheet.eachRow((row, index) => row.eachCell((cell) => { cell.alignment = { vertical: "top", wrapText: true }; const edge = { style: "thin" as const, color: { argb: "FFE5E7EB" } }; cell.border = { top: edge, bottom: edge, left: edge, right: edge }; if (index > 1 && index % 2 === 0) cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF3F4F6" } }; }));
+    const buffer = await workbook.xlsx.writeBuffer(); const url = URL.createObjectURL(new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" })); const link = document.createElement("a"); link.href = url; link.download = `entidades-procate-${new Date().toISOString().slice(0,10)}.xlsx`; link.click(); URL.revokeObjectURL(url);
+  }
+
   return (
     <AdminShell>
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
@@ -39,9 +56,7 @@ function AssociationsPage() {
           <h1 className="text-3xl font-bold tracking-tight">Associações e cooperativas</h1>
           <p className="mt-1 text-muted-foreground">Base oficial de entidades vinculadas ao PROCATE.</p>
         </div>
-        <Link to="/admin/associacoes/nova">
-          <Button size="lg"><Plus className="size-4" /> Nova entidade</Button>
-        </Link>
+        <div className="flex gap-2"><Button variant="outline" size="lg" onClick={exportAssociations}><Download className="size-4" /> Exportar Excel</Button><Link to="/admin/associacoes/nova"><Button size="lg"><Plus className="size-4" /> Nova entidade</Button></Link></div>
       </div>
 
       <div className="mb-6 flex items-center gap-3 border-b border-border pb-6">
