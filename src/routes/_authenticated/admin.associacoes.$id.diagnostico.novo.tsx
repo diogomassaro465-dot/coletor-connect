@@ -1142,6 +1142,15 @@ function NewAssessment() {
 const YN = ["Sim", "Não"];
 const YNK = ["Sim", "Não", "Não sabe"];
 const YNSOME = ["Sim", "Não", "Alguns"];
+const ACCOUNTING_BOOKS = [
+  { key: "matricula", label: "Livro de Matrícula de Cooperados" },
+  { key: "atas_assembleias", label: "Livro de Atas das Assembleias Gerais" },
+  { key: "presenca_assembleias", label: "Livro de Presença das Assembleias" },
+  { key: "atas_diretoria", label: "Livro de Atas da Diretoria" },
+  { key: "atas_conselho_fiscal", label: "Livro de Atas do Conselho Fiscal" },
+  { key: "patrimonio", label: "Livro de Registro de Patrimônio" },
+  { key: "inventario", label: "Livro de Registro de Inventário" },
+] as const;
 const SOCIAL_MATERIALS = [
   { key: "vidro", label: "Vidro" },
   { key: "pet", label: "Plástico PET" },
