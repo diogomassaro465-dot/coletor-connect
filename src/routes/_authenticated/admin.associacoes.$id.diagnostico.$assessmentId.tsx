@@ -86,7 +86,7 @@ function AssessmentDetails() {
       `Entidade: ${data.association.nome}`, `Município: ${data.association.municipio}`, `Consultor(a): ${data.assessment.consultant_name}`,
       `Visita: ${formatDate(data.assessment.data_visita)} às ${data.assessment.horario_visita.slice(0, 5)}`, `Classificação: ${STATUS[data.assessment.status]}`,
       "", "Critérios de regularidade", `Mandato em dia: ${data.assessment.mandato_em_dia ?? "Não informado"}`, `Ata registrada: ${data.assessment.ata_registrada_cartorio ?? "Não informado"}`,
-      `Estatuto registrado: ${yes(data.assessment.estatuto_registrado)}`, `Alvará: ${yes(data.assessment.alvara_funcionamento)}`, `Licença ambiental: ${data.assessment.licenca_ambiental_status ?? "Não informado"}`,
+      `Estatuto registrado: ${data.assessment.estatuto_registrado ?? "Não informado"}`, `Alvará: ${data.assessment.alvara_funcionamento ?? "Não informado"}`, `Licença ambiental: ${data.assessment.licenca_ambiental_status ?? "Não informado"}`,
       `Contabilidade regular: ${data.assessment.contabilidade_regular ?? "Não informado"}`, `Emite notas fiscais: ${data.assessment.emite_notas_fiscais ?? "Não informado"}`, `Controle de estoque: ${data.assessment.controle_estoque ?? "Não informado"}`,
       "", "Módulo social / cadastral", `Presidente: ${data.assessment.presidente_nome ?? "Não informado"} · ${data.assessment.presidente_telefone ?? "Sem telefone"}`,
       `Vice-presidente: ${data.assessment.vice_presidente_nome ?? "Não informado"} · ${data.assessment.vice_presidente_telefone ?? "Sem telefone"}`,
@@ -108,6 +108,13 @@ function AssessmentDetails() {
       `Coordenação/gerência: ${data.assessment.coordenacao_gerencia ?? "Não informado"}`, `Problemas atuais: ${data.assessment.problemas_juridicos_atuais ?? "Não informado"}`,
       `Melhorias necessárias: ${data.assessment.melhorias_juridicas_necessarias ?? "Não informado"}`, `Contrato: ${data.assessment.contrato_tipo ?? "Não informado"} — ${data.assessment.contrato_detalhes ?? "Sem detalhes"}`,
       `Pendências: ${data.assessment.pendencias_juridicas ?? "Não informado"}`, `Classificação jurídica: ${data.assessment.classificacao_juridica ?? "Não informado"}`,
+      "", "Módulo contábil", `Estatuto: ${data.assessment.estatuto_registrado ?? "Não informado"}`, `Alvará: ${data.assessment.alvara_funcionamento ?? "Não informado"}`,
+      `Ficha/livro de trabalho: ${yes(data.assessment.livro_ficha_trabalho)} — ${data.assessment.livro_ficha_trabalho_qual ?? "Sem detalhes"}`, `Livro de inspeção: ${yes(data.assessment.livro_inspecao_trabalho)}`,
+      `Filiação sindical: ${yes(data.assessment.filiacao_sindical)} — ${data.assessment.filiacao_sindical_qual ?? "Sem detalhes"}`, `SST: ${data.assessment.contrato_sst ?? "Não informado"}`,
+      `Responsável SST: ${data.assessment.contrato_sst_responsavel ?? "Não informado"}`, `Controle de frequência: ${data.assessment.controle_frequencia ?? "Não informado"} — ${data.assessment.controle_frequencia_tipo ?? "Sem tipo"}`,
+      `Contador: ${data.assessment.contador_tipo ?? "Não informado"} · ${data.assessment.contador_nome ?? "Sem nome"} · ${data.assessment.contador_telefone ?? "Sem telefone"} · ${data.assessment.contador_email ?? "Sem e-mail"}`,
+      `Critério de divisão dos resultados: ${data.assessment.divisao_resultados_criterio ?? "Não informado"}`, `Procedimento de divisão: ${data.assessment.divisao_resultados_procedimento ?? "Não informado"}`,
+      `Pendências contábeis: ${data.assessment.pendencias_contabeis ?? "Não informado"}`, `Classificação contábil: ${data.assessment.classificacao_contabil ?? "Não informado"}`,
     ];
     let y = 30; lines.forEach((line) => { const wrapped = doc.splitTextToSize(line, 180); if (y + wrapped.length * 5 > 285) { doc.addPage(); y = 15; } doc.text(wrapped, 14, y); y += wrapped.length * 5 + 1; });
     doc.save(`diagnostico-${safeName(data.association.nome)}-${data.assessment.data_visita}.pdf`);
