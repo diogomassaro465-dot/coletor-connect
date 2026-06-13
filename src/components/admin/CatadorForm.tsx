@@ -372,8 +372,10 @@ export function CatadorForm({
             onChange={(c) => setNaoTem((s) => ({ ...s, nis_foto: c }))}
           />
         </Item>
+        </section>
 
-
+        <section id="social" className="scroll-mt-24 space-y-7 rounded-3xl border border-border bg-card p-6 shadow-card md:p-8">
+          <SectionTitle icon={<WalletCards className="size-5" />} title="Situação socioeconômica" description="Renda, benefícios e acesso a serviços digitais." tone="red" />
         <Item n={13} label="Qual a renda média mensal?" error={e.renda_media_mensal?.message}>
           <Input type="number" step="0.01" min="0" {...form.register("renda_media_mensal")} placeholder="R$" />
         </Item>
@@ -408,13 +410,10 @@ export function CatadorForm({
             </RadioGroup>
           </Item>
         )}
+        </section>
 
-        {/* Bloco complementar: coleta */}
-        <div className="pt-6 mt-2 border-t border-border">
-          <h2 className="text-sm font-bold text-primary uppercase tracking-wider mb-4">
-            Informações complementares de coleta
-          </h2>
-
+        <section id="coleta" className="scroll-mt-24 space-y-7 rounded-3xl border border-border bg-card p-6 shadow-card md:p-8">
+          <SectionTitle icon={<Recycle className="size-5" />} title="Atuação na coleta" description="Materiais, equipamentos e região de trabalho." tone="blue" />
           <Item n={20} label="Materiais coletados:" error={e.materiais_coletados?.message}>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {MATERIAIS_OPTIONS.map((m) => {
@@ -451,9 +450,9 @@ export function CatadorForm({
           <Item n={23} label="Área de atuação:">
             <Textarea {...form.register("area_atuacao")} rows={2} placeholder="Bairros, regiões, pontos de coleta..." />
           </Item>
-        </div>
+        </section>
 
-        <div className="pt-6 border-t border-border flex flex-col sm:flex-row gap-3 sm:justify-end">
+        <div className="sticky bottom-4 z-10 flex flex-col gap-3 rounded-2xl border border-border bg-card/95 p-4 shadow-soft backdrop-blur sm:flex-row sm:justify-end">
           <Button type="button" variant="ghost" onClick={() => navigate({ to: "/admin" })}>
             Cancelar
           </Button>
@@ -464,6 +463,25 @@ export function CatadorForm({
         </div>
       </div>
     </form>
+  );
+}
+
+function StepLink({ href, n, label, icon, active = false }: { href: string; n: string; label: string; icon: React.ReactNode; active?: boolean }) {
+  return (
+    <a href={href} className={`grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 rounded-2xl border px-3 py-3 text-sm transition-colors ${active ? "border-primary/20 bg-primary-soft text-primary" : "border-transparent text-muted-foreground hover:border-border hover:bg-muted/60 hover:text-foreground"}`}>
+      <span className={`grid size-8 shrink-0 place-items-center rounded-full ${active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>{icon}</span>
+      <span className="min-w-0"><span className="mr-2 text-[10px] font-bold opacity-60">{n}</span><span className="font-semibold">{label}</span></span>
+    </a>
+  );
+}
+
+function SectionTitle({ icon, title, description, tone }: { icon: React.ReactNode; title: string; description: string; tone: "red" | "blue" | "yellow" }) {
+  const toneClass = tone === "red" ? "bg-secondary text-secondary-foreground" : tone === "yellow" ? "bg-warning text-warning-foreground" : "bg-primary text-primary-foreground";
+  return (
+    <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 border-b border-border pb-5">
+      <span className={`grid size-10 shrink-0 place-items-center rounded-xl ${toneClass}`}>{icon}</span>
+      <div className="min-w-0"><h3 className="font-display text-lg font-bold text-foreground">{title}</h3><p className="text-xs leading-relaxed text-muted-foreground">{description}</p></div>
+    </div>
   );
 }
 
