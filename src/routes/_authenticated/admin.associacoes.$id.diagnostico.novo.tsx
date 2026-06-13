@@ -140,17 +140,19 @@ function NewAssessment() {
         todos_sao_cooperados: bool("todos_sao_cooperados"),
         lista_cooperados_atualizada: choice("lista_cooperados_atualizada"),
         lista_nao_cooperados_atualizada: choice("lista_nao_cooperados_atualizada"),
-        regras_entrada: text(values, "regras_entrada"),
-        regras_saida_exclusao: text(values, "regras_saida_exclusao"),
+        regras_entrada: choice("regras_entrada"),
+        regras_saida_exclusao: choice("regras_saida_exclusao"),
         fluxo_trabalho_diario: text(values, "fluxo_trabalho_diario"),
-        divisao_tarefas: text(values, "divisao_tarefas"),
-        coordenacao_gerencia: text(values, "coordenacao_gerencia"),
+        divisao_tarefas: choice("divisao_tarefas"),
+        coordenacao_gerencia: choice("coordenacao_gerencia"),
         controle_jornada: bool("controle_jornada"),
         problemas_juridicos_atuais: text(values, "problemas_juridicos_atuais"),
         melhorias_juridicas_necessarias: text(values, "melhorias_juridicas_necessarias"),
         contrato_remunerado: bool("contrato_remunerado"),
         contrato_tipo: choice("contrato_tipo", "Não se aplica"),
         contrato_detalhes: text(values, "contrato_detalhes"),
+        contrato_instituicoes_publicas: text(values, "contrato_instituicoes_publicas"),
+        contrato_instituicoes_privadas: text(values, "contrato_instituicoes_privadas"),
         participa_coleta_seletiva_municipal: bool("participa_coleta_seletiva_municipal"),
         apoio_poder_publico: choice("apoio_poder_publico"),
         pendencias_juridicas: text(values, "pendencias_juridicas"),
@@ -257,6 +259,17 @@ function NewAssessment() {
         return toast.error(
           "Diagnóstico salvo, mas houve erro nos detalhes de materiais ou equipamentos.",
         );
+      }
+    }
+    if (activeModule === "juridico") {
+      const { error: associationError } = await supabase.from("associations").update({
+        nome: String(values.get("legal_association_nome") ?? "").trim(),
+        cnpj: text(values, "legal_association_cnpj"),
+        municipio: String(values.get("legal_association_municipio") ?? "").trim(),
+      }).eq("id", id);
+      if (associationError) {
+        setSaving(false);
+        return toast.error("Diagnóstico salvo, mas não foi possível atualizar a entidade.");
       }
     }
     setSaving(false);
