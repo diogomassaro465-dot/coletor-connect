@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useState, type FormEvent, type ReactNode } from "react";
 import { ArrowLeft, Calculator, Loader2, Scale, Users } from "lucide-react";
 import { toast } from "sonner";
@@ -28,6 +29,14 @@ function NewAssessment() {
   const [saving, setSaving] = useState(false);
   const [materials, setMaterials] = useState<string[]>([]);
   const [choices, setChoices] = useState<Record<string, string>>({});
+  const { data: association, isLoading: loadingAssociation } = useQuery({
+    queryKey: ["association-social-form", id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("associations").select("*").eq("id", id).single();
+      if (error) throw error;
+      return data;
+    },
+  });
 
   function choice(name: string, fallback = "Não") { return choices[name] ?? fallback; }
   function setChoice(name: string, value: string) { setChoices((current) => ({ ...current, [name]: value })); }
@@ -42,7 +51,7 @@ function NewAssessment() {
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) return toast.error("Sua sessão expirou.");
     setSaving(true);
-    const { error } = await supabase.from("association_assessments").insert({
+    const { data: assessment, error } = await supabase.from("association_assessments").insert({
       association_id: id,
       consultant_id: auth.user.id,
       consultant_name: String(values.get("consultant_name") ?? "").trim(),
@@ -52,7 +61,7 @@ function NewAssessment() {
       possui_pessoas_trans: bool("possui_pessoas_trans"), pessoas_trans_detalhes: text(values, "pessoas_trans_detalhes"),
       autodeclaracao_racial: text(values, "autodeclaracao_racial"), faixa_etaria_predominante: choice("faixa_etaria_predominante", "Até 25 anos"),
       escolaridade_predominante: choice("escolaridade_predominante", "Não alfabetizado"), media_moradores_casa: numberOrNull(values, "media_moradores_casa"),
-      presidente_nome: text(values, "presidente_nome"), presidente_telefone: text(values, "presidente_telefone"), vice_presidente_nome: text(values, "vice_presidente_nome"), vice_presidente_telefone: text(values, "vice_presidente_telefone"),
+      presidente_nome: text(values, "presidente_nome"), presidente_telefone: text(values, "presidente_telefone"), presidente_email: text(values, "presidente_email"), vice_presidente_nome: text(values, "vice_presidente_nome"), vice_presidente_telefone: text(values, "vice_presidente_telefone"), vice_presidente_email: text(values, "vice_presidente_email"),
       criancas_adolescentes_dependentes: bool("criancas_adolescentes_dependentes"), contribuicao_inss: choice("contribuicao_inss"), inscritos_cadunico: choice("inscritos_cadunico"),
       uso_epis: choice("uso_epis", "Não"), cooperativa_fornece_epis: choice("cooperativa_fornece_epis", "Não"), acidentes_ultimo_ano: bool("acidentes_ultimo_ano"), acidentes_tipo: text(values, "acidentes_tipo"), problemas_saude: text(values, "problemas_saude"),
       media_horas_trabalhadas: choice("media_horas_trabalhadas", "8h"), aumento_trabalho_festividades: bool("aumento_trabalho_festividades"),
@@ -62,9 +71,41 @@ function NewAssessment() {
       tipo_coleta: choice("tipo_coleta", "Mista"), materiais_coletados: materials, realiza_triagem: bool("realiza_triagem"), volumetria_toneladas_mes: numberOrNull(values, "volumetria_toneladas_mes"), renda_media_mensal: numberOrNull(values, "renda_media_mensal"), possui_parcerias: choice("possui_parcerias"), parcerias_detalhes: text(values, "parcerias_detalhes"), destino_venda: choice("destino_venda", "Indústria"), tipo_galpao: choice("tipo_galpao", "Não possui"), possui_veiculos_maquinas: bool("possui_veiculos_maquinas"), recebeu_apoio_programas: bool("recebeu_apoio_programas"), participa_movimentos: bool("participa_movimentos"), movimento_qual: text(values, "movimento_qual"),
       diretoria_conselho: bool("diretoria_conselho"), diretoria_nomes: text(values, "diretoria_nomes"), mandato_em_dia: choice("mandato_em_dia"), conselho_fiscal: choice("conselho_fiscal"), cargos_por_eleicao: choice("cargos_por_eleicao"), data_ultima_eleicao: text(values, "data_ultima_eleicao"), ata_registrada_cartorio: choice("ata_registrada_cartorio"), realiza_assembleias: choice("realiza_assembleias"), frequencia_assembleias: text(values, "frequencia_assembleias"), possui_registro_atas: choice("possui_registro_atas"), assessoria_juridica: bool("assessoria_juridica"), apoio_instituicoes: bool("apoio_instituicoes"), apoio_instituicoes_quais: text(values, "apoio_instituicoes_quais"), processos_judiciais: bool("processos_judiciais"), processos_judiciais_quais: text(values, "processos_judiciais_quais"), todos_sao_cooperados: bool("todos_sao_cooperados"), lista_cooperados_atualizada: choice("lista_cooperados_atualizada"), lista_nao_cooperados_atualizada: choice("lista_nao_cooperados_atualizada"), regras_entrada: text(values, "regras_entrada"), regras_saida_exclusao: text(values, "regras_saida_exclusao"), fluxo_trabalho_diario: text(values, "fluxo_trabalho_diario"), divisao_tarefas: text(values, "divisao_tarefas"), coordenacao_gerencia: text(values, "coordenacao_gerencia"), controle_jornada: bool("controle_jornada"), problemas_juridicos_atuais: text(values, "problemas_juridicos_atuais"), melhorias_juridicas_necessarias: text(values, "melhorias_juridicas_necessarias"), contrato_remunerado: bool("contrato_remunerado"), contrato_tipo: choice("contrato_tipo", "Não se aplica"), contrato_detalhes: text(values, "contrato_detalhes"), participa_coleta_seletiva_municipal: bool("participa_coleta_seletiva_municipal"), apoio_poder_publico: choice("apoio_poder_publico"), pendencias_juridicas: text(values, "pendencias_juridicas"), orientacao_regularizacao_aceita: values.has("orientacao_regularizacao_aceita"), orientacao_documentos_aceita: values.has("orientacao_documentos_aceita"), classificacao_juridica: choice("classificacao_juridica", "Irregular"),
       estatuto_registrado: choice("estatuto_registrado"), alvara_funcionamento: choice("alvara_funcionamento"), licenca_ambiental_status: choice("licenca_ambiental_status", "Nenhum"), avcb: choice("avcb"), extintores: choice("extintores"), registro_ocb: choice("registro_ocb"), empregados_registrados: Number(values.get("empregados_registrados") ?? 0), empregados_sem_registro: Number(values.get("empregados_sem_registro") ?? 0), autonomos: Number(values.get("autonomos") ?? 0), livro_ficha_trabalho: bool("livro_ficha_trabalho"), livro_ficha_trabalho_qual: text(values, "livro_ficha_trabalho_qual"), livro_inspecao_trabalho: bool("livro_inspecao_trabalho"), filiacao_sindical: bool("filiacao_sindical"), filiacao_sindical_qual: text(values, "filiacao_sindical_qual"), contrato_sst: choice("contrato_sst"), contrato_sst_responsavel: text(values, "contrato_sst_responsavel"), controle_frequencia: choice("controle_frequencia"), controle_frequencia_tipo: choice("controle_frequencia_tipo", "Não se aplica"), possui_contador: choice("possui_contador"), contador_tipo: choice("contador_tipo", "Não tem contador"), contador_nome: text(values, "contador_nome"), contador_telefone: text(values, "contador_telefone"), contador_email: text(values, "contador_email"), contabilidade_regular: choice("contabilidade_regular"), possui_conta_bancaria: choice("possui_conta_bancaria"), possui_maquineta: choice("possui_maquineta"), emite_notas_fiscais: choice("emite_notas_fiscais"), controle_estoque: choice("controle_estoque"), sistema_financeiro: choice("sistema_financeiro"), sistema_financeiro_qual: text(values, "sistema_financeiro_qual"), ano_ultimo_balanco: numberOrNull(values, "ano_ultimo_balanco"), divisao_resultados_criterio: text(values, "divisao_resultados_criterio"), divisao_resultados_procedimento: text(values, "divisao_resultados_procedimento"), pagamento_fixo_mensal: bool("pagamento_fixo_mensal"), renda_media_cooperado: numberOrNull(values, "renda_media_cooperado"), pendencias_contabeis: text(values, "pendencias_contabeis"), classificacao_contabil: choice("classificacao_contabil", "Irregular"), evidencia_frente_confirmada: values.has("evidencia_frente_confirmada"), evidencia_administrativo_confirmada: values.has("evidencia_administrativo_confirmada"), evidencia_reuniao_confirmada: values.has("evidencia_reuniao_confirmada"), evidencia_livro_trabalho_confirmada: values.has("evidencia_livro_trabalho_confirmada"), consentimento_dados: true, declaracao_veracidade: true,
-    });
-    setSaving(false);
+    }).select("id").single();
     if (error) return toast.error("Erro ao salvar diagnóstico", { description: error.message });
+    if (modulo === "social" && assessment) {
+      const associationUpdate = supabase.from("associations").update({
+        nome: String(values.get("association_nome") ?? "").trim(),
+        cnpj: text(values, "association_cnpj"),
+        municipio: String(values.get("association_municipio") ?? "").trim(),
+        inscricao_municipal: text(values, "association_inscricao_municipal"),
+        inscricao_estadual: text(values, "association_inscricao_estadual"),
+        endereco_sede: text(values, "association_endereco_sede"),
+        telefone: text(values, "association_telefone"),
+        email: text(values, "association_email"),
+        numero_associados_inicial: Number(values.get("association_numero_inicial") ?? 0),
+        numero_associados_atual: Number(values.get("association_numero_atual") ?? 0),
+      }).eq("id", id);
+      const priceRows = SOCIAL_MATERIALS.flatMap((material) => {
+        const comprador = text(values, `comprador_${material.key}`);
+        const preco = numberOrNull(values, `preco_${material.key}`);
+        return comprador || preco !== null ? [{ assessment_id: assessment.id, material: material.label, comprador, preco_por_kg: preco }] : [];
+      });
+      const equipmentRows = SOCIAL_EQUIPMENT.flatMap((equipment) => {
+        const quantidade = numberOrNull(values, `equipamento_${equipment.key}`);
+        return quantidade !== null && quantidade > 0 ? [{ assessment_id: assessment.id, tipo: equipment.label, quantidade }] : [];
+      });
+      const [, pricesResult, equipmentResult] = await Promise.all([
+        associationUpdate,
+        priceRows.length ? supabase.from("material_prices").insert(priceRows) : Promise.resolve({ error: null }),
+        equipmentRows.length ? supabase.from("association_equipment").insert(equipmentRows) : Promise.resolve({ error: null }),
+      ]);
+      if (pricesResult.error || equipmentResult.error) {
+        setSaving(false);
+        return toast.error("Diagnóstico salvo, mas houve erro nos detalhes de materiais ou equipamentos.");
+      }
+    }
+    setSaving(false);
     toast.success("Diagnóstico salvo e classificação calculada.");
     navigate({ to: "/admin/associacoes/$id", params: { id } });
   }
