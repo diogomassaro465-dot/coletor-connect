@@ -47,8 +47,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             )}
             <Link to="/admin/associacoes">
               <Button variant="ghost" size="sm">
-                {isAdmin ? <Building2 className="size-4" /> : <ClipboardPenLine className="size-4" />} {" "}
-                <span className="hidden md:inline">{isAdmin ? "Associações" : "Cadastros de campo"}</span>
+                {isAdmin ? (
+                  <Building2 className="size-4" />
+                ) : (
+                  <ClipboardPenLine className="size-4" />
+                )}{" "}
+                <span className="hidden md:inline">
+                  {isAdmin ? "Associações" : "Cadastros de campo"}
+                </span>
               </Button>
             </Link>
             {isAdmin && (
