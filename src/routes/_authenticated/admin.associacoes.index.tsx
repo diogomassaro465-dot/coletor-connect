@@ -63,7 +63,8 @@ function AssociationsPage() {
       ) : (
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {filtered.map((item) => (
-            <article key={item.id} className="rounded-xl border border-border bg-card p-5 shadow-card">
+            <Link key={item.id} to="/admin/associacoes/$id" params={{ id: item.id }} className="block">
+            <article className="rounded-xl border border-border bg-card p-5 shadow-card transition hover:border-primary/40 hover:shadow-soft">
               <div className="flex items-start justify-between gap-3">
                 <div className="grid size-10 shrink-0 place-items-center rounded-lg bg-primary-soft text-primary"><Building2 className="size-5" /></div>
                 <Badge variant={item.ativa ? "secondary" : "outline"}>{item.ativa ? "Ativa" : "Inativa"}</Badge>
@@ -75,6 +76,7 @@ function AssociationsPage() {
                 <strong className="float-right tabular-nums">{item.numero_associados_atual}</strong>
               </div>
             </article>
+            </Link>
           ))}
         </div>
       )}
