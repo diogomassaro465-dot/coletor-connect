@@ -90,7 +90,7 @@ function AuthPage() {
             {creatingAccount ? "Crie sua conta temporária de acesso." : "Acesso restrito para administradores e atendentes."}
           </p>
 
-              <form onSubmit={handleLogin} className="mt-8 space-y-4">
+              <form onSubmit={(event) => { if (creatingAccount) { event.preventDefault(); handleSignUp(); } else { handleLogin(event); } }} className="mt-8 space-y-4">
                 <div>
                   <Label htmlFor="email">E-mail</Label>
                   <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
@@ -103,11 +103,6 @@ function AuthPage() {
                   {loading && <Loader2 className="size-4 animate-spin" />} {creatingAccount ? "Criar conta" : "Entrar"}
                 </Button>
               </form>
-          {creatingAccount ? (
-            <Button type="button" variant="ghost" className="mt-3 w-full" disabled={loading} onClick={handleSignUp}>
-              Confirmar criação da conta
-            </Button>
-          ) : null}
           <Button type="button" variant="link" className="mt-2 w-full" onClick={() => setCreatingAccount((value) => !value)}>
             {creatingAccount ? "Voltar para o login" : "Criar minha conta agora"}
           </Button>
