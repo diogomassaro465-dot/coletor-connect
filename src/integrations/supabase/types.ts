@@ -14,9 +14,571 @@ export type Database = {
   }
   public: {
     Tables: {
+      accounting_books: {
+        Row: {
+          assessment_id: string
+          atualizado: boolean
+          created_at: string
+          id: string
+          implantado: boolean
+          tipo: string
+        }
+        Insert: {
+          assessment_id: string
+          atualizado?: boolean
+          created_at?: string
+          id?: string
+          implantado?: boolean
+          tipo: string
+        }
+        Update: {
+          assessment_id?: string
+          atualizado?: boolean
+          created_at?: string
+          id?: string
+          implantado?: boolean
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accounting_books_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "association_assessments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      association_assessments: {
+        Row: {
+          acidentes_tipo: string | null
+          acidentes_ultimo_ano: boolean | null
+          alvara_funcionamento: boolean | null
+          ano_ultimo_balanco: number | null
+          apoio_instituicoes: boolean | null
+          apoio_instituicoes_quais: string | null
+          apoio_poder_publico: string | null
+          assessoria_juridica: boolean | null
+          association_id: string
+          ata_registrada_cartorio: boolean | null
+          aumento_trabalho_festividades: boolean | null
+          autodeclaracao_racial: string | null
+          autonomos: number
+          avcb: string | null
+          capacitacoes_interesse: string | null
+          cargos_por_eleicao: string | null
+          conselho_fiscal: string | null
+          consultant_id: string
+          consultant_name: string
+          contabilidade_regular: string | null
+          contador_email: string | null
+          contador_nome: string | null
+          contador_telefone: string | null
+          contador_tipo: string | null
+          contrato_detalhes: string | null
+          contrato_remunerado: boolean | null
+          contrato_sst: string | null
+          contrato_sst_responsavel: string | null
+          contribuicao_inss: string | null
+          controle_estoque: string | null
+          controle_frequencia: string | null
+          controle_frequencia_tipo: string | null
+          controle_jornada: boolean | null
+          cooperativa_fornece_epis: boolean | null
+          created_at: string
+          criancas_adolescentes_dependentes: boolean | null
+          data_ultima_eleicao: string | null
+          data_visita: string
+          destino_venda: string | null
+          diretoria_conselho: boolean | null
+          diretoria_nomes: string | null
+          divisao_tarefas_gerencia: boolean | null
+          documentos_necessarios: string | null
+          emite_notas_fiscais: string | null
+          empregados_registrados: number
+          empregados_sem_registro: number
+          escolaridade_predominante: string | null
+          estatuto_registrado: boolean | null
+          extintores: string | null
+          faixa_etaria_predominante: string | null
+          filiacao_sindical: boolean | null
+          filiacao_sindical_qual: string | null
+          fluxo_trabalho_diario: string | null
+          frequencia_assembleias: string | null
+          historico_trabalho_infantil: boolean | null
+          homens: number
+          horario_visita: string
+          id: string
+          inscritos_cadunico: string | null
+          interesse_capacitacao: boolean | null
+          licenca_ambiental_status: string | null
+          livro_ficha_trabalho: boolean | null
+          livro_ficha_trabalho_qual: string | null
+          livro_inspecao_trabalho: boolean | null
+          mandato_em_dia: boolean | null
+          materiais_coletados: string[]
+          media_horas_trabalhadas: string | null
+          media_moradores_casa: number | null
+          metodo_divisao_descricao: string | null
+          metodo_divisao_dinheiro: string | null
+          motivos_entrada_reciclagem: string | null
+          movimento_qual: string | null
+          mulheres: number
+          necessita_documentos: boolean | null
+          pagamento_fixo_mensal: boolean | null
+          parcerias_detalhes: string | null
+          participa_coleta_seletiva_municipal: boolean | null
+          participa_movimentos: boolean | null
+          pessoas_trans_detalhes: string | null
+          possui_conta_bancaria: string | null
+          possui_contador: string | null
+          possui_maquineta: string | null
+          possui_parcerias: string | null
+          possui_pessoas_trans: boolean
+          possui_registro_atas: boolean | null
+          possui_veiculos_maquinas: boolean | null
+          preconceito_detalhes: string | null
+          problemas_melhorias_juridico: string | null
+          problemas_saude: string | null
+          processos_judiciais: boolean | null
+          processos_judiciais_quais: string | null
+          quantidade_beneficiarios: number | null
+          quantidade_trabalho_infantil: number | null
+          realiza_assembleias: string | null
+          realiza_triagem: boolean | null
+          recebe_beneficios: boolean | null
+          recebeu_apoio_programas: boolean | null
+          reconhecimento_sociedade: string | null
+          registro_ocb: string | null
+          regras_entrada_exclusao: boolean | null
+          relatos_preconceito: boolean | null
+          renda_media_cooperado: number | null
+          renda_media_mensal: number | null
+          sistema_financeiro: string | null
+          sistema_financeiro_qual: string | null
+          status: Database["public"]["Enums"]["diagnostic_status"]
+          tipo_coleta: string | null
+          tipo_galpao: string | null
+          todos_sao_cooperados: boolean | null
+          updated_at: string
+          uso_epis: string | null
+          volumetria_toneladas_mes: number | null
+        }
+        Insert: {
+          acidentes_tipo?: string | null
+          acidentes_ultimo_ano?: boolean | null
+          alvara_funcionamento?: boolean | null
+          ano_ultimo_balanco?: number | null
+          apoio_instituicoes?: boolean | null
+          apoio_instituicoes_quais?: string | null
+          apoio_poder_publico?: string | null
+          assessoria_juridica?: boolean | null
+          association_id: string
+          ata_registrada_cartorio?: boolean | null
+          aumento_trabalho_festividades?: boolean | null
+          autodeclaracao_racial?: string | null
+          autonomos?: number
+          avcb?: string | null
+          capacitacoes_interesse?: string | null
+          cargos_por_eleicao?: string | null
+          conselho_fiscal?: string | null
+          consultant_id: string
+          consultant_name: string
+          contabilidade_regular?: string | null
+          contador_email?: string | null
+          contador_nome?: string | null
+          contador_telefone?: string | null
+          contador_tipo?: string | null
+          contrato_detalhes?: string | null
+          contrato_remunerado?: boolean | null
+          contrato_sst?: string | null
+          contrato_sst_responsavel?: string | null
+          contribuicao_inss?: string | null
+          controle_estoque?: string | null
+          controle_frequencia?: string | null
+          controle_frequencia_tipo?: string | null
+          controle_jornada?: boolean | null
+          cooperativa_fornece_epis?: boolean | null
+          created_at?: string
+          criancas_adolescentes_dependentes?: boolean | null
+          data_ultima_eleicao?: string | null
+          data_visita: string
+          destino_venda?: string | null
+          diretoria_conselho?: boolean | null
+          diretoria_nomes?: string | null
+          divisao_tarefas_gerencia?: boolean | null
+          documentos_necessarios?: string | null
+          emite_notas_fiscais?: string | null
+          empregados_registrados?: number
+          empregados_sem_registro?: number
+          escolaridade_predominante?: string | null
+          estatuto_registrado?: boolean | null
+          extintores?: string | null
+          faixa_etaria_predominante?: string | null
+          filiacao_sindical?: boolean | null
+          filiacao_sindical_qual?: string | null
+          fluxo_trabalho_diario?: string | null
+          frequencia_assembleias?: string | null
+          historico_trabalho_infantil?: boolean | null
+          homens?: number
+          horario_visita: string
+          id?: string
+          inscritos_cadunico?: string | null
+          interesse_capacitacao?: boolean | null
+          licenca_ambiental_status?: string | null
+          livro_ficha_trabalho?: boolean | null
+          livro_ficha_trabalho_qual?: string | null
+          livro_inspecao_trabalho?: boolean | null
+          mandato_em_dia?: boolean | null
+          materiais_coletados?: string[]
+          media_horas_trabalhadas?: string | null
+          media_moradores_casa?: number | null
+          metodo_divisao_descricao?: string | null
+          metodo_divisao_dinheiro?: string | null
+          motivos_entrada_reciclagem?: string | null
+          movimento_qual?: string | null
+          mulheres?: number
+          necessita_documentos?: boolean | null
+          pagamento_fixo_mensal?: boolean | null
+          parcerias_detalhes?: string | null
+          participa_coleta_seletiva_municipal?: boolean | null
+          participa_movimentos?: boolean | null
+          pessoas_trans_detalhes?: string | null
+          possui_conta_bancaria?: string | null
+          possui_contador?: string | null
+          possui_maquineta?: string | null
+          possui_parcerias?: string | null
+          possui_pessoas_trans?: boolean
+          possui_registro_atas?: boolean | null
+          possui_veiculos_maquinas?: boolean | null
+          preconceito_detalhes?: string | null
+          problemas_melhorias_juridico?: string | null
+          problemas_saude?: string | null
+          processos_judiciais?: boolean | null
+          processos_judiciais_quais?: string | null
+          quantidade_beneficiarios?: number | null
+          quantidade_trabalho_infantil?: number | null
+          realiza_assembleias?: string | null
+          realiza_triagem?: boolean | null
+          recebe_beneficios?: boolean | null
+          recebeu_apoio_programas?: boolean | null
+          reconhecimento_sociedade?: string | null
+          registro_ocb?: string | null
+          regras_entrada_exclusao?: boolean | null
+          relatos_preconceito?: boolean | null
+          renda_media_cooperado?: number | null
+          renda_media_mensal?: number | null
+          sistema_financeiro?: string | null
+          sistema_financeiro_qual?: string | null
+          status?: Database["public"]["Enums"]["diagnostic_status"]
+          tipo_coleta?: string | null
+          tipo_galpao?: string | null
+          todos_sao_cooperados?: boolean | null
+          updated_at?: string
+          uso_epis?: string | null
+          volumetria_toneladas_mes?: number | null
+        }
+        Update: {
+          acidentes_tipo?: string | null
+          acidentes_ultimo_ano?: boolean | null
+          alvara_funcionamento?: boolean | null
+          ano_ultimo_balanco?: number | null
+          apoio_instituicoes?: boolean | null
+          apoio_instituicoes_quais?: string | null
+          apoio_poder_publico?: string | null
+          assessoria_juridica?: boolean | null
+          association_id?: string
+          ata_registrada_cartorio?: boolean | null
+          aumento_trabalho_festividades?: boolean | null
+          autodeclaracao_racial?: string | null
+          autonomos?: number
+          avcb?: string | null
+          capacitacoes_interesse?: string | null
+          cargos_por_eleicao?: string | null
+          conselho_fiscal?: string | null
+          consultant_id?: string
+          consultant_name?: string
+          contabilidade_regular?: string | null
+          contador_email?: string | null
+          contador_nome?: string | null
+          contador_telefone?: string | null
+          contador_tipo?: string | null
+          contrato_detalhes?: string | null
+          contrato_remunerado?: boolean | null
+          contrato_sst?: string | null
+          contrato_sst_responsavel?: string | null
+          contribuicao_inss?: string | null
+          controle_estoque?: string | null
+          controle_frequencia?: string | null
+          controle_frequencia_tipo?: string | null
+          controle_jornada?: boolean | null
+          cooperativa_fornece_epis?: boolean | null
+          created_at?: string
+          criancas_adolescentes_dependentes?: boolean | null
+          data_ultima_eleicao?: string | null
+          data_visita?: string
+          destino_venda?: string | null
+          diretoria_conselho?: boolean | null
+          diretoria_nomes?: string | null
+          divisao_tarefas_gerencia?: boolean | null
+          documentos_necessarios?: string | null
+          emite_notas_fiscais?: string | null
+          empregados_registrados?: number
+          empregados_sem_registro?: number
+          escolaridade_predominante?: string | null
+          estatuto_registrado?: boolean | null
+          extintores?: string | null
+          faixa_etaria_predominante?: string | null
+          filiacao_sindical?: boolean | null
+          filiacao_sindical_qual?: string | null
+          fluxo_trabalho_diario?: string | null
+          frequencia_assembleias?: string | null
+          historico_trabalho_infantil?: boolean | null
+          homens?: number
+          horario_visita?: string
+          id?: string
+          inscritos_cadunico?: string | null
+          interesse_capacitacao?: boolean | null
+          licenca_ambiental_status?: string | null
+          livro_ficha_trabalho?: boolean | null
+          livro_ficha_trabalho_qual?: string | null
+          livro_inspecao_trabalho?: boolean | null
+          mandato_em_dia?: boolean | null
+          materiais_coletados?: string[]
+          media_horas_trabalhadas?: string | null
+          media_moradores_casa?: number | null
+          metodo_divisao_descricao?: string | null
+          metodo_divisao_dinheiro?: string | null
+          motivos_entrada_reciclagem?: string | null
+          movimento_qual?: string | null
+          mulheres?: number
+          necessita_documentos?: boolean | null
+          pagamento_fixo_mensal?: boolean | null
+          parcerias_detalhes?: string | null
+          participa_coleta_seletiva_municipal?: boolean | null
+          participa_movimentos?: boolean | null
+          pessoas_trans_detalhes?: string | null
+          possui_conta_bancaria?: string | null
+          possui_contador?: string | null
+          possui_maquineta?: string | null
+          possui_parcerias?: string | null
+          possui_pessoas_trans?: boolean
+          possui_registro_atas?: boolean | null
+          possui_veiculos_maquinas?: boolean | null
+          preconceito_detalhes?: string | null
+          problemas_melhorias_juridico?: string | null
+          problemas_saude?: string | null
+          processos_judiciais?: boolean | null
+          processos_judiciais_quais?: string | null
+          quantidade_beneficiarios?: number | null
+          quantidade_trabalho_infantil?: number | null
+          realiza_assembleias?: string | null
+          realiza_triagem?: boolean | null
+          recebe_beneficios?: boolean | null
+          recebeu_apoio_programas?: boolean | null
+          reconhecimento_sociedade?: string | null
+          registro_ocb?: string | null
+          regras_entrada_exclusao?: boolean | null
+          relatos_preconceito?: boolean | null
+          renda_media_cooperado?: number | null
+          renda_media_mensal?: number | null
+          sistema_financeiro?: string | null
+          sistema_financeiro_qual?: string | null
+          status?: Database["public"]["Enums"]["diagnostic_status"]
+          tipo_coleta?: string | null
+          tipo_galpao?: string | null
+          todos_sao_cooperados?: boolean | null
+          updated_at?: string
+          uso_epis?: string | null
+          volumetria_toneladas_mes?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "association_assessments_association_id_fkey"
+            columns: ["association_id"]
+            isOneToOne: false
+            referencedRelation: "associations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      association_equipment: {
+        Row: {
+          assessment_id: string
+          created_at: string
+          id: string
+          quantidade: number
+          tipo: string
+        }
+        Insert: {
+          assessment_id: string
+          created_at?: string
+          id?: string
+          quantidade?: number
+          tipo: string
+        }
+        Update: {
+          assessment_id?: string
+          created_at?: string
+          id?: string
+          quantidade?: number
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "association_equipment_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "association_assessments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      association_evidence: {
+        Row: {
+          assessment_id: string | null
+          association_id: string
+          category: string
+          created_at: string
+          file_name: string
+          id: string
+          mime_type: string | null
+          module: Database["public"]["Enums"]["assessment_module"]
+          storage_path: string
+          uploaded_by: string
+        }
+        Insert: {
+          assessment_id?: string | null
+          association_id: string
+          category: string
+          created_at?: string
+          file_name: string
+          id?: string
+          mime_type?: string | null
+          module: Database["public"]["Enums"]["assessment_module"]
+          storage_path: string
+          uploaded_by: string
+        }
+        Update: {
+          assessment_id?: string | null
+          association_id?: string
+          category?: string
+          created_at?: string
+          file_name?: string
+          id?: string
+          mime_type?: string | null
+          module?: Database["public"]["Enums"]["assessment_module"]
+          storage_path?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "association_evidence_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "association_assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "association_evidence_association_id_fkey"
+            columns: ["association_id"]
+            isOneToOne: false
+            referencedRelation: "associations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      associations: {
+        Row: {
+          ativa: boolean
+          cnpj: string | null
+          created_at: string
+          email: string | null
+          endereco_sede: string
+          id: string
+          inscricao_estadual: string | null
+          inscricao_municipal: string | null
+          municipio: string
+          nome: string
+          numero_associados_atual: number
+          numero_associados_inicial: number
+          telefone: string | null
+          tipo: string
+          updated_at: string
+        }
+        Insert: {
+          ativa?: boolean
+          cnpj?: string | null
+          created_at?: string
+          email?: string | null
+          endereco_sede: string
+          id?: string
+          inscricao_estadual?: string | null
+          inscricao_municipal?: string | null
+          municipio: string
+          nome: string
+          numero_associados_atual?: number
+          numero_associados_inicial?: number
+          telefone?: string | null
+          tipo?: string
+          updated_at?: string
+        }
+        Update: {
+          ativa?: boolean
+          cnpj?: string | null
+          created_at?: string
+          email?: string | null
+          endereco_sede?: string
+          id?: string
+          inscricao_estadual?: string | null
+          inscricao_municipal?: string | null
+          municipio?: string
+          nome?: string
+          numero_associados_atual?: number
+          numero_associados_inicial?: number
+          telefone?: string | null
+          tipo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      audit_logs: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          id: number
+          new_data: Json | null
+          old_data: Json | null
+          record_id: string | null
+          table_name: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          id?: never
+          new_data?: Json | null
+          old_data?: Json | null
+          record_id?: string | null
+          table_name: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          id?: never
+          new_data?: Json | null
+          old_data?: Json | null
+          record_id?: string | null
+          table_name?: string
+        }
+        Relationships: []
+      }
       catadores: {
         Row: {
           area_atuacao: string | null
+          association_id: string | null
           autodeclaracao_racial: string
           cadastro_gov_br: boolean
           comprovante_residencia_url: string | null
@@ -54,6 +616,7 @@ export type Database = {
         }
         Insert: {
           area_atuacao?: string | null
+          association_id?: string | null
           autodeclaracao_racial: string
           cadastro_gov_br?: boolean
           comprovante_residencia_url?: string | null
@@ -91,6 +654,7 @@ export type Database = {
         }
         Update: {
           area_atuacao?: string | null
+          association_id?: string | null
           autodeclaracao_racial?: string
           cadastro_gov_br?: boolean
           comprovante_residencia_url?: string | null
@@ -126,7 +690,50 @@ export type Database = {
           titulo_eleitor_foto_url?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "catadores_association_id_fkey"
+            columns: ["association_id"]
+            isOneToOne: false
+            referencedRelation: "associations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      material_prices: {
+        Row: {
+          assessment_id: string
+          comprador: string | null
+          created_at: string
+          id: string
+          material: string
+          preco_por_kg: number
+        }
+        Insert: {
+          assessment_id: string
+          comprador?: string | null
+          created_at?: string
+          id?: string
+          material: string
+          preco_por_kg?: number
+        }
+        Update: {
+          assessment_id?: string
+          comprador?: string | null
+          created_at?: string
+          id?: string
+          material?: string
+          preco_por_kg?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "material_prices_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "association_assessments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -164,8 +771,10 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "atendente"
+      assessment_module: "social" | "juridico" | "contabil"
       catador_genero: "feminino" | "masculino" | "lgbtqia" | "nao_responder"
       catador_status: "pendente" | "ativo" | "inativo"
+      diagnostic_status: "regular" | "parcialmente_regular" | "irregular"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -294,8 +903,10 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "atendente"],
+      assessment_module: ["social", "juridico", "contabil"],
       catador_genero: ["feminino", "masculino", "lgbtqia", "nao_responder"],
       catador_status: ["pendente", "ativo", "inativo"],
+      diagnostic_status: ["regular", "parcialmente_regular", "irregular"],
     },
   },
 } as const
