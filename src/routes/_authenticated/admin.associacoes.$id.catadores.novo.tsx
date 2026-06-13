@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { AdminShell } from "@/components/admin/AdminShell";
@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/admin/associacoes/$id/catadores/novo")({
+  beforeLoad: ({ context }) => {
+    if (context.role !== "consultor") throw redirect({ to: "/admin/associacoes" });
+  },
   head: () => ({ meta: [{ title: "Cadastrar catador — PROCATE" }] }),
   component: NewAssociationCollector,
 });

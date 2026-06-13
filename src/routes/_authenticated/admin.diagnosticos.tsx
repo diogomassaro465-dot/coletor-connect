@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { BarChart3, Building2, CheckCircle2, Clock3, FileDown, ShieldAlert } from "lucide-react";
 import { AdminShell } from "@/components/admin/AdminShell";
@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/admin/diagnosticos")({
+  beforeLoad: ({ context }) => {
+    if (context.role !== "admin") throw redirect({ to: "/admin/associacoes" });
+  },
   head: () => ({ meta: [{ title: "Regularidade institucional — PROCATE" }] }),
   component: DiagnosticsDashboard,
 });

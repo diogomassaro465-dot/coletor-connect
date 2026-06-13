@@ -64,6 +64,8 @@ const EVIDENCE = [
 
 function AssessmentDetails() {
   const { id, assessmentId } = Route.useParams();
+  const { role } = Route.useRouteContext();
+  const canEditFieldData = role === "consultor";
   const qc = useQueryClient();
   const [cameraCategory, setCameraCategory] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -581,7 +583,7 @@ function AssessmentDetails() {
         </TabsContent>
         <TabsContent value="precos">
           <Collection title="Compradores e preços por quilograma">
-            <form
+            {canEditFieldData && <form
               onSubmit={(event) => addPrice.mutate(event)}
               className="grid gap-3 md:grid-cols-[1fr_1fr_160px_auto]"
             >
@@ -591,7 +593,7 @@ function AssessmentDetails() {
               <Button type="submit">
                 <Plus className="size-4" /> Adicionar
               </Button>
-            </form>
+            </form>}
             <Rows
               rows={data.prices.map((x) => [
                 x.material,
@@ -606,7 +608,7 @@ function AssessmentDetails() {
         </TabsContent>
         <TabsContent value="equipamentos">
           <Collection title="Veículos e máquinas">
-            <form
+            {canEditFieldData && <form
               onSubmit={(event) => addEquipment.mutate(event)}
               className="grid gap-3 md:grid-cols-[1fr_180px_auto]"
             >
@@ -620,7 +622,7 @@ function AssessmentDetails() {
               <Button type="submit">
                 <Plus className="size-4" /> Adicionar
               </Button>
-            </form>
+            </form>}
             <Rows rows={data.equipment.map((x) => [x.tipo, x.quantidade])} />
           </Collection>
         </TabsContent>
@@ -636,6 +638,7 @@ function AssessmentDetails() {
                       <label className="flex items-center gap-2 text-sm">
                         <Checkbox
                           checked={current?.implantado ?? false}
+                          disabled={!canEditFieldData}
                           onCheckedChange={(v) => updateBook(type, { implantado: !!v })}
                         />{" "}
                         Implantado
@@ -643,6 +646,7 @@ function AssessmentDetails() {
                       <label className="flex items-center gap-2 text-sm">
                         <Checkbox
                           checked={current?.atualizado ?? false}
+                          disabled={!canEditFieldData}
                           onCheckedChange={(v) => updateBook(type, { atualizado: !!v })}
                         />{" "}
                         Atualizado
@@ -650,6 +654,7 @@ function AssessmentDetails() {
                       <label className="flex items-center gap-2 text-sm">
                         <Checkbox
                           checked={current?.nao_sabe ?? false}
+                          disabled={!canEditFieldData}
                           onCheckedChange={(v) =>
                             updateBook(type, { nao_sabe: !!v, nao_possui: false })
                           }
@@ -659,6 +664,7 @@ function AssessmentDetails() {
                       <label className="flex items-center gap-2 text-sm">
                         <Checkbox
                           checked={current?.nao_possui ?? false}
+                          disabled={!canEditFieldData}
                           onCheckedChange={(v) =>
                             updateBook(type, { nao_possui: !!v, nao_sabe: false })
                           }
@@ -668,6 +674,7 @@ function AssessmentDetails() {
                     </div>
                     <Input
                       defaultValue={current?.observacao ?? ""}
+                      disabled={!canEditFieldData}
                       maxLength={500}
                       placeholder="Observação"
                       onBlur={(event) =>

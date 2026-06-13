@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -61,6 +61,9 @@ import {
 } from "@/lib/catador-constants";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
+  beforeLoad: ({ context }) => {
+    if (context.role !== "admin") throw redirect({ to: "/admin/associacoes" });
+  },
   head: () => ({ meta: [{ title: "Painel — RecicladoresBR" }] }),
   component: AdminDashboard,
 });
