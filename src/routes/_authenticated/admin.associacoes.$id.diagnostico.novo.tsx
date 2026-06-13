@@ -33,6 +33,7 @@ function NewAssessment() {
   const { modulo } = Route.useSearch();
   const navigate = useNavigate();
   const [saving, setSaving] = useState(false);
+  const [activeModule, setActiveModule] = useState(modulo);
   const [materials, setMaterials] = useState<string[]>([]);
   const [choices, setChoices] = useState<Record<string, string>>({});
   const { data: association, isLoading: loadingAssociation } = useQuery({
@@ -206,7 +207,7 @@ function NewAssessment() {
       setSaving(false);
       return toast.error("Erro ao salvar diagnóstico", { description: error.message });
     }
-    if (modulo === "social" && assessment) {
+    if (activeModule === "social" && assessment) {
       const associationUpdate = supabase
         .from("associations")
         .update({
@@ -263,7 +264,7 @@ function NewAssessment() {
     navigate({ to: "/admin/associacoes/$id", params: { id } });
   }
 
-  if (modulo === "social") {
+  if (false && modulo === "social") {
     return (
       <AdminShell>
         <Link to="/admin/associacoes/$id" params={{ id }}>
@@ -356,7 +357,7 @@ function NewAssessment() {
               <Input name="horario_visita" type="time" required />
             </Field>
           </div>
-          <Tabs defaultValue={modulo}>
+          <Tabs value={activeModule} onValueChange={(value) => setActiveModule(value as typeof modulo)}>
             <TabsList className="grid h-auto w-full grid-cols-3 rounded-2xl p-1">
               <TabsTrigger
                 value="social"
@@ -381,6 +382,20 @@ function NewAssessment() {
               </TabsTrigger>
             </TabsList>
             <TabsContent value="social">
+              {loadingAssociation ? (
+                <p className="mt-5 text-muted-foreground">Carregando dados da entidade...</p>
+              ) : (
+                <div className="mt-5 space-y-5">
+                  <SocialFields
+                    association={association}
+                    materials={materials}
+                    setMaterials={setMaterials}
+                    choice={choice}
+                    setChoice={setChoice}
+                  />
+                </div>
+              )}
+              <div className="hidden">
               <Module title="Módulo Social / Cadastral" tone="border-destructive/40">
                 <Grid>
                   <Field label="Nome do presidente">
@@ -666,6 +681,7 @@ function NewAssessment() {
                   </div>
                 </Grid>
               </Module>
+              </div>
             </TabsContent>
             <TabsContent value="juridico">
               <Module title="Módulo Jurídico" tone="border-blue-500/40">
