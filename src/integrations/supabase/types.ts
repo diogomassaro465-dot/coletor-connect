@@ -900,9 +900,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_field_consultant: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "admin" | "atendente"
+      app_role: "admin" | "atendente" | "consultor"
       assessment_module: "social" | "juridico" | "contabil"
       catador_genero: "feminino" | "masculino" | "lgbtqia" | "nao_responder"
       catador_status: "pendente" | "ativo" | "inativo"
@@ -1034,7 +1035,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "atendente"],
+      app_role: ["admin", "atendente", "consultor"],
       assessment_module: ["social", "juridico", "contabil"],
       catador_genero: ["feminino", "masculino", "lgbtqia", "nao_responder"],
       catador_status: ["pendente", "ativo", "inativo"],

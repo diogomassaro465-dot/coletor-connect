@@ -28,6 +28,8 @@ const STATUS_LABEL = {
 
 function AssociationDetails() {
   const { id } = Route.useParams();
+  const { role } = Route.useRouteContext();
+  const isConsultant = role === "consultor";
   const { data: association, isLoading } = useQuery({
     queryKey: ["association", id],
     queryFn: async () => {
@@ -86,62 +88,66 @@ function AssociationDetails() {
             <MapPin className="size-4" /> {association.municipio}
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Link to="/admin/associacoes/$id/catadores/novo" params={{ id }}>
-            <Button size="lg">
-              <UserPlus className="size-4" /> Cadastrar catador
-            </Button>
-          </Link>
-          <Link
-            to="/admin/associacoes/$id/diagnostico/novo"
-            params={{ id }}
-            search={{ modulo: "social" }}
-          >
-            <Button size="lg" variant="outline">
-              <ClipboardPlus className="size-4" /> Novo cadastro de campo
-            </Button>
-          </Link>
-        </div>
+        {isConsultant && (
+          <div className="flex flex-wrap gap-2">
+            <Link to="/admin/associacoes/$id/catadores/novo" params={{ id }}>
+              <Button size="lg">
+                <UserPlus className="size-4" /> Cadastrar catador
+              </Button>
+            </Link>
+            <Link
+              to="/admin/associacoes/$id/diagnostico/novo"
+              params={{ id }}
+              search={{ modulo: "social" }}
+            >
+              <Button size="lg" variant="outline">
+                <ClipboardPlus className="size-4" /> Novo cadastro de campo
+              </Button>
+            </Link>
+          </div>
+        )}
       </div>
 
-      <section className="mb-8 rounded-3xl border border-border bg-card p-6 shadow-card">
-        <div className="mb-5">
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
-            Formulários de campo
-          </p>
-          <h2 className="mt-1 text-xl font-bold">Escolha um dos 3 tipos de cadastro</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Cada opção abre diretamente o formulário Social, Jurídico ou Contábil da
-            associação/cooperativa.
-          </p>
-        </div>
-        <div className="grid gap-3 md:grid-cols-3">
-          <DiagnosticModule
-            id={id}
-            module="social"
-            icon={Users}
-            title="Cadastro Social"
-            description="Perfil dos associados, saúde, renda, benefícios, coleta e estrutura social."
-            tone="secondary"
-          />
-          <DiagnosticModule
-            id={id}
-            module="juridico"
-            icon={Scale}
-            title="Cadastro Jurídico"
-            description="Diretoria, atas, contratos, processos, regras internas e regularização."
-            tone="primary"
-          />
-          <DiagnosticModule
-            id={id}
-            module="contabil"
-            icon={Calculator}
-            title="Cadastro Contábil"
-            description="Documentos, contador, livros, controles, balanços e pendências contábeis."
-            tone="warning"
-          />
-        </div>
-      </section>
+      {isConsultant && (
+        <section className="mb-8 rounded-3xl border border-border bg-card p-6 shadow-card">
+          <div className="mb-5">
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+              Formulários de campo
+            </p>
+            <h2 className="mt-1 text-xl font-bold">Escolha um dos 3 tipos de cadastro</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Cada opção abre diretamente o formulário Social, Jurídico ou Contábil da
+              associação/cooperativa.
+            </p>
+          </div>
+          <div className="grid gap-3 md:grid-cols-3">
+            <DiagnosticModule
+              id={id}
+              module="social"
+              icon={Users}
+              title="Cadastro Social"
+              description="Perfil dos associados, saúde, renda, benefícios, coleta e estrutura social."
+              tone="secondary"
+            />
+            <DiagnosticModule
+              id={id}
+              module="juridico"
+              icon={Scale}
+              title="Cadastro Jurídico"
+              description="Diretoria, atas, contratos, processos, regras internas e regularização."
+              tone="primary"
+            />
+            <DiagnosticModule
+              id={id}
+              module="contabil"
+              icon={Calculator}
+              title="Cadastro Contábil"
+              description="Documentos, contador, livros, controles, balanços e pendências contábeis."
+              tone="warning"
+            />
+          </div>
+        </section>
+      )}
 
       <div className="mb-10 grid gap-4 sm:grid-cols-3">
         <Info

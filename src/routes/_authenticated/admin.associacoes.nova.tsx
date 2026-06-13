@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -17,6 +17,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/admin/associacoes/nova")({
+  beforeLoad: ({ context }) => {
+    if (context.role !== "admin") throw redirect({ to: "/admin/associacoes" });
+  },
   head: () => ({ meta: [{ title: "Nova associação — PROCATE" }] }),
   component: NewAssociationPage,
 });

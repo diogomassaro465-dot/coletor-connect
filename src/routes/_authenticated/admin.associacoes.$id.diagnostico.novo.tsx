@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState, type FormEvent, type ReactNode } from "react";
 import { ArrowLeft, Calculator, Loader2, Scale, Users } from "lucide-react";
@@ -21,6 +21,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { MATERIAIS_OPTIONS } from "@/lib/catador-constants";
 
 export const Route = createFileRoute("/_authenticated/admin/associacoes/$id/diagnostico/novo")({
+  beforeLoad: ({ context }) => {
+    if (context.role !== "consultor") throw redirect({ to: "/admin/associacoes" });
+  },
   validateSearch: (search: Record<string, unknown>) => ({
     modulo: search.modulo === "juridico" || search.modulo === "contabil" ? search.modulo : "social",
   }),

@@ -78,7 +78,7 @@ function AuthPage() {
           </Link>
           <h1 className="text-2xl font-bold">Acessar painel</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            Acesso restrito para administradores e atendentes.
+            Acesso restrito para administradores da UCIP e consultores de campo.
           </p>
 
           <form onSubmit={handleLogin} className="mt-8 space-y-4">
@@ -109,7 +109,7 @@ function AuthPage() {
             </Button>
           </form>
           <p className="mt-5 text-center text-xs text-muted-foreground">
-            Contas são fornecidas exclusivamente pela administração do projeto.
+            Cooperativas e catadores fornecem os dados, mas não acessam o sistema diretamente.
           </p>
         </div>
       </div>

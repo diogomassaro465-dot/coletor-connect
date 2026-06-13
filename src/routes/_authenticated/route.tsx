@@ -6,15 +6,20 @@ export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async () => {
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) throw redirect({ to: "/auth" });
-    const { data: isAdmin, error: roleError } = await supabase.rpc("has_role", {
-      _user_id: data.user.id,
-      _role: "admin",
-    });
-    if (roleError || !isAdmin) {
+    const { data: roles, error: roleError } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", data.user.id);
+    const role = roles?.some((item) => item.role === "admin")
+      ? "admin"
+      : roles?.some((item) => item.role === "consultor" || item.role === "atendente")
+        ? "consultor"
+        : null;
+    if (roleError || !role) {
       await supabase.auth.signOut();
       throw redirect({ to: "/auth" });
     }
-    return { user: data.user };
+    return { user: data.user, role };
   },
   component: () => <Outlet />,
 });
