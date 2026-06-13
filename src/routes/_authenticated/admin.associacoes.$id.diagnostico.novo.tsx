@@ -80,7 +80,7 @@ function NewAssessment() {
         municipio: String(values.get("association_municipio") ?? "").trim(),
         inscricao_municipal: text(values, "association_inscricao_municipal"),
         inscricao_estadual: text(values, "association_inscricao_estadual"),
-        endereco_sede: text(values, "association_endereco_sede"),
+        endereco_sede: text(values, "association_endereco_sede") ?? "",
         telefone: text(values, "association_telefone"),
         email: text(values, "association_email"),
         numero_associados_inicial: Number(values.get("association_numero_inicial") ?? 0),
@@ -110,6 +110,23 @@ function NewAssessment() {
     navigate({ to: "/admin/associacoes/$id", params: { id } });
   }
 
+  if (modulo === "social") {
+    return <AdminShell>
+      <Link to="/admin/associacoes/$id" params={{ id }}><Button variant="ghost" size="sm" className="mb-5"><ArrowLeft className="size-4" /> Voltar à entidade</Button></Link>
+      <div className="mx-auto max-w-5xl">
+        <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Equipe Social</p>
+        <h1 className="mt-1 text-3xl font-bold">Cooperativa de Catadores de Recicláveis</h1>
+        <p className="mt-2 text-muted-foreground">Formulário organizado conforme o roteiro de entrevista social.</p>
+        <form onSubmit={submit} className="mt-7 space-y-5">
+          <div className="grid gap-4 rounded-xl border border-border bg-card p-5 shadow-card md:grid-cols-3"><Field label="Nome do consultor"><Input name="consultant_name" required /></Field><Field label="Data da visita"><Input name="data_visita" type="date" required /></Field><Field label="Horário da visita"><Input name="horario_visita" type="time" required /></Field></div>
+          {loadingAssociation ? <p className="text-muted-foreground">Carregando dados da entidade...</p> : <SocialFields association={association} materials={materials} setMaterials={setMaterials} choice={choice} setChoice={setChoice} />}
+          <div className="space-y-4 rounded-xl border border-border bg-card p-5"><label className="flex items-start gap-3 text-sm"><Checkbox name="consentimento_dados" required /><span>Autorizo o tratamento dos dados coletados para as finalidades do diagnóstico e acompanhamento institucional.</span></label><label className="flex items-start gap-3 text-sm"><Checkbox name="declaracao_veracidade" required /><span>Declaro que as informações prestadas são verdadeiras e correspondem à realidade observada na visita.</span></label></div>
+          <div className="sticky bottom-4 flex justify-end rounded-xl border border-border bg-background/95 p-4 shadow-card backdrop-blur"><Button type="submit" size="lg" disabled={saving || loadingAssociation}>{saving && <Loader2 className="size-4 animate-spin" />} Salvar diagnóstico social</Button></div>
+        </form>
+      </div>
+    </AdminShell>;
+  }
+
   return <AdminShell>
     <Link to="/admin/associacoes/$id" params={{ id }}><Button variant="ghost" size="sm" className="mb-5"><ArrowLeft className="size-4" /> Voltar à entidade</Button></Link>
     <div className="mx-auto max-w-5xl"><p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">3 tipos de cadastro de campo</p><h1 className="mt-1 text-3xl font-bold">Social, Jurídico e Contábil</h1><p className="mt-2 text-muted-foreground">Selecione o tipo de cadastro e preencha o formulário correspondente ao documento de campo.</p>
@@ -126,6 +143,8 @@ function NewAssessment() {
 }
 
 const YN = ["Sim", "Não"]; const YNK = ["Sim", "Não", "Não sabe"]; const YNSOME = ["Sim", "Não", "Alguns"];
+const SOCIAL_MATERIALS = [{ key: "vidro", label: "Vidro" }, { key: "pet", label: "Plástico PET" }, { key: "outros_plasticos", label: "Outros plásticos" }, { key: "ferro", label: "Ferro" }, { key: "aluminio", label: "Alumínio" }, { key: "papelao", label: "Papelão" }, { key: "papel", label: "Papel" }, { key: "outros", label: "Outros materiais" }] as const;
+const SOCIAL_EQUIPMENT = [{ key: "caminhao", label: "Caminhão" }, { key: "prensa", label: "Prensa" }, { key: "balanca", label: "Balança" }, { key: "elevador", label: "Elevador" }] as const;
 function text(data: FormData, key: string) { const value = String(data.get(key) ?? "").trim(); return value || null; }
 function numberOrNull(data: FormData, key: string) { const value = String(data.get(key) ?? ""); return value === "" ? null : Number(value); }
 function Module({ title, tone, children }: { title: string; tone: string; children: ReactNode }) { return <section className={`mt-5 rounded-xl border bg-card p-5 shadow-card md:p-7 ${tone}`}><h2 className="mb-6 text-xl font-bold">{title}</h2>{children}</section>; }
