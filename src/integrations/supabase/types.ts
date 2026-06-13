@@ -88,6 +88,8 @@ export type Database = {
           contador_telefone: string | null
           contador_tipo: string | null
           contrato_detalhes: string | null
+          contrato_instituicoes_privadas: string | null
+          contrato_instituicoes_publicas: string | null
           contrato_remunerado: boolean | null
           contrato_sst: string | null
           contrato_sst_responsavel: string | null
@@ -232,6 +234,8 @@ export type Database = {
           contador_telefone?: string | null
           contador_tipo?: string | null
           contrato_detalhes?: string | null
+          contrato_instituicoes_privadas?: string | null
+          contrato_instituicoes_publicas?: string | null
           contrato_remunerado?: boolean | null
           contrato_sst?: string | null
           contrato_sst_responsavel?: string | null
@@ -376,6 +380,8 @@ export type Database = {
           contador_telefone?: string | null
           contador_tipo?: string | null
           contrato_detalhes?: string | null
+          contrato_instituicoes_privadas?: string | null
+          contrato_instituicoes_publicas?: string | null
           contrato_remunerado?: boolean | null
           contrato_sst?: string | null
           contrato_sst_responsavel?: string | null

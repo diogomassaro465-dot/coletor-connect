@@ -140,17 +140,19 @@ function NewAssessment() {
         todos_sao_cooperados: bool("todos_sao_cooperados"),
         lista_cooperados_atualizada: choice("lista_cooperados_atualizada"),
         lista_nao_cooperados_atualizada: choice("lista_nao_cooperados_atualizada"),
-        regras_entrada: text(values, "regras_entrada"),
-        regras_saida_exclusao: text(values, "regras_saida_exclusao"),
+        regras_entrada: choice("regras_entrada"),
+        regras_saida_exclusao: choice("regras_saida_exclusao"),
         fluxo_trabalho_diario: text(values, "fluxo_trabalho_diario"),
-        divisao_tarefas: text(values, "divisao_tarefas"),
-        coordenacao_gerencia: text(values, "coordenacao_gerencia"),
+        divisao_tarefas: choice("divisao_tarefas"),
+        coordenacao_gerencia: choice("coordenacao_gerencia"),
         controle_jornada: bool("controle_jornada"),
         problemas_juridicos_atuais: text(values, "problemas_juridicos_atuais"),
         melhorias_juridicas_necessarias: text(values, "melhorias_juridicas_necessarias"),
         contrato_remunerado: bool("contrato_remunerado"),
         contrato_tipo: choice("contrato_tipo", "Não se aplica"),
         contrato_detalhes: text(values, "contrato_detalhes"),
+        contrato_instituicoes_publicas: text(values, "contrato_instituicoes_publicas"),
+        contrato_instituicoes_privadas: text(values, "contrato_instituicoes_privadas"),
         participa_coleta_seletiva_municipal: bool("participa_coleta_seletiva_municipal"),
         apoio_poder_publico: choice("apoio_poder_publico"),
         pendencias_juridicas: text(values, "pendencias_juridicas"),
@@ -257,6 +259,20 @@ function NewAssessment() {
         return toast.error(
           "Diagnóstico salvo, mas houve erro nos detalhes de materiais ou equipamentos.",
         );
+      }
+    }
+    if (activeModule === "juridico") {
+      const { error: associationError } = await supabase
+        .from("associations")
+        .update({
+          nome: String(values.get("legal_association_nome") ?? "").trim(),
+          cnpj: text(values, "legal_association_cnpj"),
+          municipio: String(values.get("legal_association_municipio") ?? "").trim(),
+        })
+        .eq("id", id);
+      if (associationError) {
+        setSaving(false);
+        return toast.error("Diagnóstico salvo, mas não foi possível atualizar a entidade.");
       }
     }
     setSaving(false);
@@ -637,206 +653,232 @@ function NewAssessment() {
               </fieldset>
             </TabsContent>
             <TabsContent value="juridico">
-              <Module title="Módulo Jurídico" tone="border-blue-500/40">
-                <Grid>
-                  <Choice
-                    name="diretoria_conselho"
-                    label="Possui diretoria/conselho?"
-                    options={YN}
-                    value={choice("diretoria_conselho")}
-                    onChange={setChoice}
-                  />
-                  <Field label="Nomes da diretoria">
-                    <Textarea name="diretoria_nomes" maxLength={1500} />
-                  </Field>
-                  <Choice
-                    name="mandato_em_dia"
-                    label="Mandato em dia?"
-                    options={YNK}
-                    value={choice("mandato_em_dia")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="conselho_fiscal"
-                    label="Conselho fiscal?"
-                    options={YNK}
-                    value={choice("conselho_fiscal")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="cargos_por_eleicao"
-                    label="Cargos definidos por eleição?"
-                    options={YNK}
-                    value={choice("cargos_por_eleicao")}
-                    onChange={setChoice}
-                  />
-                  <Field label="Data da última eleição">
-                    <Input name="data_ultima_eleicao" type="date" />
-                  </Field>
-                  <Choice
-                    name="ata_registrada_cartorio"
-                    label="Ata registrada em cartório?"
-                    options={YNK}
-                    value={choice("ata_registrada_cartorio")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="realiza_assembleias"
-                    label="Realiza assembleias?"
-                    options={YNK}
-                    value={choice("realiza_assembleias")}
-                    onChange={setChoice}
-                  />
-                  <Field label="Frequência das assembleias">
-                    <Input name="frequencia_assembleias" maxLength={200} />
-                  </Field>
-                  <Choice
-                    name="possui_registro_atas"
-                    label="Possui registro em atas?"
-                    options={YNK}
-                    value={choice("possui_registro_atas")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="assessoria_juridica"
-                    label="Possui assessoria jurídica?"
-                    options={YN}
-                    value={choice("assessoria_juridica")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="apoio_instituicoes"
-                    label="Recebe apoio institucional?"
-                    options={YN}
-                    value={choice("apoio_instituicoes")}
-                    onChange={setChoice}
-                  />
-                  <Field label="Instituições responsáveis pelo apoio">
-                    <Textarea name="apoio_instituicoes_quais" maxLength={1000} />
-                  </Field>
-                  <Choice
-                    name="processos_judiciais"
-                    label="Possui processos judiciais?"
-                    options={YN}
-                    value={choice("processos_judiciais")}
-                    onChange={setChoice}
-                  />
-                  <Field label="Detalhes dos processos" wide>
-                    <Textarea name="processos_judiciais_quais" maxLength={1500} />
-                  </Field>
-                  <Choice
-                    name="todos_sao_cooperados"
-                    label="Todos são cooperados?"
-                    options={YN}
-                    value={choice("todos_sao_cooperados")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="lista_cooperados_atualizada"
-                    label="Lista de cooperados está atualizada?"
-                    options={YNK}
-                    value={choice("lista_cooperados_atualizada")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="lista_nao_cooperados_atualizada"
-                    label="Lista de não cooperados está atualizada?"
-                    options={YNK}
-                    value={choice("lista_nao_cooperados_atualizada")}
-                    onChange={setChoice}
-                  />
-                  <Field label="Regras de entrada">
-                    <Textarea name="regras_entrada" maxLength={1500} />
-                  </Field>
-                  <Field label="Regras de saída ou exclusão">
-                    <Textarea name="regras_saida_exclusao" maxLength={1500} />
-                  </Field>
-                  <Field label="Fluxo de trabalho diário" wide>
-                    <Textarea name="fluxo_trabalho_diario" maxLength={1500} />
-                  </Field>
-                  <Field label="Como ocorre a divisão de tarefas?">
-                    <Textarea name="divisao_tarefas" maxLength={1500} />
-                  </Field>
-                  <Field label="Como ocorre a coordenação ou gerência?">
-                    <Textarea name="coordenacao_gerencia" maxLength={1500} />
-                  </Field>
-                  <Choice
-                    name="controle_jornada"
-                    label="Há controle de jornada?"
-                    options={YN}
-                    value={choice("controle_jornada")}
-                    onChange={setChoice}
-                  />
-                  <Field label="Problemas jurídicos atuais">
-                    <Textarea name="problemas_juridicos_atuais" maxLength={1500} />
-                  </Field>
-                  <Field label="Melhorias jurídicas necessárias">
-                    <Textarea name="melhorias_juridicas_necessarias" maxLength={1500} />
-                  </Field>
-                  <Choice
-                    name="contrato_remunerado"
-                    label="Possui contrato remunerado?"
-                    options={YN}
-                    value={choice("contrato_remunerado")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="contrato_tipo"
-                    label="Tipo de contrato"
-                    options={[
-                      "Prefeitura",
-                      "Órgão público",
-                      "Instituição privada",
-                      "Outro",
-                      "Não se aplica",
-                    ]}
-                    value={choice("contrato_tipo", "Não se aplica")}
-                    onChange={setChoice}
-                  />
-                  <Field label="Detalhes do contrato" wide>
-                    <Textarea name="contrato_detalhes" maxLength={1500} />
-                  </Field>
-                  <Choice
-                    name="participa_coleta_seletiva_municipal"
-                    label="Participa da coleta seletiva municipal?"
-                    options={YN}
-                    value={choice("participa_coleta_seletiva_municipal")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="apoio_poder_publico"
-                    label="Apoio do poder público?"
-                    options={YNK}
-                    value={choice("apoio_poder_publico")}
-                    onChange={setChoice}
-                  />
-                  <Field label="Pendências jurídicas finais" wide>
-                    <Textarea name="pendencias_juridicas" maxLength={2000} />
-                  </Field>
-                  <Choice
-                    name="classificacao_juridica"
-                    label="Classificação final jurídica"
-                    options={["Regular", "Parcialmente regular", "Irregular"]}
-                    value={choice("classificacao_juridica", "Irregular")}
-                    onChange={setChoice}
-                  />
-                  <div className="space-y-4 md:col-span-2">
-                    <label className="flex items-start gap-3 rounded-lg border border-border p-4 text-sm">
-                      <Checkbox name="orientacao_regularizacao_aceita" />
+              {loadingAssociation ? (
+                <p className="mt-5 text-muted-foreground">Carregando dados da entidade...</p>
+              ) : (
+                <div className="mt-5 space-y-5">
+                  <LegalFields association={association} choice={choice} setChoice={setChoice} />
+                  <div className="space-y-4 rounded-xl border border-border bg-card p-5">
+                    <label className="flex items-start gap-3 text-sm">
+                      <Checkbox name="consentimento_dados" required />
                       <span>
-                        Confirmo que foram apresentadas as orientações para regularização jurídica.
+                        Autorizo expressamente o uso e o tratamento dos dados pessoais fornecidos
+                        neste formulário.
                       </span>
                     </label>
-                    <label className="flex items-start gap-3 rounded-lg border border-border p-4 text-sm">
-                      <Checkbox name="orientacao_documentos_aceita" />
+                    <label className="flex items-start gap-3 text-sm">
+                      <Checkbox name="declaracao_veracidade" required />
                       <span>
-                        Confirmo que foram apresentadas as orientações sobre documentos e registros
-                        necessários.
+                        Declaro, sob minha responsabilidade, que as informações prestadas são
+                        verdadeiras, completas e foram devidamente fornecidas.
                       </span>
                     </label>
                   </div>
-                </Grid>
-              </Module>
+                </div>
+              )}
+              <fieldset disabled className="hidden">
+                <Module title="Módulo Jurídico" tone="border-blue-500/40">
+                  <Grid>
+                    <Choice
+                      name="diretoria_conselho"
+                      label="Possui diretoria/conselho?"
+                      options={YN}
+                      value={choice("diretoria_conselho")}
+                      onChange={setChoice}
+                    />
+                    <Field label="Nomes da diretoria">
+                      <Textarea name="diretoria_nomes" maxLength={1500} />
+                    </Field>
+                    <Choice
+                      name="mandato_em_dia"
+                      label="Mandato em dia?"
+                      options={YNK}
+                      value={choice("mandato_em_dia")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="conselho_fiscal"
+                      label="Conselho fiscal?"
+                      options={YNK}
+                      value={choice("conselho_fiscal")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="cargos_por_eleicao"
+                      label="Cargos definidos por eleição?"
+                      options={YNK}
+                      value={choice("cargos_por_eleicao")}
+                      onChange={setChoice}
+                    />
+                    <Field label="Data da última eleição">
+                      <Input name="data_ultima_eleicao" type="date" />
+                    </Field>
+                    <Choice
+                      name="ata_registrada_cartorio"
+                      label="Ata registrada em cartório?"
+                      options={YNK}
+                      value={choice("ata_registrada_cartorio")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="realiza_assembleias"
+                      label="Realiza assembleias?"
+                      options={YNK}
+                      value={choice("realiza_assembleias")}
+                      onChange={setChoice}
+                    />
+                    <Field label="Frequência das assembleias">
+                      <Input name="frequencia_assembleias" maxLength={200} />
+                    </Field>
+                    <Choice
+                      name="possui_registro_atas"
+                      label="Possui registro em atas?"
+                      options={YNK}
+                      value={choice("possui_registro_atas")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="assessoria_juridica"
+                      label="Possui assessoria jurídica?"
+                      options={YN}
+                      value={choice("assessoria_juridica")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="apoio_instituicoes"
+                      label="Recebe apoio institucional?"
+                      options={YN}
+                      value={choice("apoio_instituicoes")}
+                      onChange={setChoice}
+                    />
+                    <Field label="Instituições responsáveis pelo apoio">
+                      <Textarea name="apoio_instituicoes_quais" maxLength={1000} />
+                    </Field>
+                    <Choice
+                      name="processos_judiciais"
+                      label="Possui processos judiciais?"
+                      options={YN}
+                      value={choice("processos_judiciais")}
+                      onChange={setChoice}
+                    />
+                    <Field label="Detalhes dos processos" wide>
+                      <Textarea name="processos_judiciais_quais" maxLength={1500} />
+                    </Field>
+                    <Choice
+                      name="todos_sao_cooperados"
+                      label="Todos são cooperados?"
+                      options={YN}
+                      value={choice("todos_sao_cooperados")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="lista_cooperados_atualizada"
+                      label="Lista de cooperados está atualizada?"
+                      options={YNK}
+                      value={choice("lista_cooperados_atualizada")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="lista_nao_cooperados_atualizada"
+                      label="Lista de não cooperados está atualizada?"
+                      options={YNK}
+                      value={choice("lista_nao_cooperados_atualizada")}
+                      onChange={setChoice}
+                    />
+                    <Field label="Regras de entrada">
+                      <Textarea name="regras_entrada" maxLength={1500} />
+                    </Field>
+                    <Field label="Regras de saída ou exclusão">
+                      <Textarea name="regras_saida_exclusao" maxLength={1500} />
+                    </Field>
+                    <Field label="Fluxo de trabalho diário" wide>
+                      <Textarea name="fluxo_trabalho_diario" maxLength={1500} />
+                    </Field>
+                    <Field label="Como ocorre a divisão de tarefas?">
+                      <Textarea name="divisao_tarefas" maxLength={1500} />
+                    </Field>
+                    <Field label="Como ocorre a coordenação ou gerência?">
+                      <Textarea name="coordenacao_gerencia" maxLength={1500} />
+                    </Field>
+                    <Choice
+                      name="controle_jornada"
+                      label="Há controle de jornada?"
+                      options={YN}
+                      value={choice("controle_jornada")}
+                      onChange={setChoice}
+                    />
+                    <Field label="Problemas jurídicos atuais">
+                      <Textarea name="problemas_juridicos_atuais" maxLength={1500} />
+                    </Field>
+                    <Field label="Melhorias jurídicas necessárias">
+                      <Textarea name="melhorias_juridicas_necessarias" maxLength={1500} />
+                    </Field>
+                    <Choice
+                      name="contrato_remunerado"
+                      label="Possui contrato remunerado?"
+                      options={YN}
+                      value={choice("contrato_remunerado")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="contrato_tipo"
+                      label="Tipo de contrato"
+                      options={[
+                        "Prefeitura",
+                        "Órgão público",
+                        "Instituição privada",
+                        "Outro",
+                        "Não se aplica",
+                      ]}
+                      value={choice("contrato_tipo", "Não se aplica")}
+                      onChange={setChoice}
+                    />
+                    <Field label="Detalhes do contrato" wide>
+                      <Textarea name="contrato_detalhes" maxLength={1500} />
+                    </Field>
+                    <Choice
+                      name="participa_coleta_seletiva_municipal"
+                      label="Participa da coleta seletiva municipal?"
+                      options={YN}
+                      value={choice("participa_coleta_seletiva_municipal")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="apoio_poder_publico"
+                      label="Apoio do poder público?"
+                      options={YNK}
+                      value={choice("apoio_poder_publico")}
+                      onChange={setChoice}
+                    />
+                    <Field label="Pendências jurídicas finais" wide>
+                      <Textarea name="pendencias_juridicas" maxLength={2000} />
+                    </Field>
+                    <Choice
+                      name="classificacao_juridica"
+                      label="Classificação final jurídica"
+                      options={["Regular", "Parcialmente regular", "Irregular"]}
+                      value={choice("classificacao_juridica", "Irregular")}
+                      onChange={setChoice}
+                    />
+                    <div className="space-y-4 md:col-span-2">
+                      <label className="flex items-start gap-3 rounded-lg border border-border p-4 text-sm">
+                        <Checkbox name="orientacao_regularizacao_aceita" />
+                        <span>
+                          Confirmo que foram apresentadas as orientações para regularização
+                          jurídica.
+                        </span>
+                      </label>
+                      <label className="flex items-start gap-3 rounded-lg border border-border p-4 text-sm">
+                        <Checkbox name="orientacao_documentos_aceita" />
+                        <span>
+                          Confirmo que foram apresentadas as orientações sobre documentos e
+                          registros necessários.
+                        </span>
+                      </label>
+                    </div>
+                  </Grid>
+                </Module>
+              </fieldset>
             </TabsContent>
             <TabsContent value="contabil">
               <Module title="Módulo Contábil" tone="border-primary/40">
@@ -1113,6 +1155,301 @@ type SocialFieldsProps = {
   choice: (name: string, fallback?: string) => string;
   setChoice: (name: string, value: string) => void;
 };
+
+function LegalFields({
+  association,
+  choice,
+  setChoice,
+}: Pick<SocialFieldsProps, "association" | "choice" | "setChoice">) {
+  return (
+    <>
+      <LegalSection number="1" title="Identificação inicial da associação/cooperativa">
+        <Grid>
+          <Field label="Nome completo da associação/cooperativa">
+            <Input name="legal_association_nome" defaultValue={association?.nome} required />
+          </Field>
+          <Field label="CNPJ (se tiver)">
+            <Input name="legal_association_cnpj" defaultValue={association?.cnpj ?? ""} />
+          </Field>
+          <Field label="Município">
+            <Input
+              name="legal_association_municipio"
+              defaultValue={association?.municipio}
+              required
+            />
+          </Field>
+        </Grid>
+      </LegalSection>
+      <LegalSection number="2" title="Gestão e organização">
+        <Grid>
+          <Choice
+            name="diretoria_conselho"
+            label="Existe diretoria ou conselho de administração?"
+            options={YN}
+            value={choice("diretoria_conselho")}
+            onChange={setChoice}
+          />
+          <Field label="Se sim, nomes dos principais responsáveis">
+            <Textarea name="diretoria_nomes" />
+          </Field>
+          <Choice
+            name="mandato_em_dia"
+            label="A diretoria está com o mandato em dia?"
+            options={YN}
+            value={choice("mandato_em_dia")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="conselho_fiscal"
+            label="Existe Conselho Fiscal?"
+            options={YNK}
+            value={choice("conselho_fiscal")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="cargos_por_eleicao"
+            label="Os cargos foram definidos por eleição?"
+            options={YNK}
+            value={choice("cargos_por_eleicao")}
+            onChange={setChoice}
+          />
+          <Field label="Quando foi a última eleição da cooperativa?">
+            <Input name="data_ultima_eleicao" type="date" />
+          </Field>
+          <Choice
+            name="ata_registrada_cartorio"
+            label="A ata foi registrada em cartório?"
+            options={YN}
+            value={choice("ata_registrada_cartorio")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="realiza_assembleias"
+            label="Realiza reuniões ou assembleias com os cooperados?"
+            options={YNK}
+            value={choice("realiza_assembleias")}
+            onChange={setChoice}
+          />
+          <Field label="Com que frequência essas reuniões acontecem?">
+            <Input name="frequencia_assembleias" />
+          </Field>
+          <Choice
+            name="possui_registro_atas"
+            label="Existe registro dessas reuniões (atas)?"
+            options={YN}
+            value={choice("possui_registro_atas")}
+            onChange={setChoice}
+          />
+        </Grid>
+      </LegalSection>
+      <LegalSection number="3" title="Apoio técnico e administrativo">
+        <Grid>
+          <Choice
+            name="assessoria_juridica"
+            label="Possui assessoria jurídica ou advogado?"
+            options={YN}
+            value={choice("assessoria_juridica")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="apoio_instituicoes"
+            label="Recebe apoio de alguma instituição?"
+            options={YN}
+            value={choice("apoio_instituicoes")}
+            onChange={setChoice}
+          />
+          <Field label="Se sim, quais instituições?" wide>
+            <Textarea name="apoio_instituicoes_quais" />
+          </Field>
+          <Choice
+            name="processos_judiciais"
+            label="Possui processos judiciais (trabalhista ou cível)?"
+            options={YN}
+            value={choice("processos_judiciais")}
+            onChange={setChoice}
+          />
+          <Field label="Se sim, quais processos?" wide>
+            <Textarea name="processos_judiciais_quais" />
+          </Field>
+        </Grid>
+      </LegalSection>
+      <LegalSection number="4" title="Quadro de cooperados">
+        <Grid>
+          <Choice
+            name="todos_sao_cooperados"
+            label="Todos que trabalham são cooperados?"
+            options={YN}
+            value={choice("todos_sao_cooperados")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="lista_cooperados_atualizada"
+            label="Existe cadastro ou lista atualizada dos cooperados? (pedir foto)"
+            options={YN}
+            value={choice("lista_cooperados_atualizada")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="lista_nao_cooperados_atualizada"
+            label="Existe lista atualizada dos não cooperados? (pedir foto)"
+            options={YN}
+            value={choice("lista_nao_cooperados_atualizada")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="regras_entrada"
+            label="Existem regras para entrada de novos cooperados?"
+            options={YN}
+            value={choice("regras_entrada")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="regras_saida_exclusao"
+            label="Existem regras para saída ou exclusão de cooperados?"
+            options={YN}
+            value={choice("regras_saida_exclusao")}
+            onChange={setChoice}
+          />
+        </Grid>
+      </LegalSection>
+      <LegalSection number="5" title="Forma de trabalho e organização das atividades">
+        <Grid>
+          <Field label="Como funciona o trabalho no dia a dia? (coleta, triagem, venda etc.)" wide>
+            <Textarea name="fluxo_trabalho_diario" />
+          </Field>
+          <Choice
+            name="divisao_tarefas"
+            label="Existe divisão de tarefas entre os cooperados?"
+            options={YN}
+            value={choice("divisao_tarefas")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="coordenacao_gerencia"
+            label="Existe alguém que coordena ou gerencia as atividades?"
+            options={YN}
+            value={choice("coordenacao_gerencia")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="controle_jornada"
+            label="Existe controle de horário ou jornada de trabalho?"
+            options={YN}
+            value={choice("controle_jornada")}
+            onChange={setChoice}
+          />
+        </Grid>
+      </LegalSection>
+      <LegalSection number="6" title="Principais dificuldades">
+        <Grid>
+          <Field label="Quais são hoje os principais problemas da cooperativa?" wide>
+            <Textarea name="problemas_juridicos_atuais" />
+          </Field>
+          <Field label="O que mais precisa melhorar atualmente?" wide>
+            <Textarea name="melhorias_juridicas_necessarias" />
+          </Field>
+        </Grid>
+      </LegalSection>
+      <LegalSection number="7" title="Relação com o poder público">
+        <Grid>
+          <Choice
+            name="contrato_tipo"
+            label="Possui contrato remunerado com prefeitura ou outra instituição?"
+            options={[
+              "Sim, prefeitura",
+              "Sim, outra instituição pública",
+              "Sim, instituição privada",
+              "Não",
+            ]}
+            value={choice("contrato_tipo", "Não")}
+            onChange={(name, value) => {
+              setChoice(name, value);
+              setChoice("contrato_remunerado", value === "Não" ? "Não" : "Sim");
+            }}
+          />
+          <Field label="Se sim, quais são as públicas?">
+            <Textarea name="contrato_instituicoes_publicas" />
+          </Field>
+          <Field label="Se sim, quais são as privadas?">
+            <Textarea name="contrato_instituicoes_privadas" />
+          </Field>
+          <Choice
+            name="participa_coleta_seletiva_municipal"
+            label="Participa da coleta seletiva do município?"
+            options={YN}
+            value={choice("participa_coleta_seletiva_municipal")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="apoio_poder_publico"
+            label="Recebe apoio do poder público (estrutura, transporte, equipamentos)?"
+            options={YNK}
+            value={choice("apoio_poder_publico")}
+            onChange={setChoice}
+          />
+        </Grid>
+      </LegalSection>
+      <LegalSection
+        number="8"
+        title="Avaliação final"
+        subtitle="Preenchimento pelo consultor após a entrevista"
+      >
+        <Grid>
+          <Choice
+            name="classificacao_juridica"
+            label="Situação da cooperativa"
+            options={["Regular", "Parcialmente regular", "Irregular"]}
+            value={choice("classificacao_juridica", "Irregular")}
+            onChange={setChoice}
+          />
+          <Field label="Principais pendências identificadas" wide>
+            <Textarea name="pendencias_juridicas" />
+          </Field>
+          <Field label="Orientações ao agente de campo" wide>
+            <div className="space-y-3 rounded-lg bg-muted p-4 text-sm leading-relaxed text-muted-foreground">
+              <p>
+                <strong>1.</strong> Antes do envio, o declarante deve autorizar expressamente o
+                tratamento dos dados e declarar a veracidade das informações.
+              </p>
+              <p>
+                <strong>2.</strong> Antes da entrevista, apresente o projeto, sua finalidade e
+                benefícios. Comece com perguntas gerais, aproveite informações já fornecidas e evite
+                repetições que causem desgaste.
+              </p>
+            </div>
+          </Field>
+        </Grid>
+      </LegalSection>
+    </>
+  );
+}
+
+function LegalSection({
+  number,
+  title,
+  subtitle,
+  children,
+}: {
+  number: string;
+  title: string;
+  subtitle?: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="rounded-xl border border-primary/30 bg-card p-5 shadow-card md:p-7">
+      <div className="mb-6 flex gap-3">
+        <span className="grid size-8 shrink-0 place-items-center rounded-full bg-primary font-bold text-primary-foreground">
+          {number}
+        </span>
+        <div>
+          <h2 className="text-lg font-bold uppercase tracking-tight">{title}</h2>
+          {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
+        </div>
+      </div>
+      {children}
+    </section>
+  );
+}
 
 function SocialFields({
   association,
