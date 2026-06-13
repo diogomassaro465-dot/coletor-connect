@@ -117,6 +117,7 @@ function NewAssessment() {
         destino_venda: choice("destino_venda", "Indústria"),
         tipo_galpao: choice("tipo_galpao", "Não possui"),
         possui_veiculos_maquinas: bool("possui_veiculos_maquinas"),
+        equipamentos_outros: text(values, "equipamentos_outros"),
         recebeu_apoio_programas: bool("recebeu_apoio_programas"),
         participa_movimentos: bool("participa_movimentos"),
         movimento_qual: text(values, "movimento_qual"),
@@ -201,7 +202,10 @@ function NewAssessment() {
       })
       .select("id")
       .single();
-    if (error) return toast.error("Erro ao salvar diagnóstico", { description: error.message });
+    if (error) {
+      setSaving(false);
+      return toast.error("Erro ao salvar diagnóstico", { description: error.message });
+    }
     if (modulo === "social" && assessment) {
       const associationUpdate = supabase
         .from("associations")
@@ -238,7 +242,7 @@ function NewAssessment() {
           ? [{ assessment_id: assessment.id, tipo: equipment.label, quantidade }]
           : [];
       });
-      const [, pricesResult, equipmentResult] = await Promise.all([
+      const [associationResult, pricesResult, equipmentResult] = await Promise.all([
         associationUpdate,
         priceRows.length
           ? supabase.from("material_prices").insert(priceRows)
@@ -247,7 +251,7 @@ function NewAssessment() {
           ? supabase.from("association_equipment").insert(equipmentRows)
           : Promise.resolve({ error: null }),
       ]);
-      if (pricesResult.error || equipmentResult.error) {
+      if (associationResult.error || pricesResult.error || equipmentResult.error) {
         setSaving(false);
         return toast.error(
           "Diagnóstico salvo, mas houve erro nos detalhes de materiais ou equipamentos.",
