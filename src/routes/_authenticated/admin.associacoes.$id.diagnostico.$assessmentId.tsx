@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
-import { ArrowLeft, Camera, Download, FileSpreadsheet, Loader2, Plus, Upload } from "lucide-react";
+import { ArrowLeft, Camera, CheckCircle2, Download, FileSpreadsheet, Loader2, Plus, ShieldCheck, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { CameraCapture } from "@/components/admin/CameraCapture";
+import { SignaturePad } from "@/components/admin/SignaturePad";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -29,6 +30,9 @@ function AssessmentDetails() {
   const [cameraCategory, setCameraCategory] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [module, setModule] = useState<"social" | "juridico" | "contabil">("social");
+  const [representativeName, setRepresentativeName] = useState("");
+  const [signature, setSignature] = useState<string | null>(null);
+  const [validating, setValidating] = useState(false);
   const { data, isLoading } = useQuery({
     queryKey: ["assessment-detail", assessmentId],
     queryFn: async () => {
@@ -75,6 +79,24 @@ function AssessmentDetails() {
     setUploading(false);
   }
 
+  async function validateEvidence() {
+    if (!data) return;
+    const categories = new Set(data.evidence.map((file) => file.category));
+    const required = ["Frente da cooperativa", "Sala administrativa/financeiro/almoxarifado", "Reunião/entrevista"];
+    const hasDocument = data.evidence.some((file) => file.category.startsWith("Lista de") || file.category.startsWith("Livro"));
+    const missing = required.filter((category) => !categories.has(category));
+    const finalName = representativeName.trim() || data.assessment.representative_name?.trim() || "";
+    const finalSignature = signature ?? data.assessment.representative_signature;
+    if (missing.length || !hasDocument) return toast.error("Evidências incompletas", { description: "Anexe frente, sala administrativa, reunião/entrevista e ao menos uma lista ou livro." });
+    if (!finalName || !finalSignature) return toast.error("Assinatura obrigatória", { description: "Informe o representante e colete a assinatura." });
+    setValidating(true);
+    const { error } = await supabase.from("association_assessments").update({ evidence_validated: true, representative_name: finalName, representative_signature: finalSignature, signed_at: new Date().toISOString() }).eq("id", assessmentId);
+    setValidating(false);
+    if (error) return toast.error("Não foi possível concluir", { description: error.message });
+    toast.success("Evidências validadas e diagnóstico concluído.");
+    refresh();
+  }
+
   async function exportPdf() {
     if (!data) return;
     const { jsPDF } = await import("jspdf");
@@ -84,6 +106,8 @@ function AssessmentDetails() {
     const lines = [
       `Entidade: ${data.association.nome}`, `Município: ${data.association.municipio}`, `Consultor(a): ${data.assessment.consultant_name}`,
       `Visita: ${formatDate(data.assessment.data_visita)} às ${data.assessment.horario_visita.slice(0, 5)}`, `Classificação: ${STATUS[data.assessment.status]}`,
+      `Índice de regularidade: ${Number(data.assessment.regularity_index).toLocaleString("pt-BR")}% (${data.assessment.regularity_compliant_count}/${data.assessment.regularity_total_count} critérios)`,
+      `Evidências: ${data.assessment.evidence_validated ? "Validadas" : "Pendentes"}`, `Representante: ${data.assessment.representative_name ?? "Assinatura pendente"}`,
       "", "Critérios de regularidade", `Mandato em dia: ${data.assessment.mandato_em_dia ?? "Não informado"}`, `Ata registrada: ${data.assessment.ata_registrada_cartorio ?? "Não informado"}`,
       `Estatuto registrado: ${data.assessment.estatuto_registrado ?? "Não informado"}`, `Alvará: ${data.assessment.alvara_funcionamento ?? "Não informado"}`, `Licença ambiental: ${data.assessment.licenca_ambiental_status ?? "Não informado"}`,
       `Contabilidade regular: ${data.assessment.contabilidade_regular ?? "Não informado"}`, `Emite notas fiscais: ${data.assessment.emite_notas_fiscais ?? "Não informado"}`, `Controle de estoque: ${data.assessment.controle_estoque ?? "Não informado"}`,
@@ -123,7 +147,7 @@ function AssessmentDetails() {
     if (!data) return;
     const ExcelJS = (await import("exceljs")).default; const wb = new ExcelJS.Workbook(); const ws = wb.addWorksheet("Diagnóstico");
     ws.columns = [{ header: "Campo", key: "field", width: 36 }, { header: "Valor", key: "value", width: 70 }];
-    Object.entries(data.assessment).forEach(([field, value]) => ws.addRow({ field: field.replaceAll("_", " "), value: Array.isArray(value) ? value.join(", ") : value ?? "" }));
+    Object.entries(data.assessment).forEach(([field, value]) => ws.addRow({ field: field.replaceAll("_", " "), value: field === "representative_signature" ? (value ? "Assinatura coletada" : "Pendente") : Array.isArray(value) ? value.join(", ") : value ?? "" }));
     ws.getRow(1).eachCell((cell) => { cell.font = { bold: true, color: { argb: "FFFFFFFF" } }; cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF15803D" } }; });
     ws.eachRow((row, index) => { row.eachCell((cell) => { cell.alignment = { vertical: "top", wrapText: true }; cell.border = { top: { style: "thin", color: { argb: "FFE5E7EB" } }, bottom: { style: "thin", color: { argb: "FFE5E7EB" } }, left: { style: "thin", color: { argb: "FFE5E7EB" } }, right: { style: "thin", color: { argb: "FFE5E7EB" } } }; if (index > 1 && index % 2 === 0) cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF3F4F6" } }; }); });
     const buffer = await wb.xlsx.writeBuffer(); downloadBlob(new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }), `diagnostico-${safeName(data.association.nome)}.xlsx`);
