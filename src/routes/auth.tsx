@@ -17,7 +17,6 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [creatingAccount, setCreatingAccount] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -38,22 +37,6 @@ function AuthPage() {
     }
     toast.success("Bem-vindo!");
     navigate({ to: "/admin/novo" });
-  }
-
-  async function handleSignUp() {
-    if (!email || password.length < 8) {
-      toast.error("Informe um e-mail válido e uma senha com pelo menos 8 caracteres.");
-      return;
-    }
-    setLoading(true);
-    const { error } = await supabase.auth.signUp({ email, password });
-    setLoading(false);
-    if (error) {
-      toast.error("Não foi possível criar a conta", { description: error.message });
-      return;
-    }
-    toast.success("Conta criada. Avise aqui para eu conceder o acesso administrativo e fechar o cadastro.");
-    setCreatingAccount(false);
   }
 
   return (
@@ -87,10 +70,10 @@ function AuthPage() {
           </Link>
           <h1 className="text-2xl font-bold">Acessar painel</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            {creatingAccount ? "Crie sua conta temporária de acesso." : "Acesso restrito para administradores e atendentes."}
+            Acesso restrito para administradores e atendentes.
           </p>
 
-              <form onSubmit={(event) => { if (creatingAccount) { event.preventDefault(); handleSignUp(); } else { handleLogin(event); } }} className="mt-8 space-y-4">
+              <form onSubmit={handleLogin} className="mt-8 space-y-4">
                 <div>
                   <Label htmlFor="email">E-mail</Label>
                   <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
@@ -100,12 +83,10 @@ function AuthPage() {
                   <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading && <Loader2 className="size-4 animate-spin" />} {creatingAccount ? "Criar conta" : "Entrar"}
+                  {loading && <Loader2 className="size-4 animate-spin" />} Entrar
                 </Button>
               </form>
-          <Button type="button" variant="link" className="mt-2 w-full" onClick={() => setCreatingAccount((value) => !value)}>
-            {creatingAccount ? "Voltar para o login" : "Criar minha conta agora"}
-          </Button>
+          <p className="mt-5 text-center text-xs text-muted-foreground">Contas são fornecidas exclusivamente pela administração do projeto.</p>
         </div>
       </div>
     </div>
