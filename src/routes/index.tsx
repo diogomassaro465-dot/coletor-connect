@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { Recycle, Users, BarChart3, ShieldCheck, ArrowRight, LeafyGreen } from "lucide-react";
+import { Users, BarChart3, ShieldCheck, ArrowRight, LeafyGreen } from "lucide-react";
+import procateLogo from "@/assets/procate-logo.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -22,11 +23,12 @@ function Landing() {
       {/* Nav */}
       <header className="border-b border-border bg-background/80 backdrop-blur-md sticky top-0 z-40">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <Link to="/" className="flex items-center gap-2 font-display font-bold text-lg">
-            <span className="grid place-items-center size-9 rounded-lg bg-primary text-primary-foreground">
-              <Recycle className="size-5" />
-            </span>
-            <span>RecicladoresBR</span>
+          <Link to="/" aria-label="PROCATE — Página inicial">
+            <img
+              src={procateLogo}
+              alt="PROCATE — Projeto Catador Empreendedor"
+              className="h-11 w-auto sm:h-12"
+            />
           </Link>
           <div className="flex items-center gap-2">
             <Link to="/auth">
@@ -42,7 +44,7 @@ function Landing() {
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-hero opacity-95" />
-        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 20% 30%, white 0%, transparent 40%), radial-gradient(circle at 80% 70%, white 0%, transparent 35%)' }} />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,color-mix(in_oklab,var(--color-primary-foreground)_20%,transparent)_0%,transparent_40%),radial-gradient(circle_at_80%_70%,color-mix(in_oklab,var(--color-success)_25%,transparent)_0%,transparent_35%)]" />
         <div className="container relative mx-auto px-4 py-24 md:py-32 text-primary-foreground">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium ring-1 ring-white/20 backdrop-blur-sm">
@@ -53,8 +55,8 @@ function Landing() {
               Dignidade e dados para quem move a reciclagem.
             </h1>
             <p className="mt-6 text-lg md:text-xl text-white/90 max-w-2xl">
-              Cadastre, organize e dê visibilidade aos catadores de materiais recicláveis.
-              Uma base confiável para cooperativas, organizações e empresas.
+              Cadastre, organize e dê visibilidade aos catadores de materiais recicláveis. Uma base
+              confiável para cooperativas, organizações e empresas.
             </p>
             <div className="mt-10 flex flex-wrap gap-3">
               <Link to="/auth">
@@ -63,7 +65,11 @@ function Landing() {
                 </Button>
               </Link>
               <a href="#sobre">
-                <Button size="lg" variant="outline" className="text-base bg-white/10 text-white border-white/30 hover:bg-white/20 hover:text-white">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="text-base bg-white/10 text-white border-white/30 hover:bg-white/20 hover:text-white"
+                >
                   Saiba mais
                 </Button>
               </a>
@@ -77,8 +83,8 @@ function Landing() {
         <div className="max-w-2xl">
           <h2 className="text-3xl md:text-4xl font-bold">Uma plataforma feita para gestores</h2>
           <p className="mt-4 text-muted-foreground text-lg">
-            Ferramenta admin-first para registrar, filtrar e exportar dados de catadores
-            com segurança e respeito à privacidade.
+            Ferramenta admin-first para registrar, filtrar e exportar dados de catadores com
+            segurança e respeito à privacidade.
           </p>
         </div>
 
@@ -117,10 +123,15 @@ function Landing() {
           <div className="max-w-2xl">
             <h2 className="text-3xl md:text-4xl font-bold">Pronto para começar?</h2>
             <p className="mt-3 text-white/90 text-lg">
-              Crie sua conta de administrador em segundos e comece a cadastrar catadores agora mesmo.
+              Crie sua conta de administrador em segundos e comece a cadastrar catadores agora
+              mesmo.
             </p>
             <Link to="/auth" className="inline-block mt-8">
-              <Button size="lg" variant="outline" className="bg-white text-secondary border-white hover:bg-white/90 hover:text-secondary">
+              <Button
+                size="lg"
+                variant="outline"
+                className="bg-white text-secondary border-white hover:bg-white/90 hover:text-secondary"
+              >
                 Acessar painel <ArrowRight className="ml-1 size-4" />
               </Button>
             </Link>
