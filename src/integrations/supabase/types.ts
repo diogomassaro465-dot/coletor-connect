@@ -121,6 +121,7 @@ export type Database = {
           escolaridade_predominante: string | null
           estatuto_registrado: string | null
           evidencia_administrativo_confirmada: boolean
+          evidencia_entrevista_confirmada: boolean
           evidencia_frente_confirmada: boolean
           evidencia_livro_trabalho_confirmada: boolean
           evidencia_reuniao_confirmada: boolean
@@ -267,6 +268,7 @@ export type Database = {
           escolaridade_predominante?: string | null
           estatuto_registrado?: string | null
           evidencia_administrativo_confirmada?: boolean
+          evidencia_entrevista_confirmada?: boolean
           evidencia_frente_confirmada?: boolean
           evidencia_livro_trabalho_confirmada?: boolean
           evidencia_reuniao_confirmada?: boolean
@@ -413,6 +415,7 @@ export type Database = {
           escolaridade_predominante?: string | null
           estatuto_registrado?: string | null
           evidencia_administrativo_confirmada?: boolean
+          evidencia_entrevista_confirmada?: boolean
           evidencia_frente_confirmada?: boolean
           evidencia_livro_trabalho_confirmada?: boolean
           evidencia_reuniao_confirmada?: boolean

@@ -199,6 +199,7 @@ function NewAssessment() {
         evidencia_frente_confirmada: values.has("evidencia_frente_confirmada"),
         evidencia_administrativo_confirmada: values.has("evidencia_administrativo_confirmada"),
         evidencia_reuniao_confirmada: values.has("evidencia_reuniao_confirmada"),
+        evidencia_entrevista_confirmada: values.has("evidencia_entrevista_confirmada"),
         evidencia_livro_trabalho_confirmada: values.has("evidencia_livro_trabalho_confirmada"),
         consentimento_dados: true,
         declaracao_veracidade: true,
@@ -273,6 +274,32 @@ function NewAssessment() {
       if (associationError) {
         setSaving(false);
         return toast.error("Diagnóstico salvo, mas não foi possível atualizar a entidade.");
+      }
+    }
+    if (activeModule === "contabil" && assessment) {
+      const { error: associationError } = await supabase
+        .from("associations")
+        .update({
+          nome: String(values.get("accounting_association_nome") ?? "").trim(),
+          cnpj: text(values, "accounting_association_cnpj"),
+          municipio: String(values.get("accounting_association_municipio") ?? "").trim(),
+        })
+        .eq("id", id);
+      const bookRows = ACCOUNTING_BOOKS.map((book) => ({
+        assessment_id: assessment.id,
+        tipo: book.label,
+        implantado: choice(`livro_${book.key}_implantado`) === "Sim",
+        atualizado: choice(`livro_${book.key}_atualizado`) === "Sim",
+        nao_possui: choice(`livro_${book.key}_implantado`) === "Não",
+        nao_sabe: choice(`livro_${book.key}_implantado`) === "Não sabe informar",
+        observacao: text(values, `livro_${book.key}_observacao`),
+      }));
+      const { error: booksError } = await supabase.from("accounting_books").insert(bookRows);
+      if (associationError || booksError) {
+        setSaving(false);
+        return toast.error(
+          "Diagnóstico salvo, mas houve erro nos dados da entidade ou dos livros.",
+        );
       }
     }
     setSaving(false);
@@ -881,229 +908,258 @@ function NewAssessment() {
               </fieldset>
             </TabsContent>
             <TabsContent value="contabil">
-              <Module title="Módulo Contábil" tone="border-primary/40">
-                <Grid>
-                  <Choice
-                    name="estatuto_registrado"
-                    label="Estatuto registrado?"
-                    options={YNK}
-                    value={choice("estatuto_registrado")}
-                    onChange={setChoice}
+              {loadingAssociation ? (
+                <p className="mt-5 text-muted-foreground">Carregando dados da entidade...</p>
+              ) : (
+                <div className="mt-5 space-y-5">
+                  <AccountingFields
+                    association={association}
+                    choice={choice}
+                    setChoice={setChoice}
                   />
-                  <Choice
-                    name="alvara_funcionamento"
-                    label="Alvará de funcionamento?"
-                    options={YNK}
-                    value={choice("alvara_funcionamento")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="licenca_ambiental_status"
-                    label="Licença ambiental"
-                    options={["Licença", "Dispensa", "Nenhum", "Não sabe informar"]}
-                    value={choice("licenca_ambiental_status", "Nenhum")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="avcb"
-                    label="Atestado dos Bombeiros?"
-                    options={YNK}
-                    value={choice("avcb")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="extintores"
-                    label="Possui extintores?"
-                    options={YNK}
-                    value={choice("extintores")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="registro_ocb"
-                    label="Registro na OCB?"
-                    options={YNK}
-                    value={choice("registro_ocb")}
-                    onChange={setChoice}
-                  />
-                  <NumberField name="empregados_registrados" label="Empregados registrados" />
-                  <NumberField name="empregados_sem_registro" label="Empregados sem registro" />
-                  <NumberField name="autonomos" label="Autônomos" />
-                  <Choice
-                    name="livro_ficha_trabalho"
-                    label="Possui ficha/livro de trabalho?"
-                    options={YN}
-                    value={choice("livro_ficha_trabalho")}
-                    onChange={setChoice}
-                  />
-                  <Field label="Qual ficha/livro de trabalho?">
-                    <Input name="livro_ficha_trabalho_qual" maxLength={300} />
-                  </Field>
-                  <Choice
-                    name="livro_inspecao_trabalho"
-                    label="Possui livro de inspeção do trabalho?"
-                    options={YN}
-                    value={choice("livro_inspecao_trabalho")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="filiacao_sindical"
-                    label="Possui filiação sindical?"
-                    options={YN}
-                    value={choice("filiacao_sindical")}
-                    onChange={setChoice}
-                  />
-                  <Field label="Qual sindicato?">
-                    <Input name="filiacao_sindical_qual" maxLength={300} />
-                  </Field>
-                  <Choice
-                    name="contrato_sst"
-                    label="Possui serviço ou contrato de SST?"
-                    options={YNK}
-                    value={choice("contrato_sst")}
-                    onChange={setChoice}
-                  />
-                  <Field label="Responsável pelo SST">
-                    <Input name="contrato_sst_responsavel" maxLength={300} />
-                  </Field>
-                  <Choice
-                    name="controle_frequencia"
-                    label="Realiza controle de frequência?"
-                    options={YNK}
-                    value={choice("controle_frequencia")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="controle_frequencia_tipo"
-                    label="Tipo de controle de frequência"
-                    options={["Livro/ficha", "Sistema eletrônico", "Outro", "Não se aplica"]}
-                    value={choice("controle_frequencia_tipo", "Não se aplica")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="possui_contador"
-                    label="Possui contador?"
-                    options={YNK}
-                    value={choice("possui_contador")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="contador_tipo"
-                    label="Tipo de contador"
-                    options={[
-                      "Terceirizado",
-                      "Voluntário",
-                      "Empregado",
-                      "Cooperado",
-                      "Não tem contador",
-                      "Outro",
-                    ]}
-                    value={choice("contador_tipo", "Não tem contador")}
-                    onChange={setChoice}
-                  />
-                  <Field label="Nome do contador">
-                    <Input name="contador_nome" maxLength={150} />
-                  </Field>
-                  <Field label="Telefone do contador">
-                    <Input name="contador_telefone" type="tel" maxLength={30} />
-                  </Field>
-                  <Field label="E-mail do contador">
-                    <Input name="contador_email" type="email" maxLength={255} />
-                  </Field>
-                  <Choice
-                    name="contabilidade_regular"
-                    label="Contabilidade regular?"
-                    options={YNK}
-                    value={choice("contabilidade_regular")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="possui_conta_bancaria"
-                    label="Possui conta bancária?"
-                    options={YNK}
-                    value={choice("possui_conta_bancaria")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="possui_maquineta"
-                    label="Possui maquineta?"
-                    options={YNK}
-                    value={choice("possui_maquineta")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="emite_notas_fiscais"
-                    label="Emite notas fiscais?"
-                    options={YNK}
-                    value={choice("emite_notas_fiscais")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="controle_estoque"
-                    label="Faz controle de estoque?"
-                    options={YNK}
-                    value={choice("controle_estoque")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="sistema_financeiro"
-                    label="Possui sistema financeiro?"
-                    options={YNK}
-                    value={choice("sistema_financeiro")}
-                    onChange={setChoice}
-                  />
-                  <Field label="Qual sistema?">
-                    <Input name="sistema_financeiro_qual" maxLength={300} />
-                  </Field>
-                  <NumberField name="ano_ultimo_balanco" label="Ano do último balanço" />
-                  <Field label="Como são definidos os critérios de divisão dos resultados?" wide>
-                    <Textarea name="divisao_resultados_criterio" maxLength={1500} />
-                  </Field>
-                  <Field label="Como a divisão dos resultados é realizada?" wide>
-                    <Textarea name="divisao_resultados_procedimento" maxLength={1500} />
-                  </Field>
-                  <Choice
-                    name="pagamento_fixo_mensal"
-                    label="Existe pagamento fixo mensal?"
-                    options={YN}
-                    value={choice("pagamento_fixo_mensal")}
-                    onChange={setChoice}
-                  />
-                  <NumberField
-                    name="renda_media_cooperado"
-                    label="Renda média do cooperado"
-                    step="0.01"
-                  />
-                  <Field label="Pendências contábeis finais" wide>
-                    <Textarea name="pendencias_contabeis" maxLength={2000} />
-                  </Field>
-                  <Choice
-                    name="classificacao_contabil"
-                    label="Classificação final contábil"
-                    options={["Regular", "Parcialmente regular", "Irregular"]}
-                    value={choice("classificacao_contabil", "Irregular")}
-                    onChange={setChoice}
-                  />
-                  <div className="space-y-3 md:col-span-2">
-                    <p className="text-sm font-medium">Checklist obrigatório de evidências</p>
-                    <label className="flex items-center gap-3 text-sm">
-                      <Checkbox name="evidencia_frente_confirmada" required /> Foto da frente da
-                      entidade
+                  <div className="space-y-4 rounded-xl border border-border bg-card p-5">
+                    <label className="flex items-start gap-3 text-sm">
+                      <Checkbox name="consentimento_dados" required />
+                      <span>
+                        Autorizo o tratamento dos dados coletados para as finalidades do diagnóstico
+                        e acompanhamento institucional.
+                      </span>
                     </label>
-                    <label className="flex items-center gap-3 text-sm">
-                      <Checkbox name="evidencia_administrativo_confirmada" required /> Foto da área
-                      administrativa/financeira/almoxarifado
-                    </label>
-                    <label className="flex items-center gap-3 text-sm">
-                      <Checkbox name="evidencia_reuniao_confirmada" required /> Foto da reunião ou
-                      entrevista
-                    </label>
-                    <label className="flex items-center gap-3 text-sm">
-                      <Checkbox name="evidencia_livro_trabalho_confirmada" required /> Foto da ficha
-                      ou livro de trabalho
+                    <label className="flex items-start gap-3 text-sm">
+                      <Checkbox name="declaracao_veracidade" required />
+                      <span>
+                        Declaro que as informações prestadas são verdadeiras e correspondem à
+                        realidade observada na visita.
+                      </span>
                     </label>
                   </div>
-                </Grid>
-              </Module>
+                </div>
+              )}
+              <fieldset disabled className="hidden">
+                <Module title="Módulo Contábil" tone="border-primary/40">
+                  <Grid>
+                    <Choice
+                      name="estatuto_registrado"
+                      label="Estatuto registrado?"
+                      options={YNK}
+                      value={choice("estatuto_registrado")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="alvara_funcionamento"
+                      label="Alvará de funcionamento?"
+                      options={YNK}
+                      value={choice("alvara_funcionamento")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="licenca_ambiental_status"
+                      label="Licença ambiental"
+                      options={["Licença", "Dispensa", "Nenhum", "Não sabe informar"]}
+                      value={choice("licenca_ambiental_status", "Nenhum")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="avcb"
+                      label="Atestado dos Bombeiros?"
+                      options={YNK}
+                      value={choice("avcb")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="extintores"
+                      label="Possui extintores?"
+                      options={YNK}
+                      value={choice("extintores")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="registro_ocb"
+                      label="Registro na OCB?"
+                      options={YNK}
+                      value={choice("registro_ocb")}
+                      onChange={setChoice}
+                    />
+                    <NumberField name="empregados_registrados" label="Empregados registrados" />
+                    <NumberField name="empregados_sem_registro" label="Empregados sem registro" />
+                    <NumberField name="autonomos" label="Autônomos" />
+                    <Choice
+                      name="livro_ficha_trabalho"
+                      label="Possui ficha/livro de trabalho?"
+                      options={YN}
+                      value={choice("livro_ficha_trabalho")}
+                      onChange={setChoice}
+                    />
+                    <Field label="Qual ficha/livro de trabalho?">
+                      <Input name="livro_ficha_trabalho_qual" maxLength={300} />
+                    </Field>
+                    <Choice
+                      name="livro_inspecao_trabalho"
+                      label="Possui livro de inspeção do trabalho?"
+                      options={YN}
+                      value={choice("livro_inspecao_trabalho")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="filiacao_sindical"
+                      label="Possui filiação sindical?"
+                      options={YN}
+                      value={choice("filiacao_sindical")}
+                      onChange={setChoice}
+                    />
+                    <Field label="Qual sindicato?">
+                      <Input name="filiacao_sindical_qual" maxLength={300} />
+                    </Field>
+                    <Choice
+                      name="contrato_sst"
+                      label="Possui serviço ou contrato de SST?"
+                      options={YNK}
+                      value={choice("contrato_sst")}
+                      onChange={setChoice}
+                    />
+                    <Field label="Responsável pelo SST">
+                      <Input name="contrato_sst_responsavel" maxLength={300} />
+                    </Field>
+                    <Choice
+                      name="controle_frequencia"
+                      label="Realiza controle de frequência?"
+                      options={YNK}
+                      value={choice("controle_frequencia")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="controle_frequencia_tipo"
+                      label="Tipo de controle de frequência"
+                      options={["Livro/ficha", "Sistema eletrônico", "Outro", "Não se aplica"]}
+                      value={choice("controle_frequencia_tipo", "Não se aplica")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="possui_contador"
+                      label="Possui contador?"
+                      options={YNK}
+                      value={choice("possui_contador")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="contador_tipo"
+                      label="Tipo de contador"
+                      options={[
+                        "Terceirizado",
+                        "Voluntário",
+                        "Empregado",
+                        "Cooperado",
+                        "Não tem contador",
+                        "Outro",
+                      ]}
+                      value={choice("contador_tipo", "Não tem contador")}
+                      onChange={setChoice}
+                    />
+                    <Field label="Nome do contador">
+                      <Input name="contador_nome" maxLength={150} />
+                    </Field>
+                    <Field label="Telefone do contador">
+                      <Input name="contador_telefone" type="tel" maxLength={30} />
+                    </Field>
+                    <Field label="E-mail do contador">
+                      <Input name="contador_email" type="email" maxLength={255} />
+                    </Field>
+                    <Choice
+                      name="contabilidade_regular"
+                      label="Contabilidade regular?"
+                      options={YNK}
+                      value={choice("contabilidade_regular")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="possui_conta_bancaria"
+                      label="Possui conta bancária?"
+                      options={YNK}
+                      value={choice("possui_conta_bancaria")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="possui_maquineta"
+                      label="Possui maquineta?"
+                      options={YNK}
+                      value={choice("possui_maquineta")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="emite_notas_fiscais"
+                      label="Emite notas fiscais?"
+                      options={YNK}
+                      value={choice("emite_notas_fiscais")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="controle_estoque"
+                      label="Faz controle de estoque?"
+                      options={YNK}
+                      value={choice("controle_estoque")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="sistema_financeiro"
+                      label="Possui sistema financeiro?"
+                      options={YNK}
+                      value={choice("sistema_financeiro")}
+                      onChange={setChoice}
+                    />
+                    <Field label="Qual sistema?">
+                      <Input name="sistema_financeiro_qual" maxLength={300} />
+                    </Field>
+                    <NumberField name="ano_ultimo_balanco" label="Ano do último balanço" />
+                    <Field label="Como são definidos os critérios de divisão dos resultados?" wide>
+                      <Textarea name="divisao_resultados_criterio" maxLength={1500} />
+                    </Field>
+                    <Field label="Como a divisão dos resultados é realizada?" wide>
+                      <Textarea name="divisao_resultados_procedimento" maxLength={1500} />
+                    </Field>
+                    <Choice
+                      name="pagamento_fixo_mensal"
+                      label="Existe pagamento fixo mensal?"
+                      options={YN}
+                      value={choice("pagamento_fixo_mensal")}
+                      onChange={setChoice}
+                    />
+                    <NumberField
+                      name="renda_media_cooperado"
+                      label="Renda média do cooperado"
+                      step="0.01"
+                    />
+                    <Field label="Pendências contábeis finais" wide>
+                      <Textarea name="pendencias_contabeis" maxLength={2000} />
+                    </Field>
+                    <Choice
+                      name="classificacao_contabil"
+                      label="Classificação final contábil"
+                      options={["Regular", "Parcialmente regular", "Irregular"]}
+                      value={choice("classificacao_contabil", "Irregular")}
+                      onChange={setChoice}
+                    />
+                    <div className="space-y-3 md:col-span-2">
+                      <p className="text-sm font-medium">Checklist obrigatório de evidências</p>
+                      <label className="flex items-center gap-3 text-sm">
+                        <Checkbox name="evidencia_frente_confirmada" required /> Foto da frente da
+                        entidade
+                      </label>
+                      <label className="flex items-center gap-3 text-sm">
+                        <Checkbox name="evidencia_administrativo_confirmada" required /> Foto da
+                        área administrativa/financeira/almoxarifado
+                      </label>
+                      <label className="flex items-center gap-3 text-sm">
+                        <Checkbox name="evidencia_reuniao_confirmada" required /> Foto da reunião ou
+                        entrevista
+                      </label>
+                      <label className="flex items-center gap-3 text-sm">
+                        <Checkbox name="evidencia_livro_trabalho_confirmada" required /> Foto da
+                        ficha ou livro de trabalho
+                      </label>
+                    </div>
+                  </Grid>
+                </Module>
+              </fieldset>
             </TabsContent>
           </Tabs>
           <div className="sticky bottom-4 mt-6 flex justify-end rounded-xl border border-border bg-background/95 p-4 shadow-card backdrop-blur">
@@ -1120,6 +1176,15 @@ function NewAssessment() {
 const YN = ["Sim", "Não"];
 const YNK = ["Sim", "Não", "Não sabe"];
 const YNSOME = ["Sim", "Não", "Alguns"];
+const ACCOUNTING_BOOKS = [
+  { key: "matricula", label: "Livro de Matrícula de Cooperados" },
+  { key: "atas_assembleias", label: "Livro de Atas das Assembleias Gerais" },
+  { key: "presenca_assembleias", label: "Livro de Presença das Assembleias" },
+  { key: "atas_diretoria", label: "Livro de Atas da Diretoria" },
+  { key: "atas_conselho_fiscal", label: "Livro de Atas do Conselho Fiscal" },
+  { key: "patrimonio", label: "Livro de Registro de Patrimônio" },
+  { key: "inventario", label: "Livro de Registro de Inventário" },
+] as const;
 const SOCIAL_MATERIALS = [
   { key: "vidro", label: "Vidro" },
   { key: "pet", label: "Plástico PET" },
@@ -1421,6 +1486,373 @@ function LegalFields({
         </Grid>
       </LegalSection>
     </>
+  );
+}
+
+function AccountingFields({
+  association,
+  choice,
+  setChoice,
+}: Pick<SocialFieldsProps, "association" | "choice" | "setChoice">) {
+  return (
+    <>
+      <AccountingSection number="1" title="Identificação inicial da associação/cooperativa">
+        <Grid>
+          <Field label="Nome completo da associação/cooperativa">
+            <Input name="accounting_association_nome" defaultValue={association?.nome} required />
+          </Field>
+          <Field label="CNPJ (se tiver)">
+            <Input name="accounting_association_cnpj" defaultValue={association?.cnpj ?? ""} />
+          </Field>
+          <Field label="Município">
+            <Input
+              name="accounting_association_municipio"
+              defaultValue={association?.municipio}
+              required
+            />
+          </Field>
+        </Grid>
+      </AccountingSection>
+      <AccountingSection number="2" title="Gestão e organização">
+        <Grid>
+          <Choice
+            name="estatuto_registrado"
+            label="Possui Estatuto registrado na Junta Comercial do Estado?"
+            options={YN}
+            value={choice("estatuto_registrado")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="alvara_funcionamento"
+            label="Possui alvará de funcionamento/localização?"
+            options={YN}
+            value={choice("alvara_funcionamento")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="licenca_ambiental_status"
+            label="Possui licença ambiental ou certificado de dispensa?"
+            options={["Licença ambiental", "Certificado de Dispensa", "Nenhum"]}
+            value={choice("licenca_ambiental_status", "Nenhum")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="avcb"
+            label="Possui atestado de vistoria do Corpo de Bombeiros Militar de PE?"
+            options={YNK}
+            value={choice("avcb")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="extintores"
+            label="Possui extintores de incêndio?"
+            options={YNK}
+            value={choice("extintores")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="registro_ocb"
+            label="Possui registro no sistema OCB?"
+            options={YNK}
+            value={choice("registro_ocb")}
+            onChange={setChoice}
+          />
+          <Field label="Livros da organização (tirar fotos)" wide>
+            <div className="overflow-x-auto rounded-lg border border-border">
+              <table className="w-full min-w-[760px] text-left text-sm">
+                <thead className="bg-muted">
+                  <tr>
+                    <th className="p-3">Tipo</th>
+                    <th className="p-3">Implantado</th>
+                    <th className="p-3">Atualizado</th>
+                    <th className="p-3">Observação</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ACCOUNTING_BOOKS.map((book) => (
+                    <tr key={book.key} className="border-t border-border">
+                      <td className="p-3 font-medium">{book.label}</td>
+                      <td className="p-3">
+                        <CompactChoice
+                          name={`livro_${book.key}_implantado`}
+                          options={YNK}
+                          value={choice(`livro_${book.key}_implantado`)}
+                          onChange={setChoice}
+                        />
+                      </td>
+                      <td className="p-3">
+                        <CompactChoice
+                          name={`livro_${book.key}_atualizado`}
+                          options={YNK}
+                          value={choice(`livro_${book.key}_atualizado`)}
+                          onChange={setChoice}
+                        />
+                      </td>
+                      <td className="p-3">
+                        <Input name={`livro_${book.key}_observacao`} />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Field>
+        </Grid>
+      </AccountingSection>
+      <AccountingSection number="3" title="Departamento de pessoal">
+        <Grid>
+          <NumberField name="empregados_registrados" label="Quantos empregados registrados?" />
+          <NumberField name="empregados_sem_registro" label="Quantos trabalhadores sem registro?" />
+          <NumberField name="autonomos" label="Quantos trabalhadores autônomos?" />
+          <Choice
+            name="livro_ficha_trabalho"
+            label="Existe livro ou ficha de trabalho? (tirar foto)"
+            options={YN}
+            value={choice("livro_ficha_trabalho")}
+            onChange={setChoice}
+          />
+          <Field label="Se sim, qual?">
+            <Input name="livro_ficha_trabalho_qual" />
+          </Field>
+          <Choice
+            name="livro_inspecao_trabalho"
+            label="Existe livro de inspeção do trabalho? (tirar foto)"
+            options={YN}
+            value={choice("livro_inspecao_trabalho")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="filiacao_sindical"
+            label="A organização é filiada a algum sindicato?"
+            options={YN}
+            value={choice("filiacao_sindical")}
+            onChange={setChoice}
+          />
+          <Field label="Se sim, qual sindicato?">
+            <Input name="filiacao_sindical_qual" />
+          </Field>
+          <Choice
+            name="contrato_sst"
+            label="Possui contrato para acompanhamento de SST?"
+            options={YNK}
+            value={choice("contrato_sst")}
+            onChange={setChoice}
+          />
+          <Field label="Empresa ou responsável técnico">
+            <Input name="contrato_sst_responsavel" />
+          </Field>
+          <Choice
+            name="controle_frequencia"
+            label="Tem controle de frequência dos empregados?"
+            options={YNK}
+            value={choice("controle_frequencia")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="controle_frequencia_tipo"
+            label="Se sim, qual tipo?"
+            options={["Livro/ficha", "Eletrônico", "Outro", "Não se aplica"]}
+            value={choice("controle_frequencia_tipo", "Não se aplica")}
+            onChange={setChoice}
+          />
+        </Grid>
+      </AccountingSection>
+      <AccountingSection number="4" title="Diagnóstico contábil e fiscal">
+        <Grid>
+          <Choice
+            name="possui_contador"
+            label="A organização possui contador?"
+            options={YNK}
+            value={choice("possui_contador")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="contador_tipo"
+            label="Se sim, qual o tipo de contrato?"
+            options={[
+              "Terceirizado",
+              "Voluntário",
+              "Empregado",
+              "Cooperado",
+              "Outro tipo",
+              "Não tem contador",
+            ]}
+            value={choice("contador_tipo", "Não tem contador")}
+            onChange={setChoice}
+          />
+          <Field label="Nome do contador">
+            <Input name="contador_nome" />
+          </Field>
+          <Field label="Telefone/WhatsApp">
+            <Input name="contador_telefone" type="tel" />
+          </Field>
+          <Field label="E-mail">
+            <Input name="contador_email" type="email" />
+          </Field>
+          <Choice
+            name="contabilidade_regular"
+            label="Possui contabilidade regular?"
+            options={YNK}
+            value={choice("contabilidade_regular")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="possui_conta_bancaria"
+            label="Possui conta bancária?"
+            options={YNK}
+            value={choice("possui_conta_bancaria")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="possui_maquineta"
+            label="Trabalha com maquineta de cartão?"
+            options={YNK}
+            value={choice("possui_maquineta")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="emite_notas_fiscais"
+            label="Realiza emissão de notas fiscais?"
+            options={YNK}
+            value={choice("emite_notas_fiscais")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="controle_estoque"
+            label="Faz controle de estoque?"
+            options={YNK}
+            value={choice("controle_estoque")}
+            onChange={setChoice}
+          />
+          <Choice
+            name="sistema_financeiro"
+            label="Usa sistema para controle financeiro?"
+            options={YNK}
+            value={choice("sistema_financeiro")}
+            onChange={setChoice}
+          />
+          <Field label="Se sim, qual sistema?">
+            <Input name="sistema_financeiro_qual" />
+          </Field>
+          <NumberField name="ano_ultimo_balanco" label="Ano do último balanço apresentado" />
+        </Grid>
+      </AccountingSection>
+      <AccountingSection number="5" title="Remuneração e divisão dos resultados">
+        <Grid>
+          <Field label="Como é feita a divisão do dinheiro entre os cooperados?" wide>
+            <Textarea name="divisao_resultados_procedimento" />
+          </Field>
+          <Field label="A divisão é igual para todos ou depende da produção?" wide>
+            <Textarea name="divisao_resultados_criterio" />
+          </Field>
+          <Choice
+            name="pagamento_fixo_mensal"
+            label="Existe pagamento fixo mensal?"
+            options={YN}
+            value={choice("pagamento_fixo_mensal")}
+            onChange={setChoice}
+          />
+          <NumberField
+            name="renda_media_cooperado"
+            label="Renda média mensal de um cooperado"
+            step="0.01"
+          />
+        </Grid>
+      </AccountingSection>
+      <AccountingSection
+        number="6"
+        title="Avaliação final"
+        subtitle="Preenchimento pelo consultor após a entrevista"
+      >
+        <Grid>
+          <Choice
+            name="classificacao_contabil"
+            label="Situação da cooperativa"
+            options={["Regular", "Parcialmente regular", "Irregular"]}
+            value={choice("classificacao_contabil", "Irregular")}
+            onChange={setChoice}
+          />
+          <Field label="Principais pendências identificadas" wide>
+            <Textarea name="pendencias_contabeis" />
+          </Field>
+          <Field label="Checklist das fotos / comprovação da visita" wide>
+            <div className="grid gap-3 rounded-lg bg-muted p-4 sm:grid-cols-2">
+              <Evidence
+                name="evidencia_frente_confirmada"
+                label="Frente da cooperativa (placa de identificação)"
+              />
+              <Evidence name="evidencia_reuniao_confirmada" label="Momento da reunião com todos" />
+              <Evidence name="evidencia_entrevista_confirmada" label="Momento da entrevista" />
+              <Evidence
+                name="evidencia_administrativo_confirmada"
+                label="Sala de administração, financeiro e almoxarifado"
+              />
+            </div>
+          </Field>
+        </Grid>
+      </AccountingSection>
+    </>
+  );
+}
+
+function AccountingSection({
+  number,
+  title,
+  subtitle,
+  children,
+}: {
+  number: string;
+  title: string;
+  subtitle?: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="rounded-xl border border-warning/50 bg-card p-5 shadow-card md:p-7">
+      <div className="mb-6 flex gap-3">
+        <span className="grid size-8 shrink-0 place-items-center rounded-full bg-warning font-bold text-warning-foreground">
+          {number}
+        </span>
+        <div>
+          <h2 className="text-lg font-bold uppercase tracking-tight">{title}</h2>
+          {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
+        </div>
+      </div>
+      {children}
+    </section>
+  );
+}
+function CompactChoice({
+  name,
+  options,
+  value,
+  onChange,
+}: {
+  name: string;
+  options: string[];
+  value: string;
+  onChange: (name: string, value: string) => void;
+}) {
+  return (
+    <Select value={value} onValueChange={(next) => onChange(name, next)}>
+      <SelectTrigger className="min-w-36">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {options.map((option) => (
+          <SelectItem key={option} value={option}>
+            {option}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
+function Evidence({ name, label }: { name: string; label: string }) {
+  return (
+    <label className="flex items-start gap-3 text-sm">
+      <Checkbox name={name} required />
+      <span>{label}</span>
+    </label>
   );
 }
 
