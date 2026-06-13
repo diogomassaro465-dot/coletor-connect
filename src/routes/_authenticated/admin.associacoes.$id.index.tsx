@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Calculator, CalendarDays, ClipboardPlus, MapPin, Scale, Users } from "lucide-react";
+import { ArrowLeft, Calculator, CalendarDays, ClipboardPlus, MapPin, Scale, UserPlus, Users } from "lucide-react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,7 +44,10 @@ function AssociationDetails() {
           <h1 className="max-w-3xl text-3xl font-bold leading-tight">{association.nome}</h1>
           <p className="mt-2 flex items-center gap-1.5 text-muted-foreground"><MapPin className="size-4" /> {association.municipio}</p>
         </div>
-        <Link to="/admin/associacoes/$id/diagnostico/novo" params={{ id }} search={{ modulo: "social" }}><Button size="lg"><ClipboardPlus className="size-4" /> Novo cadastro de campo</Button></Link>
+        <div className="flex flex-wrap gap-2">
+          <Link to="/admin/associacoes/$id/catadores/novo" params={{ id }}><Button size="lg"><UserPlus className="size-4" /> Cadastrar catador</Button></Link>
+          <Link to="/admin/associacoes/$id/diagnostico/novo" params={{ id }} search={{ modulo: "social" }}><Button size="lg" variant="outline"><ClipboardPlus className="size-4" /> Novo cadastro de campo</Button></Link>
+        </div>
       </div>
 
       <section className="mb-8 rounded-3xl border border-border bg-card p-6 shadow-card">
