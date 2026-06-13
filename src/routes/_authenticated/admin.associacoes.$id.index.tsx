@@ -58,10 +58,10 @@ function AssociationDetails() {
         <p className="mt-1 text-sm text-muted-foreground">Cada visita mantém seu próprio retrato institucional.</p>
         <div className="mt-5 divide-y divide-border border-y border-border">
           {assessments.length === 0 ? <p className="py-10 text-center text-muted-foreground">Nenhum diagnóstico realizado.</p> : assessments.map((item) => (
-            <div key={item.id} className="flex flex-wrap items-center justify-between gap-4 py-4">
+            <Link key={item.id} to="/admin/associacoes/$id/diagnostico/$assessmentId" params={{ id, assessmentId: item.id }} className="flex flex-wrap items-center justify-between gap-4 py-4 transition hover:bg-muted/40">
               <div><p className="font-medium">Visita de {new Date(`${item.data_visita}T12:00:00`).toLocaleDateString("pt-BR")}</p><p className="text-sm text-muted-foreground">Consultor(a): {item.consultant_name}</p></div>
               <Badge variant="outline" className={item.status === "regular" ? "border-success/40 text-success" : item.status === "irregular" ? "border-destructive/40 text-destructive" : "border-warning/50 text-warning-foreground"}>{STATUS_LABEL[item.status]}</Badge>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
