@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { Recycle, Users, BarChart3, ShieldCheck, ArrowRight, LeafyGreen } from "lucide-react";
+import { Users, BarChart3, ShieldCheck, ArrowRight, LeafyGreen } from "lucide-react";
+import procateLogo from "@/assets/procate-logo.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -22,11 +23,8 @@ function Landing() {
       {/* Nav */}
       <header className="border-b border-border bg-background/80 backdrop-blur-md sticky top-0 z-40">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <Link to="/" className="flex items-center gap-2 font-display font-bold text-lg">
-            <span className="grid place-items-center size-9 rounded-lg bg-primary text-primary-foreground">
-              <Recycle className="size-5" />
-            </span>
-            <span>RecicladoresBR</span>
+          <Link to="/" aria-label="PROCATE — Página inicial">
+            <img src={procateLogo} alt="PROCATE — Projeto Catador Empreendedor" className="h-11 w-auto sm:h-12" />
           </Link>
           <div className="flex items-center gap-2">
             <Link to="/auth">
@@ -42,7 +40,7 @@ function Landing() {
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-hero opacity-95" />
-        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 20% 30%, white 0%, transparent 40%), radial-gradient(circle at 80% 70%, white 0%, transparent 35%)' }} />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,color-mix(in_oklab,var(--color-primary-foreground)_20%,transparent)_0%,transparent_40%),radial-gradient(circle_at_80%_70%,color-mix(in_oklab,var(--color-success)_25%,transparent)_0%,transparent_35%)]" />
         <div className="container relative mx-auto px-4 py-24 md:py-32 text-primary-foreground">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium ring-1 ring-white/20 backdrop-blur-sm">

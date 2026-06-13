@@ -1,8 +1,9 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Recycle, LogOut, LayoutDashboard, UserPlus, Building2 } from "lucide-react";
+import { LogOut, LayoutDashboard, UserPlus, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import procateLogo from "@/assets/procate-logo.png";
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
@@ -19,11 +20,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-background">
       <header className="bg-card/95 backdrop-blur border-b border-border sticky top-0 z-30">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <Link to="/admin" className="flex items-center gap-2 font-display font-bold">
-            <span className="grid place-items-center size-9 rounded-lg bg-primary text-primary-foreground">
-              <Recycle className="size-5" />
-            </span>
-            <span>RecicladoresBR</span>
+          <Link to="/admin" className="flex items-center gap-2" aria-label="PROCATE — Painel administrativo">
+            <img src={procateLogo} alt="PROCATE — Projeto Catador Empreendedor" className="h-10 w-auto sm:h-11" />
             <span className="hidden sm:inline-block text-xs font-medium uppercase tracking-wider text-muted-foreground ml-2 px-2 py-0.5 rounded bg-muted">
               Admin
             </span>

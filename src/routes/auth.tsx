@@ -4,8 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Recycle, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import procateLogo from "@/assets/procate-logo.png";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -43,11 +44,8 @@ function AuthPage() {
     <div className="min-h-screen grid md:grid-cols-2">
       {/* Left visual */}
       <div className="hidden md:flex relative bg-gradient-hero text-primary-foreground p-12 flex-col justify-between">
-        <Link to="/" className="flex items-center gap-2 font-display font-bold text-lg">
-          <span className="grid place-items-center size-9 rounded-lg bg-white/15 backdrop-blur">
-            <Recycle className="size-5" />
-          </span>
-          RecicladoresBR
+        <Link to="/" className="w-fit rounded-2xl bg-card/95 px-5 py-3 shadow-soft" aria-label="PROCATE — Página inicial">
+          <img src={procateLogo} alt="PROCATE — Projeto Catador Empreendedor" className="h-14 w-auto" />
         </Link>
         <div>
           <h2 className="text-3xl font-bold leading-tight">
@@ -62,11 +60,8 @@ function AuthPage() {
       {/* Right form */}
       <div className="flex items-center justify-center p-6 md:p-12 bg-background">
         <div className="w-full max-w-sm">
-          <Link to="/" className="md:hidden flex items-center gap-2 font-display font-bold text-lg mb-8">
-            <span className="grid place-items-center size-9 rounded-lg bg-primary text-primary-foreground">
-              <Recycle className="size-5" />
-            </span>
-            RecicladoresBR
+          <Link to="/" className="mb-8 block w-fit md:hidden" aria-label="PROCATE — Página inicial">
+            <img src={procateLogo} alt="PROCATE — Projeto Catador Empreendedor" className="h-14 w-auto max-w-full" />
           </Link>
           <h1 className="text-2xl font-bold">Acessar painel</h1>
           <p className="text-muted-foreground text-sm mt-1">
