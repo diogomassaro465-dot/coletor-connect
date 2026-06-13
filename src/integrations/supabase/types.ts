@@ -115,6 +115,7 @@ export type Database = {
           emite_notas_fiscais: string | null
           empregados_registrados: number
           empregados_sem_registro: number
+          equipamentos_outros: string | null
           escolaridade_predominante: string | null
           estatuto_registrado: string | null
           evidencia_administrativo_confirmada: boolean
@@ -258,6 +259,7 @@ export type Database = {
           emite_notas_fiscais?: string | null
           empregados_registrados?: number
           empregados_sem_registro?: number
+          equipamentos_outros?: string | null
           escolaridade_predominante?: string | null
           estatuto_registrado?: string | null
           evidencia_administrativo_confirmada?: boolean
@@ -401,6 +403,7 @@ export type Database = {
           emite_notas_fiscais?: string | null
           empregados_registrados?: number
           empregados_sem_registro?: number
+          equipamentos_outros?: string | null
           escolaridade_predominante?: string | null
           estatuto_registrado?: string | null
           evidencia_administrativo_confirmada?: boolean
