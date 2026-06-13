@@ -49,7 +49,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             </Link>
             <Link to="/admin/diagnosticos">
               <Button variant="ghost" size="sm">
-                <BarChart3 className="size-4" /> <span className="hidden lg:inline">Regularidade</span>
+                <BarChart3 className="size-4" />{" "}
+                <span className="hidden lg:inline">Regularidade</span>
               </Button>
             </Link>
             <Button variant="ghost" size="sm" onClick={signOut} title="Sair">
