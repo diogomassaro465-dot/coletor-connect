@@ -85,7 +85,7 @@ export type Database = {
           controle_frequencia: string | null
           controle_frequencia_tipo: string | null
           controle_jornada: boolean | null
-          cooperativa_fornece_epis: boolean | null
+          cooperativa_fornece_epis: string | null
           created_at: string
           criancas_adolescentes_dependentes: boolean | null
           data_ultima_eleicao: string | null
@@ -205,7 +205,7 @@ export type Database = {
           controle_frequencia?: string | null
           controle_frequencia_tipo?: string | null
           controle_jornada?: boolean | null
-          cooperativa_fornece_epis?: boolean | null
+          cooperativa_fornece_epis?: string | null
           created_at?: string
           criancas_adolescentes_dependentes?: boolean | null
           data_ultima_eleicao?: string | null
@@ -325,7 +325,7 @@ export type Database = {
           controle_frequencia?: string | null
           controle_frequencia_tipo?: string | null
           controle_jornada?: boolean | null
-          cooperativa_fornece_epis?: boolean | null
+          cooperativa_fornece_epis?: string | null
           created_at?: string
           criancas_adolescentes_dependentes?: boolean | null
           data_ultima_eleicao?: string | null
