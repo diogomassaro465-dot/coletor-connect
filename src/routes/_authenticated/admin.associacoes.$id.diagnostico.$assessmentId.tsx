@@ -810,7 +810,8 @@ function AssessmentDetails() {
                 </div>
               ) : (
                 <p className="rounded-lg border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-                  A coleta da assinatura e a validação das evidências são realizadas pelo consultor responsável.
+                  A coleta da assinatura e a validação das evidências são realizadas pelo consultor
+                  responsável.
                 </p>
               )}
             </div>
