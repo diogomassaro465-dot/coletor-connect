@@ -17,9 +17,10 @@ function NovoCatador() {
           <ArrowLeft className="size-4" /> Voltar ao painel
         </Button>
       </Link>
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold">Novo cadastro</h1>
-        <p className="text-muted-foreground mt-1">Preencha as etapas a seguir para cadastrar um(a) catador(a).</p>
+      <div className="mb-8 max-w-6xl mx-auto">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Cadastro individual</p>
+        <h1 className="mt-2 text-3xl font-extrabold md:text-4xl">Novo cadastro</h1>
+        <p className="mt-2 max-w-2xl text-muted-foreground">Preencha os blocos abaixo para cadastrar um(a) catador(a). Seu progresso é salvo automaticamente neste aparelho.</p>
       </div>
       <CatadorForm mode="create" />
     </AdminShell>
