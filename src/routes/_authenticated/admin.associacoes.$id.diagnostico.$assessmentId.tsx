@@ -418,7 +418,7 @@ function AssessmentDetails() {
     ["Entrevista", true],
     ["Evidências", data.evidence.length >= 4],
     ["Processamento", Boolean(a.processed_at)],
-    ["Índice", a.regularity_total_count > 0],
+    ["Índice", Boolean(a.processed_at)],
     ["Ação", a.evidence_validated],
   ] as const;
   return (
@@ -431,7 +431,7 @@ function AssessmentDetails() {
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4 border-b border-border pb-7">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="outline">{STATUS[a.status]}</Badge>
+            {a.processed_at && <Badge variant="outline">{STATUS[a.status]}</Badge>}
             <Badge variant={a.evidence_validated ? "secondary" : "outline"}>
               {a.evidence_validated ? "Fluxo concluído" : "Evidências pendentes"}
             </Badge>
@@ -468,20 +468,21 @@ function AssessmentDetails() {
           <p className="text-xs font-bold uppercase tracking-wider opacity-80">
             Índice de regularidade
           </p>
-          <div className="mt-1 flex items-end gap-2">
-            <strong className="text-4xl tabular-nums">
-              {Number(a.regularity_index).toLocaleString("pt-BR")}%
-            </strong>
-            <span className="pb-1 text-sm opacity-80">
-              {a.regularity_compliant_count}/{a.regularity_total_count} critérios
-            </span>
-          </div>
-          <progress
-            className="mt-3 h-2 w-full accent-current"
-            max="100"
-            value={Number(a.regularity_index)}
-            aria-label="Índice de regularidade"
-          />
+          {a.processed_at ? (
+            <>
+              <div className="mt-1 flex items-end gap-2">
+                <strong className="text-4xl tabular-nums">
+                  {Number(a.regularity_index).toLocaleString("pt-BR")}%
+                </strong>
+                <span className="pb-1 text-sm opacity-80">
+                  {a.regularity_compliant_count}/{a.regularity_total_count} critérios
+                </span>
+              </div>
+              <progress className="mt-3 h-2 w-full accent-current" max="100" value={Number(a.regularity_index)} aria-label="Índice de regularidade" />
+            </>
+          ) : (
+            <p className="mt-3 font-semibold">Aguardando evidências e assinatura</p>
+          )}
         </div>
       </section>
       <Tabs defaultValue="resumo">
