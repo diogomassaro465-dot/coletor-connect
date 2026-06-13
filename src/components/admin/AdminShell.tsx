@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Recycle, LogOut, LayoutDashboard, UserPlus } from "lucide-react";
+import { Recycle, LogOut, LayoutDashboard, UserPlus, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -34,6 +34,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 <LayoutDashboard className="size-4" /> <span className="hidden sm:inline">Catadores</span>
               </Button>
             </Link>
+             <Link to="/admin/associacoes">
+               <Button variant="ghost" size="sm">
+                 <Building2 className="size-4" /> <span className="hidden md:inline">Associações</span>
+               </Button>
+             </Link>
             <Link to="/admin/novo">
               <Button variant="default" size="sm">
                 <UserPlus className="size-4" /> <span className="hidden sm:inline">Novo cadastro</span>
