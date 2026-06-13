@@ -16,8 +16,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-muted/30">
-      <header className="bg-background border-b border-border sticky top-0 z-30">
+    <div className="min-h-screen bg-background">
+      <header className="bg-card/95 backdrop-blur border-b border-border sticky top-0 z-30">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <Link to="/admin" className="flex items-center gap-2 font-display font-bold">
             <span className="grid place-items-center size-9 rounded-lg bg-primary text-primary-foreground">
@@ -50,7 +50,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </nav>
         </div>
       </header>
-      <main className="container mx-auto px-4 py-8">{children}</main>
+       <main className="container mx-auto px-4 py-8 md:py-10">{children}</main>
     </div>
   );
 }
