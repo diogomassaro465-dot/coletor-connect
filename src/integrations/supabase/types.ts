@@ -120,6 +120,7 @@ export type Database = {
           equipamentos_outros: string | null
           escolaridade_predominante: string | null
           estatuto_registrado: string | null
+          evidence_validated: boolean
           evidencia_administrativo_confirmada: boolean
           evidencia_entrevista_confirmada: boolean
           evidencia_frente_confirmada: boolean
@@ -177,6 +178,7 @@ export type Database = {
           problemas_juridicos_atuais: string | null
           problemas_melhorias_juridico: string | null
           problemas_saude: string | null
+          processed_at: string | null
           processos_judiciais: boolean | null
           processos_judiciais_quais: string | null
           quantidade_beneficiarios: number | null
@@ -190,9 +192,15 @@ export type Database = {
           regras_entrada: string | null
           regras_entrada_exclusao: boolean | null
           regras_saida_exclusao: string | null
+          regularity_compliant_count: number
+          regularity_index: number
+          regularity_total_count: number
           relatos_preconceito: boolean | null
           renda_media_cooperado: number | null
           renda_media_mensal: number | null
+          representative_name: string | null
+          representative_signature: string | null
+          signed_at: string | null
           sistema_financeiro: string | null
           sistema_financeiro_qual: string | null
           status: Database["public"]["Enums"]["diagnostic_status"]
@@ -267,6 +275,7 @@ export type Database = {
           equipamentos_outros?: string | null
           escolaridade_predominante?: string | null
           estatuto_registrado?: string | null
+          evidence_validated?: boolean
           evidencia_administrativo_confirmada?: boolean
           evidencia_entrevista_confirmada?: boolean
           evidencia_frente_confirmada?: boolean
@@ -324,6 +333,7 @@ export type Database = {
           problemas_juridicos_atuais?: string | null
           problemas_melhorias_juridico?: string | null
           problemas_saude?: string | null
+          processed_at?: string | null
           processos_judiciais?: boolean | null
           processos_judiciais_quais?: string | null
           quantidade_beneficiarios?: number | null
@@ -337,9 +347,15 @@ export type Database = {
           regras_entrada?: string | null
           regras_entrada_exclusao?: boolean | null
           regras_saida_exclusao?: string | null
+          regularity_compliant_count?: number
+          regularity_index?: number
+          regularity_total_count?: number
           relatos_preconceito?: boolean | null
           renda_media_cooperado?: number | null
           renda_media_mensal?: number | null
+          representative_name?: string | null
+          representative_signature?: string | null
+          signed_at?: string | null
           sistema_financeiro?: string | null
           sistema_financeiro_qual?: string | null
           status?: Database["public"]["Enums"]["diagnostic_status"]
@@ -414,6 +430,7 @@ export type Database = {
           equipamentos_outros?: string | null
           escolaridade_predominante?: string | null
           estatuto_registrado?: string | null
+          evidence_validated?: boolean
           evidencia_administrativo_confirmada?: boolean
           evidencia_entrevista_confirmada?: boolean
           evidencia_frente_confirmada?: boolean
@@ -471,6 +488,7 @@ export type Database = {
           problemas_juridicos_atuais?: string | null
           problemas_melhorias_juridico?: string | null
           problemas_saude?: string | null
+          processed_at?: string | null
           processos_judiciais?: boolean | null
           processos_judiciais_quais?: string | null
           quantidade_beneficiarios?: number | null
@@ -484,9 +502,15 @@ export type Database = {
           regras_entrada?: string | null
           regras_entrada_exclusao?: boolean | null
           regras_saida_exclusao?: string | null
+          regularity_compliant_count?: number
+          regularity_index?: number
+          regularity_total_count?: number
           relatos_preconceito?: boolean | null
           renda_media_cooperado?: number | null
           renda_media_mensal?: number | null
+          representative_name?: string | null
+          representative_signature?: string | null
+          signed_at?: string | null
           sistema_financeiro?: string | null
           sistema_financeiro_qual?: string | null
           status?: Database["public"]["Enums"]["diagnostic_status"]
