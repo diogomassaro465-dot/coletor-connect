@@ -128,14 +128,12 @@ function AssessmentDetails() {
     mutationFn: async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       const form = new FormData(event.currentTarget);
-      const { error } = await supabase
-        .from("material_prices")
-        .insert({
-          assessment_id: assessmentId,
-          material: String(form.get("material") ?? "").trim(),
-          comprador: String(form.get("comprador") ?? "").trim() || null,
-          preco_por_kg: Number(form.get("preco") ?? 0),
-        });
+      const { error } = await supabase.from("material_prices").insert({
+        assessment_id: assessmentId,
+        material: String(form.get("material") ?? "").trim(),
+        comprador: String(form.get("comprador") ?? "").trim() || null,
+        preco_por_kg: Number(form.get("preco") ?? 0),
+      });
       if (error) throw error;
       event.currentTarget.reset();
     },
@@ -146,13 +144,11 @@ function AssessmentDetails() {
     mutationFn: async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       const form = new FormData(event.currentTarget);
-      const { error } = await supabase
-        .from("association_equipment")
-        .insert({
-          assessment_id: assessmentId,
-          tipo: String(form.get("tipo") ?? "").trim(),
-          quantidade: Number(form.get("quantidade") ?? 0),
-        });
+      const { error } = await supabase.from("association_equipment").insert({
+        assessment_id: assessmentId,
+        tipo: String(form.get("tipo") ?? "").trim(),
+        quantidade: Number(form.get("quantidade") ?? 0),
+      });
       if (error) throw error;
       event.currentTarget.reset();
     },
@@ -193,18 +189,16 @@ function AssessmentDetails() {
       .from("catadores-docs")
       .upload(path, file, { contentType: file.type, upsert: false });
     if (!uploaded.error) {
-      const saved = await supabase
-        .from("association_evidence")
-        .insert({
-          association_id: id,
-          assessment_id: assessmentId,
-          module,
-          category,
-          storage_path: path,
-          file_name: file.name.slice(0, 200),
-          mime_type: file.type,
-          uploaded_by: auth.user.id,
-        });
+      const saved = await supabase.from("association_evidence").insert({
+        association_id: id,
+        assessment_id: assessmentId,
+        module,
+        category,
+        storage_path: path,
+        file_name: file.name.slice(0, 200),
+        mime_type: file.type,
+        uploaded_by: auth.user.id,
+      });
       if (saved.error) await supabase.storage.from("catadores-docs").remove([path]);
       if (saved.error)
         toast.error("Erro ao registrar evidência", { description: saved.error.message });
