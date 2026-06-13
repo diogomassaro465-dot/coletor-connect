@@ -60,13 +60,14 @@ export type Database = {
           apoio_poder_publico: string | null
           assessoria_juridica: boolean | null
           association_id: string
-          ata_registrada_cartorio: boolean | null
+          ata_registrada_cartorio: string | null
           aumento_trabalho_festividades: boolean | null
           autodeclaracao_racial: string | null
           autonomos: number
           avcb: string | null
           capacitacoes_interesse: string | null
           cargos_por_eleicao: string | null
+          classificacao_juridica: string | null
           conselho_fiscal: string | null
           consentimento_dados: boolean
           consultant_id: string
@@ -80,12 +81,14 @@ export type Database = {
           contrato_remunerado: boolean | null
           contrato_sst: string | null
           contrato_sst_responsavel: string | null
+          contrato_tipo: string | null
           contribuicao_inss: string | null
           controle_estoque: string | null
           controle_frequencia: string | null
           controle_frequencia_tipo: string | null
           controle_jornada: boolean | null
           cooperativa_fornece_epis: string | null
+          coordenacao_gerencia: string | null
           created_at: string
           criancas_adolescentes_dependentes: boolean | null
           data_ultima_eleicao: string | null
@@ -94,6 +97,7 @@ export type Database = {
           destino_venda: string | null
           diretoria_conselho: boolean | null
           diretoria_nomes: string | null
+          divisao_tarefas: string | null
           divisao_tarefas_gerencia: boolean | null
           documentos_necessarios: string | null
           emite_notas_fiscais: string | null
@@ -114,34 +118,41 @@ export type Database = {
           inscritos_cadunico: string | null
           interesse_capacitacao: boolean | null
           licenca_ambiental_status: string | null
+          lista_cooperados_atualizada: string | null
+          lista_nao_cooperados_atualizada: string | null
           livro_ficha_trabalho: boolean | null
           livro_ficha_trabalho_qual: string | null
           livro_inspecao_trabalho: boolean | null
-          mandato_em_dia: boolean | null
+          mandato_em_dia: string | null
           materiais_coletados: string[]
           media_horas_trabalhadas: string | null
           media_moradores_casa: number | null
+          melhorias_juridicas_necessarias: string | null
           metodo_divisao_descricao: string | null
           metodo_divisao_dinheiro: string | null
           motivos_entrada_reciclagem: string | null
           movimento_qual: string | null
           mulheres: number
           necessita_documentos: boolean | null
+          orientacao_documentos_aceita: boolean
+          orientacao_regularizacao_aceita: boolean
           pagamento_fixo_mensal: boolean | null
           parcerias_detalhes: string | null
           participa_coleta_seletiva_municipal: boolean | null
           participa_movimentos: boolean | null
+          pendencias_juridicas: string | null
           pessoas_trans_detalhes: string | null
           possui_conta_bancaria: string | null
           possui_contador: string | null
           possui_maquineta: string | null
           possui_parcerias: string | null
           possui_pessoas_trans: boolean
-          possui_registro_atas: boolean | null
+          possui_registro_atas: string | null
           possui_veiculos_maquinas: boolean | null
           preconceito_detalhes: string | null
           presidente_nome: string | null
           presidente_telefone: string | null
+          problemas_juridicos_atuais: string | null
           problemas_melhorias_juridico: string | null
           problemas_saude: string | null
           processos_judiciais: boolean | null
@@ -154,7 +165,9 @@ export type Database = {
           recebeu_apoio_programas: boolean | null
           reconhecimento_sociedade: string | null
           registro_ocb: string | null
+          regras_entrada: string | null
           regras_entrada_exclusao: boolean | null
+          regras_saida_exclusao: string | null
           relatos_preconceito: boolean | null
           renda_media_cooperado: number | null
           renda_media_mensal: number | null
@@ -180,13 +193,14 @@ export type Database = {
           apoio_poder_publico?: string | null
           assessoria_juridica?: boolean | null
           association_id: string
-          ata_registrada_cartorio?: boolean | null
+          ata_registrada_cartorio?: string | null
           aumento_trabalho_festividades?: boolean | null
           autodeclaracao_racial?: string | null
           autonomos?: number
           avcb?: string | null
           capacitacoes_interesse?: string | null
           cargos_por_eleicao?: string | null
+          classificacao_juridica?: string | null
           conselho_fiscal?: string | null
           consentimento_dados?: boolean
           consultant_id: string
@@ -200,12 +214,14 @@ export type Database = {
           contrato_remunerado?: boolean | null
           contrato_sst?: string | null
           contrato_sst_responsavel?: string | null
+          contrato_tipo?: string | null
           contribuicao_inss?: string | null
           controle_estoque?: string | null
           controle_frequencia?: string | null
           controle_frequencia_tipo?: string | null
           controle_jornada?: boolean | null
           cooperativa_fornece_epis?: string | null
+          coordenacao_gerencia?: string | null
           created_at?: string
           criancas_adolescentes_dependentes?: boolean | null
           data_ultima_eleicao?: string | null
@@ -214,6 +230,7 @@ export type Database = {
           destino_venda?: string | null
           diretoria_conselho?: boolean | null
           diretoria_nomes?: string | null
+          divisao_tarefas?: string | null
           divisao_tarefas_gerencia?: boolean | null
           documentos_necessarios?: string | null
           emite_notas_fiscais?: string | null
@@ -234,34 +251,41 @@ export type Database = {
           inscritos_cadunico?: string | null
           interesse_capacitacao?: boolean | null
           licenca_ambiental_status?: string | null
+          lista_cooperados_atualizada?: string | null
+          lista_nao_cooperados_atualizada?: string | null
           livro_ficha_trabalho?: boolean | null
           livro_ficha_trabalho_qual?: string | null
           livro_inspecao_trabalho?: boolean | null
-          mandato_em_dia?: boolean | null
+          mandato_em_dia?: string | null
           materiais_coletados?: string[]
           media_horas_trabalhadas?: string | null
           media_moradores_casa?: number | null
+          melhorias_juridicas_necessarias?: string | null
           metodo_divisao_descricao?: string | null
           metodo_divisao_dinheiro?: string | null
           motivos_entrada_reciclagem?: string | null
           movimento_qual?: string | null
           mulheres?: number
           necessita_documentos?: boolean | null
+          orientacao_documentos_aceita?: boolean
+          orientacao_regularizacao_aceita?: boolean
           pagamento_fixo_mensal?: boolean | null
           parcerias_detalhes?: string | null
           participa_coleta_seletiva_municipal?: boolean | null
           participa_movimentos?: boolean | null
+          pendencias_juridicas?: string | null
           pessoas_trans_detalhes?: string | null
           possui_conta_bancaria?: string | null
           possui_contador?: string | null
           possui_maquineta?: string | null
           possui_parcerias?: string | null
           possui_pessoas_trans?: boolean
-          possui_registro_atas?: boolean | null
+          possui_registro_atas?: string | null
           possui_veiculos_maquinas?: boolean | null
           preconceito_detalhes?: string | null
           presidente_nome?: string | null
           presidente_telefone?: string | null
+          problemas_juridicos_atuais?: string | null
           problemas_melhorias_juridico?: string | null
           problemas_saude?: string | null
           processos_judiciais?: boolean | null
@@ -274,7 +298,9 @@ export type Database = {
           recebeu_apoio_programas?: boolean | null
           reconhecimento_sociedade?: string | null
           registro_ocb?: string | null
+          regras_entrada?: string | null
           regras_entrada_exclusao?: boolean | null
+          regras_saida_exclusao?: string | null
           relatos_preconceito?: boolean | null
           renda_media_cooperado?: number | null
           renda_media_mensal?: number | null
@@ -300,13 +326,14 @@ export type Database = {
           apoio_poder_publico?: string | null
           assessoria_juridica?: boolean | null
           association_id?: string
-          ata_registrada_cartorio?: boolean | null
+          ata_registrada_cartorio?: string | null
           aumento_trabalho_festividades?: boolean | null
           autodeclaracao_racial?: string | null
           autonomos?: number
           avcb?: string | null
           capacitacoes_interesse?: string | null
           cargos_por_eleicao?: string | null
+          classificacao_juridica?: string | null
           conselho_fiscal?: string | null
           consentimento_dados?: boolean
           consultant_id?: string
@@ -320,12 +347,14 @@ export type Database = {
           contrato_remunerado?: boolean | null
           contrato_sst?: string | null
           contrato_sst_responsavel?: string | null
+          contrato_tipo?: string | null
           contribuicao_inss?: string | null
           controle_estoque?: string | null
           controle_frequencia?: string | null
           controle_frequencia_tipo?: string | null
           controle_jornada?: boolean | null
           cooperativa_fornece_epis?: string | null
+          coordenacao_gerencia?: string | null
           created_at?: string
           criancas_adolescentes_dependentes?: boolean | null
           data_ultima_eleicao?: string | null
@@ -334,6 +363,7 @@ export type Database = {
           destino_venda?: string | null
           diretoria_conselho?: boolean | null
           diretoria_nomes?: string | null
+          divisao_tarefas?: string | null
           divisao_tarefas_gerencia?: boolean | null
           documentos_necessarios?: string | null
           emite_notas_fiscais?: string | null
@@ -354,34 +384,41 @@ export type Database = {
           inscritos_cadunico?: string | null
           interesse_capacitacao?: boolean | null
           licenca_ambiental_status?: string | null
+          lista_cooperados_atualizada?: string | null
+          lista_nao_cooperados_atualizada?: string | null
           livro_ficha_trabalho?: boolean | null
           livro_ficha_trabalho_qual?: string | null
           livro_inspecao_trabalho?: boolean | null
-          mandato_em_dia?: boolean | null
+          mandato_em_dia?: string | null
           materiais_coletados?: string[]
           media_horas_trabalhadas?: string | null
           media_moradores_casa?: number | null
+          melhorias_juridicas_necessarias?: string | null
           metodo_divisao_descricao?: string | null
           metodo_divisao_dinheiro?: string | null
           motivos_entrada_reciclagem?: string | null
           movimento_qual?: string | null
           mulheres?: number
           necessita_documentos?: boolean | null
+          orientacao_documentos_aceita?: boolean
+          orientacao_regularizacao_aceita?: boolean
           pagamento_fixo_mensal?: boolean | null
           parcerias_detalhes?: string | null
           participa_coleta_seletiva_municipal?: boolean | null
           participa_movimentos?: boolean | null
+          pendencias_juridicas?: string | null
           pessoas_trans_detalhes?: string | null
           possui_conta_bancaria?: string | null
           possui_contador?: string | null
           possui_maquineta?: string | null
           possui_parcerias?: string | null
           possui_pessoas_trans?: boolean
-          possui_registro_atas?: boolean | null
+          possui_registro_atas?: string | null
           possui_veiculos_maquinas?: boolean | null
           preconceito_detalhes?: string | null
           presidente_nome?: string | null
           presidente_telefone?: string | null
+          problemas_juridicos_atuais?: string | null
           problemas_melhorias_juridico?: string | null
           problemas_saude?: string | null
           processos_judiciais?: boolean | null
@@ -394,7 +431,9 @@ export type Database = {
           recebeu_apoio_programas?: boolean | null
           reconhecimento_sociedade?: string | null
           registro_ocb?: string | null
+          regras_entrada?: string | null
           regras_entrada_exclusao?: boolean | null
+          regras_saida_exclusao?: string | null
           relatos_preconceito?: boolean | null
           renda_media_cooperado?: number | null
           renda_media_mensal?: number | null
