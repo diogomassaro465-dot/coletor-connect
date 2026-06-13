@@ -225,8 +225,8 @@ function AdminDashboard() {
           <Button variant="outline" onClick={exportXLSX}>
             <Download className="size-4" /> Exportar Excel
           </Button>
-          <Link to="/admin/novo">
-            <Button>Novo cadastro</Button>
+          <Link to="/admin/associacoes">
+            <Button>Escolher entidade</Button>
           </Link>
         </div>
       </div>
@@ -301,8 +301,8 @@ function AdminDashboard() {
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-16">
                   <p className="text-muted-foreground">Nenhum catador encontrado.</p>
-                  <Link to="/admin/novo" className="inline-block mt-4">
-                    <Button size="sm">Criar primeiro cadastro</Button>
+                  <Link to="/admin/associacoes" className="inline-block mt-4">
+                    <Button size="sm">Escolher entidade</Button>
                   </Link>
                 </TableCell>
               </TableRow>
