@@ -63,7 +63,7 @@ export function SignaturePad({ value, onChange }: SignaturePadProps) {
     if (!drawingRef.current) return;
     drawingRef.current = false;
     const canvas = canvasRef.current;
-    if (canvas && hasStroke) onChange(canvas.toDataURL("image/png"));
+    if (canvas) onChange(canvas.toDataURL("image/png"));
   }
 
   function clear() {
