@@ -24,26 +24,30 @@ function NewAssociationPage() {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     setSaving(true);
-    const { error } = await supabase.from("associations").insert({
-      nome: String(form.get("nome") ?? "").trim(),
-      tipo,
-      cnpj: String(form.get("cnpj") ?? "").trim() || null,
-      municipio: String(form.get("municipio") ?? "").trim(),
-      inscricao_municipal: String(form.get("inscricao_municipal") ?? "").trim() || null,
-      inscricao_estadual: String(form.get("inscricao_estadual") ?? "").trim() || null,
-      endereco_sede: String(form.get("endereco_sede") ?? "").trim(),
-      telefone: String(form.get("telefone") ?? "").trim() || null,
-      email: String(form.get("email") ?? "").trim() || null,
-      numero_associados_inicial: Number(form.get("numero_associados_inicial") ?? 0),
-      numero_associados_atual: Number(form.get("numero_associados_atual") ?? 0),
-    });
+    const { data: association, error } = await supabase
+      .from("associations")
+      .insert({
+        nome: String(form.get("nome") ?? "").trim(),
+        tipo,
+        cnpj: String(form.get("cnpj") ?? "").trim() || null,
+        municipio: String(form.get("municipio") ?? "").trim(),
+        inscricao_municipal: String(form.get("inscricao_municipal") ?? "").trim() || null,
+        inscricao_estadual: String(form.get("inscricao_estadual") ?? "").trim() || null,
+        endereco_sede: String(form.get("endereco_sede") ?? "").trim(),
+        telefone: String(form.get("telefone") ?? "").trim() || null,
+        email: String(form.get("email") ?? "").trim() || null,
+        numero_associados_inicial: Number(form.get("numero_associados_inicial") ?? 0),
+        numero_associados_atual: Number(form.get("numero_associados_atual") ?? 0),
+      })
+      .select("id")
+      .single();
     setSaving(false);
     if (error) {
       toast.error("Não foi possível cadastrar", { description: error.message });
       return;
     }
     toast.success("Entidade cadastrada com sucesso.");
-    navigate({ to: "/admin/associacoes" });
+    navigate({ to: "/admin/associacoes/$id", params: { id: association.id } });
   }
 
   return (
