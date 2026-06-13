@@ -147,7 +147,7 @@ export function CatadorForm({
       association_id: values.association_id,
       email: naoTem.email ? null : values.email || null,
       telefone: naoTem.telefone ? null : values.telefone || null,
-      nome_cooperativa: association?.nome ?? values.nome_cooperativa || null,
+      nome_cooperativa: association?.nome ?? (values.nome_cooperativa || null),
       titulo_eleitor: values.titulo_eleitor || null,
       ctps: values.ctps || null,
       nis: values.nis || null,
