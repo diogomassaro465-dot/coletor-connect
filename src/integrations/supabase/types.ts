@@ -167,6 +167,7 @@ export type Database = {
           possui_registro_atas: string | null
           possui_veiculos_maquinas: boolean | null
           preconceito_detalhes: string | null
+          presidente_email: string | null
           presidente_nome: string | null
           presidente_telefone: string | null
           problemas_juridicos_atuais: string | null
@@ -196,6 +197,7 @@ export type Database = {
           todos_sao_cooperados: boolean | null
           updated_at: string
           uso_epis: string | null
+          vice_presidente_email: string | null
           vice_presidente_nome: string | null
           vice_presidente_telefone: string | null
           volumetria_toneladas_mes: number | null
@@ -308,6 +310,7 @@ export type Database = {
           possui_registro_atas?: string | null
           possui_veiculos_maquinas?: boolean | null
           preconceito_detalhes?: string | null
+          presidente_email?: string | null
           presidente_nome?: string | null
           presidente_telefone?: string | null
           problemas_juridicos_atuais?: string | null
@@ -337,6 +340,7 @@ export type Database = {
           todos_sao_cooperados?: boolean | null
           updated_at?: string
           uso_epis?: string | null
+          vice_presidente_email?: string | null
           vice_presidente_nome?: string | null
           vice_presidente_telefone?: string | null
           volumetria_toneladas_mes?: number | null
@@ -449,6 +453,7 @@ export type Database = {
           possui_registro_atas?: string | null
           possui_veiculos_maquinas?: boolean | null
           preconceito_detalhes?: string | null
+          presidente_email?: string | null
           presidente_nome?: string | null
           presidente_telefone?: string | null
           problemas_juridicos_atuais?: string | null
@@ -478,6 +483,7 @@ export type Database = {
           todos_sao_cooperados?: boolean | null
           updated_at?: string
           uso_epis?: string | null
+          vice_presidente_email?: string | null
           vice_presidente_nome?: string | null
           vice_presidente_telefone?: string | null
           volumetria_toneladas_mes?: number | null
