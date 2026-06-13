@@ -199,6 +199,7 @@ function NewAssessment() {
         evidencia_frente_confirmada: values.has("evidencia_frente_confirmada"),
         evidencia_administrativo_confirmada: values.has("evidencia_administrativo_confirmada"),
         evidencia_reuniao_confirmada: values.has("evidencia_reuniao_confirmada"),
+        evidencia_entrevista_confirmada: values.has("evidencia_entrevista_confirmada"),
         evidencia_livro_trabalho_confirmada: values.has("evidencia_livro_trabalho_confirmada"),
         consentimento_dados: true,
         declaracao_veracidade: true,
@@ -273,6 +274,27 @@ function NewAssessment() {
       if (associationError) {
         setSaving(false);
         return toast.error("Diagnóstico salvo, mas não foi possível atualizar a entidade.");
+      }
+    }
+    if (activeModule === "contabil" && assessment) {
+      const { error: associationError } = await supabase.from("associations").update({
+        nome: String(values.get("accounting_association_nome") ?? "").trim(),
+        cnpj: text(values, "accounting_association_cnpj"),
+        municipio: String(values.get("accounting_association_municipio") ?? "").trim(),
+      }).eq("id", id);
+      const bookRows = ACCOUNTING_BOOKS.map((book) => ({
+        assessment_id: assessment.id,
+        tipo: book.label,
+        implantado: choice(`livro_${book.key}_implantado`) === "Sim",
+        atualizado: choice(`livro_${book.key}_atualizado`) === "Sim",
+        nao_possui: choice(`livro_${book.key}_implantado`) === "Não",
+        nao_sabe: choice(`livro_${book.key}_implantado`) === "Não sabe informar",
+        observacao: text(values, `livro_${book.key}_observacao`),
+      }));
+      const { error: booksError } = await supabase.from("accounting_books").insert(bookRows);
+      if (associationError || booksError) {
+        setSaving(false);
+        return toast.error("Diagnóstico salvo, mas houve erro nos dados da entidade ou dos livros.");
       }
     }
     setSaving(false);
