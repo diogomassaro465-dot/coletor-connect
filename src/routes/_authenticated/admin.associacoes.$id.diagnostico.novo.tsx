@@ -357,7 +357,10 @@ function NewAssessment() {
               <Input name="horario_visita" type="time" required />
             </Field>
           </div>
-          <Tabs value={activeModule} onValueChange={(value) => setActiveModule(value as typeof modulo)}>
+          <Tabs
+            value={activeModule}
+            onValueChange={(value) => setActiveModule(value as typeof modulo)}
+          >
             <TabsList className="grid h-auto w-full grid-cols-3 rounded-2xl p-1">
               <TabsTrigger
                 value="social"
@@ -394,288 +397,14 @@ function NewAssessment() {
                     setChoice={setChoice}
                   />
                   <div className="space-y-4 rounded-xl border border-border bg-card p-5">
-                    <label className="flex items-start gap-3 text-sm"><Checkbox name="consentimento_dados" required /><span>Autorizo o tratamento dos dados coletados para as finalidades do diagnóstico e acompanhamento institucional.</span></label>
-                    <label className="flex items-start gap-3 text-sm"><Checkbox name="declaracao_veracidade" required /><span>Declaro que as informações prestadas são verdadeiras e correspondem à realidade observada na visita.</span></label>
-                  </div>
-                </div>
-              )}
-              <fieldset disabled className="hidden">
-              <Module title="Módulo Social / Cadastral" tone="border-destructive/40">
-                <Grid>
-                  <Field label="Nome do presidente">
-                    <Input name="presidente_nome" maxLength={150} />
-                  </Field>
-                  <Field label="Telefone do presidente">
-                    <Input name="presidente_telefone" type="tel" maxLength={30} />
-                  </Field>
-                  <Field label="Nome do vice-presidente">
-                    <Input name="vice_presidente_nome" maxLength={150} />
-                  </Field>
-                  <Field label="Telefone do vice-presidente">
-                    <Input name="vice_presidente_telefone" type="tel" maxLength={30} />
-                  </Field>
-                  <NumberField name="homens" label="Quantidade de homens" />
-                  <NumberField name="mulheres" label="Quantidade de mulheres" />
-                  <Choice
-                    name="possui_pessoas_trans"
-                    label="Possui pessoas trans?"
-                    options={YN}
-                    value={choice("possui_pessoas_trans")}
-                    onChange={setChoice}
-                  />
-                  <Field label="Identidades e quantidade">
-                    <Input name="pessoas_trans_detalhes" maxLength={300} />
-                  </Field>
-                  <Field label="Relação da autodeclaração racial" wide>
-                    <Textarea name="autodeclaracao_racial" maxLength={1000} />
-                  </Field>
-                  <Choice
-                    name="faixa_etaria_predominante"
-                    label="Faixa etária predominante"
-                    options={["Até 25 anos", "26 a 40 anos", "41 a 60 anos", "Acima de 60 anos"]}
-                    value={choice("faixa_etaria_predominante", "Até 25 anos")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="escolaridade_predominante"
-                    label="Escolaridade predominante"
-                    options={[
-                      "Não alfabetizado",
-                      "Ensino fundamental incompleto",
-                      "Ensino fundamental completo",
-                      "Ensino médio",
-                      "Ensino superior",
-                    ]}
-                    value={choice("escolaridade_predominante", "Não alfabetizado")}
-                    onChange={setChoice}
-                  />
-                  <NumberField name="media_moradores_casa" label="Média de moradores por casa" />
-                  <Choice
-                    name="criancas_adolescentes_dependentes"
-                    label="Possui crianças ou adolescentes dependentes?"
-                    options={YN}
-                    value={choice("criancas_adolescentes_dependentes")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="contribuicao_inss"
-                    label="Contribuição INSS"
-                    options={YNSOME}
-                    value={choice("contribuicao_inss")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="inscritos_cadunico"
-                    label="Inscritos no CadÚnico"
-                    options={YNK}
-                    value={choice("inscritos_cadunico")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="uso_epis"
-                    label="Utilização de EPIs"
-                    options={["Sim todos", "Parcialmente", "Não"]}
-                    value={choice("uso_epis")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="cooperativa_fornece_epis"
-                    label="A entidade fornece EPIs?"
-                    options={["Todos", "Parcialmente", "Não"]}
-                    value={choice("cooperativa_fornece_epis")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="acidentes_ultimo_ano"
-                    label="Acidentes no último ano?"
-                    options={YN}
-                    value={choice("acidentes_ultimo_ano")}
-                    onChange={setChoice}
-                  />
-                  <Field label="Tipo de acidentes">
-                    <Textarea name="acidentes_tipo" maxLength={1000} />
-                  </Field>
-                  <Field label="Principais problemas de saúde">
-                    <Textarea name="problemas_saude" maxLength={1000} />
-                  </Field>
-                  <Choice
-                    name="media_horas_trabalhadas"
-                    label="Média de horas trabalhadas por dia"
-                    options={["Até 4h", "6h", "8h", "Mais de 8h"]}
-                    value={choice("media_horas_trabalhadas", "8h")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="aumento_trabalho_festividades"
-                    label="O trabalho aumenta em festividades?"
-                    options={YN}
-                    value={choice("aumento_trabalho_festividades")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="necessita_documentos"
-                    label="Há necessidade de emitir documentos?"
-                    options={YN}
-                    value={choice("necessita_documentos")}
-                    onChange={setChoice}
-                  />
-                  <Field label="Documentos necessários">
-                    <Textarea name="documentos_necessarios" maxLength={1000} />
-                  </Field>
-                  <Choice
-                    name="recebe_beneficios"
-                    label="Recebe benefícios sociais?"
-                    options={YN}
-                    value={choice("recebe_beneficios")}
-                    onChange={setChoice}
-                  />
-                  <NumberField
-                    name="quantidade_beneficiarios"
-                    label="Quantidade de beneficiários"
-                  />
-                  <Choice
-                    name="reconhecimento_sociedade"
-                    label="Há reconhecimento pela sociedade?"
-                    options={YNK}
-                    value={choice("reconhecimento_sociedade")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="relatos_preconceito"
-                    label="Há relatos de preconceito ou discriminação?"
-                    options={YN}
-                    value={choice("relatos_preconceito")}
-                    onChange={setChoice}
-                  />
-                  <Field label="Detalhes dos relatos">
-                    <Textarea name="preconceito_detalhes" maxLength={1000} />
-                  </Field>
-                  <Field label="Motivos de entrada na reciclagem" wide>
-                    <Textarea name="motivos_entrada_reciclagem" maxLength={1500} />
-                  </Field>
-                  <Choice
-                    name="historico_trabalho_infantil"
-                    label="Há histórico de trabalho infantil?"
-                    options={YN}
-                    value={choice("historico_trabalho_infantil")}
-                    onChange={setChoice}
-                  />
-                  <NumberField
-                    name="quantidade_trabalho_infantil"
-                    label="Quantidade relacionada ao trabalho infantil"
-                  />
-                  <Choice
-                    name="interesse_capacitacao"
-                    label="Há interesse em capacitações?"
-                    options={YN}
-                    value={choice("interesse_capacitacao")}
-                    onChange={setChoice}
-                  />
-                  <Field label="Capacitações de interesse">
-                    <Textarea name="capacitacoes_interesse" maxLength={1000} />
-                  </Field>
-                  <Choice
-                    name="tipo_coleta"
-                    label="Tipo de coleta"
-                    options={["Ruas", "Domicílios", "Mista", "Outro"]}
-                    value={choice("tipo_coleta", "Mista")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="realiza_triagem"
-                    label="Realiza triagem dos materiais?"
-                    options={YN}
-                    value={choice("realiza_triagem")}
-                    onChange={setChoice}
-                  />
-                  <NumberField
-                    name="volumetria_toneladas_mes"
-                    label="Toneladas por mês"
-                    step="0.001"
-                  />
-                  <NumberField name="renda_media_mensal" label="Renda média mensal" step="0.01" />
-                  <Field label="Materiais coletados (selecione todos os aplicáveis)" wide>
-                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                      {MATERIAIS_OPTIONS.map((m) => (
-                        <label
-                          key={m}
-                          className="flex items-center gap-2 rounded-md border border-border p-2 text-sm"
-                        >
-                          <Checkbox
-                            checked={materials.includes(m)}
-                            onCheckedChange={(checked) =>
-                              setMaterials((current) =>
-                                checked ? [...current, m] : current.filter((x) => x !== m),
-                              )
-                            }
-                          />
-                          {m}
-                        </label>
-                      ))}
-                    </div>
-                  </Field>
-                  <Choice
-                    name="possui_parcerias"
-                    label="Possui parcerias?"
-                    options={[
-                      "Sim — poder público",
-                      "Sim — instituições privadas",
-                      "Sim — outras",
-                      "Não",
-                    ]}
-                    value={choice("possui_parcerias")}
-                    onChange={setChoice}
-                  />
-                  <Field label="Detalhes das parcerias">
-                    <Textarea name="parcerias_detalhes" maxLength={1000} />
-                  </Field>
-                  <Choice
-                    name="destino_venda"
-                    label="Destino da venda"
-                    options={["Indústria", "Intermediários/Atravessadores", "Outro"]}
-                    value={choice("destino_venda", "Indústria")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="tipo_galpao"
-                    label="Situação do galpão"
-                    options={["Próprio", "Alugado", "Cedido", "Não possui", "Outro"]}
-                    value={choice("tipo_galpao", "Não possui")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="possui_veiculos_maquinas"
-                    label="Possui veículos ou máquinas?"
-                    options={YN}
-                    value={choice("possui_veiculos_maquinas")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="recebeu_apoio_programas"
-                    label="Recebeu apoio de programas ou projetos?"
-                    options={YN}
-                    value={choice("recebeu_apoio_programas")}
-                    onChange={setChoice}
-                  />
-                  <Choice
-                    name="participa_movimentos"
-                    label="Participa de movimentos ou redes?"
-                    options={YN}
-                    value={choice("participa_movimentos")}
-                    onChange={setChoice}
-                  />
-                  <Field label="Qual movimento ou rede?">
-                    <Input name="movimento_qual" maxLength={300} />
-                  </Field>
-                  <div className="space-y-4 md:col-span-2">
-                    <label className="flex items-start gap-3 rounded-lg border border-border p-4 text-sm">
+                    <label className="flex items-start gap-3 text-sm">
                       <Checkbox name="consentimento_dados" required />
                       <span>
                         Autorizo o tratamento dos dados coletados para as finalidades do diagnóstico
                         e acompanhamento institucional.
                       </span>
                     </label>
-                    <label className="flex items-start gap-3 rounded-lg border border-border p-4 text-sm">
+                    <label className="flex items-start gap-3 text-sm">
                       <Checkbox name="declaracao_veracidade" required />
                       <span>
                         Declaro que as informações prestadas são verdadeiras e correspondem à
@@ -683,8 +412,294 @@ function NewAssessment() {
                       </span>
                     </label>
                   </div>
-                </Grid>
-              </Module>
+                </div>
+              )}
+              <fieldset disabled className="hidden">
+                <Module title="Módulo Social / Cadastral" tone="border-destructive/40">
+                  <Grid>
+                    <Field label="Nome do presidente">
+                      <Input name="presidente_nome" maxLength={150} />
+                    </Field>
+                    <Field label="Telefone do presidente">
+                      <Input name="presidente_telefone" type="tel" maxLength={30} />
+                    </Field>
+                    <Field label="Nome do vice-presidente">
+                      <Input name="vice_presidente_nome" maxLength={150} />
+                    </Field>
+                    <Field label="Telefone do vice-presidente">
+                      <Input name="vice_presidente_telefone" type="tel" maxLength={30} />
+                    </Field>
+                    <NumberField name="homens" label="Quantidade de homens" />
+                    <NumberField name="mulheres" label="Quantidade de mulheres" />
+                    <Choice
+                      name="possui_pessoas_trans"
+                      label="Possui pessoas trans?"
+                      options={YN}
+                      value={choice("possui_pessoas_trans")}
+                      onChange={setChoice}
+                    />
+                    <Field label="Identidades e quantidade">
+                      <Input name="pessoas_trans_detalhes" maxLength={300} />
+                    </Field>
+                    <Field label="Relação da autodeclaração racial" wide>
+                      <Textarea name="autodeclaracao_racial" maxLength={1000} />
+                    </Field>
+                    <Choice
+                      name="faixa_etaria_predominante"
+                      label="Faixa etária predominante"
+                      options={["Até 25 anos", "26 a 40 anos", "41 a 60 anos", "Acima de 60 anos"]}
+                      value={choice("faixa_etaria_predominante", "Até 25 anos")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="escolaridade_predominante"
+                      label="Escolaridade predominante"
+                      options={[
+                        "Não alfabetizado",
+                        "Ensino fundamental incompleto",
+                        "Ensino fundamental completo",
+                        "Ensino médio",
+                        "Ensino superior",
+                      ]}
+                      value={choice("escolaridade_predominante", "Não alfabetizado")}
+                      onChange={setChoice}
+                    />
+                    <NumberField name="media_moradores_casa" label="Média de moradores por casa" />
+                    <Choice
+                      name="criancas_adolescentes_dependentes"
+                      label="Possui crianças ou adolescentes dependentes?"
+                      options={YN}
+                      value={choice("criancas_adolescentes_dependentes")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="contribuicao_inss"
+                      label="Contribuição INSS"
+                      options={YNSOME}
+                      value={choice("contribuicao_inss")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="inscritos_cadunico"
+                      label="Inscritos no CadÚnico"
+                      options={YNK}
+                      value={choice("inscritos_cadunico")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="uso_epis"
+                      label="Utilização de EPIs"
+                      options={["Sim todos", "Parcialmente", "Não"]}
+                      value={choice("uso_epis")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="cooperativa_fornece_epis"
+                      label="A entidade fornece EPIs?"
+                      options={["Todos", "Parcialmente", "Não"]}
+                      value={choice("cooperativa_fornece_epis")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="acidentes_ultimo_ano"
+                      label="Acidentes no último ano?"
+                      options={YN}
+                      value={choice("acidentes_ultimo_ano")}
+                      onChange={setChoice}
+                    />
+                    <Field label="Tipo de acidentes">
+                      <Textarea name="acidentes_tipo" maxLength={1000} />
+                    </Field>
+                    <Field label="Principais problemas de saúde">
+                      <Textarea name="problemas_saude" maxLength={1000} />
+                    </Field>
+                    <Choice
+                      name="media_horas_trabalhadas"
+                      label="Média de horas trabalhadas por dia"
+                      options={["Até 4h", "6h", "8h", "Mais de 8h"]}
+                      value={choice("media_horas_trabalhadas", "8h")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="aumento_trabalho_festividades"
+                      label="O trabalho aumenta em festividades?"
+                      options={YN}
+                      value={choice("aumento_trabalho_festividades")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="necessita_documentos"
+                      label="Há necessidade de emitir documentos?"
+                      options={YN}
+                      value={choice("necessita_documentos")}
+                      onChange={setChoice}
+                    />
+                    <Field label="Documentos necessários">
+                      <Textarea name="documentos_necessarios" maxLength={1000} />
+                    </Field>
+                    <Choice
+                      name="recebe_beneficios"
+                      label="Recebe benefícios sociais?"
+                      options={YN}
+                      value={choice("recebe_beneficios")}
+                      onChange={setChoice}
+                    />
+                    <NumberField
+                      name="quantidade_beneficiarios"
+                      label="Quantidade de beneficiários"
+                    />
+                    <Choice
+                      name="reconhecimento_sociedade"
+                      label="Há reconhecimento pela sociedade?"
+                      options={YNK}
+                      value={choice("reconhecimento_sociedade")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="relatos_preconceito"
+                      label="Há relatos de preconceito ou discriminação?"
+                      options={YN}
+                      value={choice("relatos_preconceito")}
+                      onChange={setChoice}
+                    />
+                    <Field label="Detalhes dos relatos">
+                      <Textarea name="preconceito_detalhes" maxLength={1000} />
+                    </Field>
+                    <Field label="Motivos de entrada na reciclagem" wide>
+                      <Textarea name="motivos_entrada_reciclagem" maxLength={1500} />
+                    </Field>
+                    <Choice
+                      name="historico_trabalho_infantil"
+                      label="Há histórico de trabalho infantil?"
+                      options={YN}
+                      value={choice("historico_trabalho_infantil")}
+                      onChange={setChoice}
+                    />
+                    <NumberField
+                      name="quantidade_trabalho_infantil"
+                      label="Quantidade relacionada ao trabalho infantil"
+                    />
+                    <Choice
+                      name="interesse_capacitacao"
+                      label="Há interesse em capacitações?"
+                      options={YN}
+                      value={choice("interesse_capacitacao")}
+                      onChange={setChoice}
+                    />
+                    <Field label="Capacitações de interesse">
+                      <Textarea name="capacitacoes_interesse" maxLength={1000} />
+                    </Field>
+                    <Choice
+                      name="tipo_coleta"
+                      label="Tipo de coleta"
+                      options={["Ruas", "Domicílios", "Mista", "Outro"]}
+                      value={choice("tipo_coleta", "Mista")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="realiza_triagem"
+                      label="Realiza triagem dos materiais?"
+                      options={YN}
+                      value={choice("realiza_triagem")}
+                      onChange={setChoice}
+                    />
+                    <NumberField
+                      name="volumetria_toneladas_mes"
+                      label="Toneladas por mês"
+                      step="0.001"
+                    />
+                    <NumberField name="renda_media_mensal" label="Renda média mensal" step="0.01" />
+                    <Field label="Materiais coletados (selecione todos os aplicáveis)" wide>
+                      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                        {MATERIAIS_OPTIONS.map((m) => (
+                          <label
+                            key={m}
+                            className="flex items-center gap-2 rounded-md border border-border p-2 text-sm"
+                          >
+                            <Checkbox
+                              checked={materials.includes(m)}
+                              onCheckedChange={(checked) =>
+                                setMaterials((current) =>
+                                  checked ? [...current, m] : current.filter((x) => x !== m),
+                                )
+                              }
+                            />
+                            {m}
+                          </label>
+                        ))}
+                      </div>
+                    </Field>
+                    <Choice
+                      name="possui_parcerias"
+                      label="Possui parcerias?"
+                      options={[
+                        "Sim — poder público",
+                        "Sim — instituições privadas",
+                        "Sim — outras",
+                        "Não",
+                      ]}
+                      value={choice("possui_parcerias")}
+                      onChange={setChoice}
+                    />
+                    <Field label="Detalhes das parcerias">
+                      <Textarea name="parcerias_detalhes" maxLength={1000} />
+                    </Field>
+                    <Choice
+                      name="destino_venda"
+                      label="Destino da venda"
+                      options={["Indústria", "Intermediários/Atravessadores", "Outro"]}
+                      value={choice("destino_venda", "Indústria")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="tipo_galpao"
+                      label="Situação do galpão"
+                      options={["Próprio", "Alugado", "Cedido", "Não possui", "Outro"]}
+                      value={choice("tipo_galpao", "Não possui")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="possui_veiculos_maquinas"
+                      label="Possui veículos ou máquinas?"
+                      options={YN}
+                      value={choice("possui_veiculos_maquinas")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="recebeu_apoio_programas"
+                      label="Recebeu apoio de programas ou projetos?"
+                      options={YN}
+                      value={choice("recebeu_apoio_programas")}
+                      onChange={setChoice}
+                    />
+                    <Choice
+                      name="participa_movimentos"
+                      label="Participa de movimentos ou redes?"
+                      options={YN}
+                      value={choice("participa_movimentos")}
+                      onChange={setChoice}
+                    />
+                    <Field label="Qual movimento ou rede?">
+                      <Input name="movimento_qual" maxLength={300} />
+                    </Field>
+                    <div className="space-y-4 md:col-span-2">
+                      <label className="flex items-start gap-3 rounded-lg border border-border p-4 text-sm">
+                        <Checkbox name="consentimento_dados" required />
+                        <span>
+                          Autorizo o tratamento dos dados coletados para as finalidades do
+                          diagnóstico e acompanhamento institucional.
+                        </span>
+                      </label>
+                      <label className="flex items-start gap-3 rounded-lg border border-border p-4 text-sm">
+                        <Checkbox name="declaracao_veracidade" required />
+                        <span>
+                          Declaro que as informações prestadas são verdadeiras e correspondem à
+                          realidade observada na visita.
+                        </span>
+                      </label>
+                    </div>
+                  </Grid>
+                </Module>
               </fieldset>
             </TabsContent>
             <TabsContent value="juridico">
