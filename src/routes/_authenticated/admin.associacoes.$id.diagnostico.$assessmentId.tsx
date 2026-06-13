@@ -52,7 +52,10 @@ function AssessmentDetails() {
 
   async function toggleBook(tipo: string, field: "implantado" | "atualizado", checked: boolean) {
     const current = data?.books.find((book) => book.tipo === tipo);
-    const result = current ? await supabase.from("accounting_books").update({ [field]: checked }).eq("id", current.id) : await supabase.from("accounting_books").insert({ assessment_id: assessmentId, tipo, [field]: checked });
+    const changes = field === "implantado" ? { implantado: checked } : { atualizado: checked };
+    const result = current
+      ? await supabase.from("accounting_books").update(changes).eq("id", current.id)
+      : await supabase.from("accounting_books").insert({ assessment_id: assessmentId, tipo, ...changes });
     if (result.error) toast.error("Erro ao atualizar livro", { description: result.error.message }); else refresh();
   }
 
