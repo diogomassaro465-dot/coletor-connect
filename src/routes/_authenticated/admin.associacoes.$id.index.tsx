@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, CalendarDays, ClipboardPlus, MapPin, Users } from "lucide-react";
+import { ArrowLeft, Calculator, CalendarDays, ClipboardPlus, MapPin, Scale, Users } from "lucide-react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,8 +44,17 @@ function AssociationDetails() {
           <h1 className="max-w-3xl text-3xl font-bold leading-tight">{association.nome}</h1>
           <p className="mt-2 flex items-center gap-1.5 text-muted-foreground"><MapPin className="size-4" /> {association.municipio}</p>
         </div>
-        <Link to="/admin/associacoes/$id/diagnostico/novo" params={{ id }}><Button size="lg"><ClipboardPlus className="size-4" /> Novo diagnóstico</Button></Link>
+        <Link to="/admin/associacoes/$id/diagnostico/novo" params={{ id }}><Button size="lg"><ClipboardPlus className="size-4" /> Novo diagnóstico completo</Button></Link>
       </div>
+
+      <section className="mb-8 rounded-3xl border border-border bg-card p-6 shadow-card">
+        <div className="mb-5"><p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Diagnóstico institucional</p><h2 className="mt-1 text-xl font-bold">Três módulos em um único diagnóstico</h2><p className="mt-1 text-sm text-muted-foreground">O cadastro individual do catador é separado. Aqui, a entidade é avaliada nos eixos Social/Cadastral, Jurídico e Contábil.</p></div>
+        <div className="grid gap-3 md:grid-cols-3">
+          <DiagnosticModule icon={Users} title="Social / Cadastral" description="Perfil dos associados, saúde, renda, benefícios, coleta e estrutura social." tone="secondary" />
+          <DiagnosticModule icon={Scale} title="Jurídico" description="Diretoria, atas, contratos, processos, regras internas e regularização." tone="primary" />
+          <DiagnosticModule icon={Calculator} title="Contábil" description="Documentos, contador, livros, controles, balanços e pendências contábeis." tone="warning" />
+        </div>
+      </section>
 
       <div className="mb-10 grid gap-4 sm:grid-cols-3">
         <Info label="Associados no início" value={association.numero_associados_inicial} icon={Users} />
@@ -71,4 +80,9 @@ function AssociationDetails() {
 
 function Info({ label, value, icon: Icon }: { label: string; value: number; icon: typeof Users }) {
   return <div className="flex items-center gap-4 rounded-xl border border-border bg-card p-5 shadow-card"><div className="grid size-10 place-items-center rounded-lg bg-primary-soft text-primary"><Icon className="size-5" /></div><div><p className="text-2xl font-bold tabular-nums">{value}</p><p className="text-sm text-muted-foreground">{label}</p></div></div>;
+}
+
+function DiagnosticModule({ icon: Icon, title, description, tone }: { icon: typeof Users; title: string; description: string; tone: "secondary" | "primary" | "warning" }) {
+  const toneClass = tone === "secondary" ? "bg-secondary text-secondary-foreground" : tone === "warning" ? "bg-warning text-warning-foreground" : "bg-primary text-primary-foreground";
+  return <div className="rounded-2xl border border-border bg-background p-4"><div className={`mb-3 grid size-10 place-items-center rounded-xl ${toneClass}`}><Icon className="size-5" /></div><h3 className="font-display font-bold">{title}</h3><p className="mt-1 text-xs leading-relaxed text-muted-foreground">{description}</p></div>;
 }

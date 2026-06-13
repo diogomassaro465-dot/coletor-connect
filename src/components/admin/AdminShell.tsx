@@ -36,12 +36,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             </Link>
              <Link to="/admin/associacoes">
                <Button variant="ghost" size="sm">
-                 <Building2 className="size-4" /> <span className="hidden md:inline">Associações</span>
+                 <Building2 className="size-4" /> <span className="hidden md:inline">Associações e diagnósticos</span>
                </Button>
              </Link>
             <Link to="/admin/novo">
               <Button variant="default" size="sm">
-                <UserPlus className="size-4" /> <span className="hidden sm:inline">Novo cadastro</span>
+                 <UserPlus className="size-4" /> <span className="hidden sm:inline">Cadastrar catador</span>
               </Button>
             </Link>
             <Button variant="ghost" size="sm" onClick={signOut} title="Sair">
