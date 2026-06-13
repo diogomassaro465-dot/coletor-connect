@@ -21,6 +21,9 @@ export type Database = {
           created_at: string
           id: string
           implantado: boolean
+          nao_possui: boolean
+          nao_sabe: boolean
+          observacao: string | null
           tipo: string
         }
         Insert: {
@@ -29,6 +32,9 @@ export type Database = {
           created_at?: string
           id?: string
           implantado?: boolean
+          nao_possui?: boolean
+          nao_sabe?: boolean
+          observacao?: string | null
           tipo: string
         }
         Update: {
@@ -37,6 +43,9 @@ export type Database = {
           created_at?: string
           id?: string
           implantado?: boolean
+          nao_possui?: boolean
+          nao_sabe?: boolean
+          observacao?: string | null
           tipo?: string
         }
         Relationships: [
@@ -53,7 +62,7 @@ export type Database = {
         Row: {
           acidentes_tipo: string | null
           acidentes_ultimo_ano: boolean | null
-          alvara_funcionamento: boolean | null
+          alvara_funcionamento: string | null
           ano_ultimo_balanco: number | null
           apoio_instituicoes: boolean | null
           apoio_instituicoes_quais: string | null
@@ -67,6 +76,7 @@ export type Database = {
           avcb: string | null
           capacitacoes_interesse: string | null
           cargos_por_eleicao: string | null
+          classificacao_contabil: string | null
           classificacao_juridica: string | null
           conselho_fiscal: string | null
           consentimento_dados: boolean
@@ -97,6 +107,8 @@ export type Database = {
           destino_venda: string | null
           diretoria_conselho: boolean | null
           diretoria_nomes: string | null
+          divisao_resultados_criterio: string | null
+          divisao_resultados_procedimento: string | null
           divisao_tarefas: string | null
           divisao_tarefas_gerencia: boolean | null
           documentos_necessarios: string | null
@@ -104,7 +116,11 @@ export type Database = {
           empregados_registrados: number
           empregados_sem_registro: number
           escolaridade_predominante: string | null
-          estatuto_registrado: boolean | null
+          estatuto_registrado: string | null
+          evidencia_administrativo_confirmada: boolean
+          evidencia_frente_confirmada: boolean
+          evidencia_livro_trabalho_confirmada: boolean
+          evidencia_reuniao_confirmada: boolean
           extintores: string | null
           faixa_etaria_predominante: string | null
           filiacao_sindical: boolean | null
@@ -140,6 +156,7 @@ export type Database = {
           parcerias_detalhes: string | null
           participa_coleta_seletiva_municipal: boolean | null
           participa_movimentos: boolean | null
+          pendencias_contabeis: string | null
           pendencias_juridicas: string | null
           pessoas_trans_detalhes: string | null
           possui_conta_bancaria: string | null
@@ -186,7 +203,7 @@ export type Database = {
         Insert: {
           acidentes_tipo?: string | null
           acidentes_ultimo_ano?: boolean | null
-          alvara_funcionamento?: boolean | null
+          alvara_funcionamento?: string | null
           ano_ultimo_balanco?: number | null
           apoio_instituicoes?: boolean | null
           apoio_instituicoes_quais?: string | null
@@ -200,6 +217,7 @@ export type Database = {
           avcb?: string | null
           capacitacoes_interesse?: string | null
           cargos_por_eleicao?: string | null
+          classificacao_contabil?: string | null
           classificacao_juridica?: string | null
           conselho_fiscal?: string | null
           consentimento_dados?: boolean
@@ -230,6 +248,8 @@ export type Database = {
           destino_venda?: string | null
           diretoria_conselho?: boolean | null
           diretoria_nomes?: string | null
+          divisao_resultados_criterio?: string | null
+          divisao_resultados_procedimento?: string | null
           divisao_tarefas?: string | null
           divisao_tarefas_gerencia?: boolean | null
           documentos_necessarios?: string | null
@@ -237,7 +257,11 @@ export type Database = {
           empregados_registrados?: number
           empregados_sem_registro?: number
           escolaridade_predominante?: string | null
-          estatuto_registrado?: boolean | null
+          estatuto_registrado?: string | null
+          evidencia_administrativo_confirmada?: boolean
+          evidencia_frente_confirmada?: boolean
+          evidencia_livro_trabalho_confirmada?: boolean
+          evidencia_reuniao_confirmada?: boolean
           extintores?: string | null
           faixa_etaria_predominante?: string | null
           filiacao_sindical?: boolean | null
@@ -273,6 +297,7 @@ export type Database = {
           parcerias_detalhes?: string | null
           participa_coleta_seletiva_municipal?: boolean | null
           participa_movimentos?: boolean | null
+          pendencias_contabeis?: string | null
           pendencias_juridicas?: string | null
           pessoas_trans_detalhes?: string | null
           possui_conta_bancaria?: string | null
@@ -319,7 +344,7 @@ export type Database = {
         Update: {
           acidentes_tipo?: string | null
           acidentes_ultimo_ano?: boolean | null
-          alvara_funcionamento?: boolean | null
+          alvara_funcionamento?: string | null
           ano_ultimo_balanco?: number | null
           apoio_instituicoes?: boolean | null
           apoio_instituicoes_quais?: string | null
@@ -333,6 +358,7 @@ export type Database = {
           avcb?: string | null
           capacitacoes_interesse?: string | null
           cargos_por_eleicao?: string | null
+          classificacao_contabil?: string | null
           classificacao_juridica?: string | null
           conselho_fiscal?: string | null
           consentimento_dados?: boolean
@@ -363,6 +389,8 @@ export type Database = {
           destino_venda?: string | null
           diretoria_conselho?: boolean | null
           diretoria_nomes?: string | null
+          divisao_resultados_criterio?: string | null
+          divisao_resultados_procedimento?: string | null
           divisao_tarefas?: string | null
           divisao_tarefas_gerencia?: boolean | null
           documentos_necessarios?: string | null
@@ -370,7 +398,11 @@ export type Database = {
           empregados_registrados?: number
           empregados_sem_registro?: number
           escolaridade_predominante?: string | null
-          estatuto_registrado?: boolean | null
+          estatuto_registrado?: string | null
+          evidencia_administrativo_confirmada?: boolean
+          evidencia_frente_confirmada?: boolean
+          evidencia_livro_trabalho_confirmada?: boolean
+          evidencia_reuniao_confirmada?: boolean
           extintores?: string | null
           faixa_etaria_predominante?: string | null
           filiacao_sindical?: boolean | null
@@ -406,6 +438,7 @@ export type Database = {
           parcerias_detalhes?: string | null
           participa_coleta_seletiva_municipal?: boolean | null
           participa_movimentos?: boolean | null
+          pendencias_contabeis?: string | null
           pendencias_juridicas?: string | null
           pessoas_trans_detalhes?: string | null
           possui_conta_bancaria?: string | null
