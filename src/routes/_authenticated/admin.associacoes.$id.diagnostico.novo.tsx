@@ -650,8 +650,18 @@ function NewAssessment() {
               </fieldset>
             </TabsContent>
             <TabsContent value="juridico">
-              <Module title="Módulo Jurídico" tone="border-blue-500/40">
-                <Grid>
+              {loadingAssociation ? (
+                <p className="mt-5 text-muted-foreground">Carregando dados da entidade...</p>
+              ) : (
+                <div className="mt-5 space-y-5">
+                  <LegalFields association={association} choice={choice} setChoice={setChoice} />
+                  <div className="space-y-4 rounded-xl border border-border bg-card p-5">
+                    <label className="flex items-start gap-3 text-sm"><Checkbox name="consentimento_dados" required /><span>Autorizo expressamente o uso e o tratamento dos dados pessoais fornecidos neste formulário.</span></label>
+                    <label className="flex items-start gap-3 text-sm"><Checkbox name="declaracao_veracidade" required /><span>Declaro, sob minha responsabilidade, que as informações prestadas são verdadeiras, completas e foram devidamente fornecidas.</span></label>
+                  </div>
+                </div>
+              )}
+              <fieldset disabled className="hidden"><Module title="Módulo Jurídico" tone="border-blue-500/40"><Grid>
                   <Choice
                     name="diretoria_conselho"
                     label="Possui diretoria/conselho?"
@@ -848,8 +858,7 @@ function NewAssessment() {
                       </span>
                     </label>
                   </div>
-                </Grid>
-              </Module>
+                </Grid></Module></fieldset>
             </TabsContent>
             <TabsContent value="contabil">
               <Module title="Módulo Contábil" tone="border-primary/40">
