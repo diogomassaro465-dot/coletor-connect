@@ -68,6 +68,7 @@ export type Database = {
           capacitacoes_interesse: string | null
           cargos_por_eleicao: string | null
           conselho_fiscal: string | null
+          consentimento_dados: boolean
           consultant_id: string
           consultant_name: string
           contabilidade_regular: string | null
@@ -89,6 +90,7 @@ export type Database = {
           criancas_adolescentes_dependentes: boolean | null
           data_ultima_eleicao: string | null
           data_visita: string
+          declaracao_veracidade: boolean
           destino_venda: string | null
           diretoria_conselho: boolean | null
           diretoria_nomes: string | null
@@ -138,6 +140,8 @@ export type Database = {
           possui_registro_atas: boolean | null
           possui_veiculos_maquinas: boolean | null
           preconceito_detalhes: string | null
+          presidente_nome: string | null
+          presidente_telefone: string | null
           problemas_melhorias_juridico: string | null
           problemas_saude: string | null
           processos_judiciais: boolean | null
@@ -162,6 +166,8 @@ export type Database = {
           todos_sao_cooperados: boolean | null
           updated_at: string
           uso_epis: string | null
+          vice_presidente_nome: string | null
+          vice_presidente_telefone: string | null
           volumetria_toneladas_mes: number | null
         }
         Insert: {
@@ -182,6 +188,7 @@ export type Database = {
           capacitacoes_interesse?: string | null
           cargos_por_eleicao?: string | null
           conselho_fiscal?: string | null
+          consentimento_dados?: boolean
           consultant_id: string
           consultant_name: string
           contabilidade_regular?: string | null
@@ -203,6 +210,7 @@ export type Database = {
           criancas_adolescentes_dependentes?: boolean | null
           data_ultima_eleicao?: string | null
           data_visita: string
+          declaracao_veracidade?: boolean
           destino_venda?: string | null
           diretoria_conselho?: boolean | null
           diretoria_nomes?: string | null
@@ -252,6 +260,8 @@ export type Database = {
           possui_registro_atas?: boolean | null
           possui_veiculos_maquinas?: boolean | null
           preconceito_detalhes?: string | null
+          presidente_nome?: string | null
+          presidente_telefone?: string | null
           problemas_melhorias_juridico?: string | null
           problemas_saude?: string | null
           processos_judiciais?: boolean | null
@@ -276,6 +286,8 @@ export type Database = {
           todos_sao_cooperados?: boolean | null
           updated_at?: string
           uso_epis?: string | null
+          vice_presidente_nome?: string | null
+          vice_presidente_telefone?: string | null
           volumetria_toneladas_mes?: number | null
         }
         Update: {
@@ -296,6 +308,7 @@ export type Database = {
           capacitacoes_interesse?: string | null
           cargos_por_eleicao?: string | null
           conselho_fiscal?: string | null
+          consentimento_dados?: boolean
           consultant_id?: string
           consultant_name?: string
           contabilidade_regular?: string | null
@@ -317,6 +330,7 @@ export type Database = {
           criancas_adolescentes_dependentes?: boolean | null
           data_ultima_eleicao?: string | null
           data_visita?: string
+          declaracao_veracidade?: boolean
           destino_venda?: string | null
           diretoria_conselho?: boolean | null
           diretoria_nomes?: string | null
@@ -366,6 +380,8 @@ export type Database = {
           possui_registro_atas?: boolean | null
           possui_veiculos_maquinas?: boolean | null
           preconceito_detalhes?: string | null
+          presidente_nome?: string | null
+          presidente_telefone?: string | null
           problemas_melhorias_juridico?: string | null
           problemas_saude?: string | null
           processos_judiciais?: boolean | null
@@ -390,6 +406,8 @@ export type Database = {
           todos_sao_cooperados?: boolean | null
           updated_at?: string
           uso_epis?: string | null
+          vice_presidente_nome?: string | null
+          vice_presidente_telefone?: string | null
           volumetria_toneladas_mes?: number | null
         }
         Relationships: [
