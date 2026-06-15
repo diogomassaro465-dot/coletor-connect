@@ -15,8 +15,7 @@ export const Route = createFileRoute("/_authenticated/admin/associacoes/")({
 });
 
 function AssociationsPage() {
-  const { role } = Route.useRouteContext();
-  const isAdmin = role === "admin";
+  const { isAdmin } = Route.useRouteContext();
   const [search, setSearch] = useState("");
   const { data = [], isLoading } = useQuery({
     queryKey: ["associations"],
