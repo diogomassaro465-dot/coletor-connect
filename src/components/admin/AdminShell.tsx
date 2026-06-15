@@ -8,8 +8,7 @@ import procateLogo from "@/assets/procate-logo.png";
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const { role } = useRouteContext({ from: "/_authenticated" });
-  const isAdmin = role === "admin";
+  const { isAdmin } = useRouteContext({ from: "/_authenticated" });
 
   async function signOut() {
     await qc.cancelQueries();
