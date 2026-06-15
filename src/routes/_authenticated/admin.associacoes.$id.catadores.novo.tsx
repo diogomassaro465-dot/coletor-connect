@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/admin/associacoes/$id/catadores/novo")({
   beforeLoad: ({ context }) => {
-    if (context.role !== "consultor") throw redirect({ to: "/admin/associacoes" });
+    if (!context.isConsultant) throw redirect({ to: "/admin/associacoes" });
   },
   head: () => ({ meta: [{ title: "Cadastrar catador — PROCATE" }] }),
   component: NewAssociationCollector,

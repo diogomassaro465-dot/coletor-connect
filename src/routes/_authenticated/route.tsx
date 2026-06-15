@@ -10,16 +10,16 @@ export const Route = createFileRoute("/_authenticated")({
       .from("user_roles")
       .select("role")
       .eq("user_id", data.user.id);
-    const role = roles?.some((item) => item.role === "admin")
-      ? "admin"
-      : roles?.some((item) => item.role === "consultor" || item.role === "atendente")
-        ? "consultor"
-        : null;
+    const isAdmin = !!roles?.some((item) => item.role === "admin");
+    const isConsultant = !!roles?.some(
+      (item) => item.role === "consultor" || item.role === "atendente",
+    );
+    const role = isAdmin ? "admin" : isConsultant ? "consultor" : null;
     if (roleError || !role) {
       await supabase.auth.signOut();
       throw redirect({ to: "/auth" });
     }
-    return { user: data.user, role };
+    return { user: data.user, role, isAdmin, isConsultant };
   },
   component: () => <Outlet />,
 });
