@@ -93,6 +93,40 @@ function AssociationDetails() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          {(isAdmin || isConsultant) && (
+            <>
+              <Link to="/admin/associacoes/$id/documentos" params={{ id }}>
+                <Button size="lg" variant="outline">
+                  <FolderOpen className="size-4" /> Documentos
+                </Button>
+              </Link>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={async () => {
+                  try {
+                    const [{ data: catadores }, { data: documents }] = await Promise.all([
+                      supabase.from("catadores").select("id, genero").eq("association_id", id),
+                      supabase
+                        .from("association_documents")
+                        .select("category, title, issued_at, expires_at")
+                        .eq("association_id", id),
+                    ]);
+                    buildAssociationReportPDF({
+                      association,
+                      assessments,
+                      catadores: catadores ?? [],
+                      documents: documents ?? [],
+                    });
+                  } catch (err: any) {
+                    toast.error(err.message ?? "Falha ao gerar relatório");
+                  }
+                }}
+              >
+                <FileDown className="size-4" /> Relatório PDF
+              </Button>
+            </>
+          )}
           {isAdmin && (
             <Link to="/admin/associacoes/$id/editar" params={{ id }}>
               <Button size="lg" variant="outline">
