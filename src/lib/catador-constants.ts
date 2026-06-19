@@ -29,25 +29,46 @@ export const ESCOLARIDADE_OPTIONS = [
 ];
 
 export const MATERIAIS_OPTIONS = [
-  "Papel",
+  "Papel branco",
+  "Papel misto",
   "Papelão",
-  "Plástico",
-  "Metal",
-  "Alumínio",
-  "Vidro",
-  "Eletrônicos",
-  "Óleo de cozinha",
   "Tetra Pak",
+  "Plástico PET",
+  "Plástico PEAD (rígido)",
+  "Plástico filme",
+  "Plástico misto",
+  "Isopor (EPS)",
+  "Sucata ferrosa",
+  "Sucata branca (eletrodomésticos)",
+  "Alumínio (latinha)",
+  "Alumínio (perfil)",
+  "Cobre",
+  "Vidro incolor",
+  "Vidro colorido",
+  "Eletroeletrônicos",
+  "Óleo de cozinha usado",
+  "Pneus",
+  "Pilhas e baterias",
+  "Madeira",
+  "Têxteis",
   "Outros",
 ];
 
 export const NIVEL_GOV_BR_OPTIONS = ["Bronze", "Prata", "Ouro"];
+
+export const RENDA_REFERENCIA = 1621; // salário mínimo nacional 2026 (referência)
 
 export const STATUS_OPTIONS = [
   { value: "pendente", label: "Pendente" },
   { value: "ativo", label: "Ativo" },
   { value: "inativo", label: "Inativo" },
 ] as const;
+
+export const STATUS_DESCRIPTION: Record<string, string> = {
+  pendente: "Cadastro recém-criado, aguardando validação dos dados pelo Administrador.",
+  ativo: "Catador validado e participando ativamente das atividades de coleta.",
+  inativo: "Catador desligado, afastado ou sem coleta registrada nos últimos 90 dias.",
+};
 
 export const STATUS_LABEL: Record<string, string> = Object.fromEntries(
   STATUS_OPTIONS.map((o) => [o.value, o.label]),
