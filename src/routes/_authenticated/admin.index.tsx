@@ -426,24 +426,30 @@ function AdminDashboard() {
                           <Eye className="size-4" /> Ver detalhes
                         </DropdownMenuItem>
                       </Link>
-                      <Link to="/admin/$id/editar" params={{ id: c.id }}>
-                        <DropdownMenuItem>
-                          <Pencil className="size-4" /> Editar
-                        </DropdownMenuItem>
-                      </Link>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-                        Status
-                      </DropdownMenuLabel>
-                      {STATUS_OPTIONS.map((s) => (
-                        <DropdownMenuItem
-                          key={s.value}
-                          disabled={c.status === s.value}
-                          onClick={() => statusMutation.mutate({ id: c.id, status: s.value })}
-                        >
-                          {s.label}
-                        </DropdownMenuItem>
-                      ))}
+                      {isRecenseador && (
+                        <Link to="/admin/$id/editar" params={{ id: c.id }}>
+                          <DropdownMenuItem>
+                            <Pencil className="size-4" /> Editar
+                          </DropdownMenuItem>
+                        </Link>
+                      )}
+                      {isAdmin && (
+                        <>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                            Status
+                          </DropdownMenuLabel>
+                          {STATUS_OPTIONS.map((s) => (
+                            <DropdownMenuItem
+                              key={s.value}
+                              disabled={c.status === s.value}
+                              onClick={() => statusMutation.mutate({ id: c.id, status: s.value })}
+                            >
+                              {s.label}
+                            </DropdownMenuItem>
+                          ))}
+                        </>
+                      )}
                       <DropdownMenuSeparator />
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
