@@ -9,11 +9,14 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ArrowLeft, Pencil, Trash2, ChevronDown } from "lucide-react";
+import {
+  Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { ArrowLeft, Pencil, Trash2, ChevronDown, Check, Info, History } from "lucide-react";
 import { toast } from "sonner";
-import { GENERO_LABEL, STATUS_OPTIONS, STATUS_LABEL } from "@/lib/catador-constants";
+import { GENERO_LABEL, STATUS_OPTIONS, STATUS_LABEL, STATUS_DESCRIPTION } from "@/lib/catador-constants";
 
 export const Route = createFileRoute("/_authenticated/admin/$id/")({
   head: () => ({ meta: [{ title: "Detalhes — RecicladoresBR" }] }),
@@ -81,6 +84,22 @@ function CatadorDetails() {
           <div className="flex items-center gap-3 flex-wrap">
             <h1 className="text-3xl font-bold">{c.nome_completo}</h1>
             <StatusPill status={c.status} />
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label={`Sobre o status ${STATUS_LABEL[c.status] ?? c.status}`}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <Info className="size-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs text-xs">
+                  {STATUS_DESCRIPTION[c.status] ?? "Sem descrição."}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
           <p className="text-muted-foreground mt-1">
             Cadastrado em {new Date(c.data_cadastro).toLocaleDateString("pt-BR")}
@@ -93,16 +112,33 @@ function CatadorDetails() {
                 Status <ChevronDown className="size-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {STATUS_OPTIONS.map((s) => (
-                <DropdownMenuItem
-                  key={s.value}
-                  disabled={c.status === s.value}
-                  onClick={() => statusMutation.mutate(s.value)}
-                >
-                  {s.label}
-                </DropdownMenuItem>
-              ))}
+            <DropdownMenuContent align="end" className="w-72">
+              <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                Alterar status do cadastro
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {STATUS_OPTIONS.map((s) => {
+                const isCurrent = c.status === s.value;
+                return (
+                  <DropdownMenuItem
+                    key={s.value}
+                    onClick={() => !isCurrent && statusMutation.mutate(s.value)}
+                    className="flex items-start gap-2 py-2"
+                  >
+                    <Check
+                      className={`size-4 mt-0.5 shrink-0 ${isCurrent ? "text-primary" : "opacity-0"}`}
+                    />
+                    <div className="flex-1">
+                      <div className="font-medium">
+                        {s.label} {isCurrent && <span className="text-xs text-muted-foreground">(atual)</span>}
+                      </div>
+                      <p className="text-xs text-muted-foreground leading-snug">
+                        {STATUS_DESCRIPTION[s.value]}
+                      </p>
+                    </div>
+                  </DropdownMenuItem>
+                );
+              })}
             </DropdownMenuContent>
           </DropdownMenu>
           <Link to="/admin/$id/editar" params={{ id }}>
@@ -188,6 +224,10 @@ function CatadorDetails() {
             <DocPreview label="NIS" path={c.nis_foto_url} />
           </div>
         </Section>
+
+        <Section title="Histórico de alterações" className="lg:col-span-2">
+          <AuditTrail recordId={id} />
+        </Section>
       </div>
     </AdminShell>
   );
@@ -253,6 +293,79 @@ function DocPreview({ label, path }: { label: string; path: string | null }) {
         </a>
       )}
     </div>
+  );
+}
+
+function AuditTrail({ recordId }: { recordId: string }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["audit", "catadores", recordId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("audit_logs")
+        .select("id, action, created_at, actor_id, new_data, old_data")
+        .eq("table_name", "catadores")
+        .eq("record_id", recordId)
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      const ids = Array.from(new Set((data ?? []).map((r: any) => r.actor_id).filter(Boolean)));
+      let names: Record<string, string> = {};
+      if (ids.length) {
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("user_id, full_name, email")
+          .in("user_id", ids as string[]);
+        for (const p of profiles ?? []) {
+          names[p.user_id] = p.full_name || p.email || p.user_id;
+        }
+      }
+      return (data ?? []).map((r: any) => ({ ...r, actor_name: r.actor_id ? names[r.actor_id] ?? r.actor_id : "Sistema" }));
+    },
+  });
+
+  if (isLoading) return <p className="text-sm text-muted-foreground">Carregando histórico...</p>;
+  if (!data?.length) return <p className="text-sm text-muted-foreground">Nenhuma alteração registrada ainda.</p>;
+
+  const ACTION_LABEL: Record<string, { label: string; tone: string }> = {
+    INSERT: { label: "Criado", tone: "bg-success/15 text-success border-success/30" },
+    UPDATE: { label: "Editado", tone: "bg-primary/10 text-primary border-primary/30" },
+    DELETE: { label: "Excluído", tone: "bg-destructive/10 text-destructive border-destructive/30" },
+  };
+
+  return (
+    <ol className="relative border-l border-border ml-2 space-y-4">
+      {data.map((e) => {
+        const meta = ACTION_LABEL[e.action] ?? { label: e.action, tone: "" };
+        const changes: string[] = [];
+        if (e.action === "UPDATE" && e.old_data && e.new_data) {
+          for (const k of Object.keys(e.new_data)) {
+            if (["updated_at", "updated_by"].includes(k)) continue;
+            const a = JSON.stringify(e.old_data[k]);
+            const b = JSON.stringify(e.new_data[k]);
+            if (a !== b) changes.push(k);
+          }
+        }
+        return (
+          <li key={e.id} className="ml-4">
+            <div className="absolute -left-1.5 mt-1.5 size-3 rounded-full bg-primary border-2 border-background" />
+            <div className="flex flex-wrap items-center gap-2 text-sm">
+              <Badge variant="outline" className={meta.tone}>
+                <History className="size-3 mr-1" /> {meta.label}
+              </Badge>
+              <span className="font-medium">{e.actor_name}</span>
+              <span className="text-muted-foreground">
+                {new Date(e.created_at).toLocaleString("pt-BR")}
+              </span>
+            </div>
+            {changes.length > 0 && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Campos alterados: {changes.join(", ")}
+              </p>
+            )}
+          </li>
+        );
+      })}
+    </ol>
   );
 }
 
