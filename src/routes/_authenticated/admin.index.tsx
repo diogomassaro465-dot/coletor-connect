@@ -327,13 +327,6 @@ function AdminDashboard() {
               </Button>
             </Link>
           )}
-          {isRecenseador && (
-            <Link to="/admin/novo">
-              <Button>
-                <Plus className="size-4" /> Novo catador
-              </Button>
-            </Link>
-          )}
           <Link to="/admin/associacoes">
             <Button variant={isRecenseador ? "outline" : "default"}>Escolher entidade</Button>
           </Link>
