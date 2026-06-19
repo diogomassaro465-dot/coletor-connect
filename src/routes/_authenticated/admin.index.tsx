@@ -426,53 +426,63 @@ function AdminDashboard() {
                           <Eye className="size-4" /> Ver detalhes
                         </DropdownMenuItem>
                       </Link>
-                      <Link to="/admin/$id/editar" params={{ id: c.id }}>
-                        <DropdownMenuItem>
-                          <Pencil className="size-4" /> Editar
-                        </DropdownMenuItem>
-                      </Link>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-                        Status
-                      </DropdownMenuLabel>
-                      {STATUS_OPTIONS.map((s) => (
-                        <DropdownMenuItem
-                          key={s.value}
-                          disabled={c.status === s.value}
-                          onClick={() => statusMutation.mutate({ id: c.id, status: s.value })}
-                        >
-                          {s.label}
-                        </DropdownMenuItem>
-                      ))}
-                      <DropdownMenuSeparator />
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <DropdownMenuItem
-                            onSelect={(e) => e.preventDefault()}
-                            className="text-destructive focus:text-destructive"
-                          >
-                            <Trash2 className="size-4" /> Excluir
+                      {isRecenseador && (
+                        <Link to="/admin/$id/editar" params={{ id: c.id }}>
+                          <DropdownMenuItem>
+                            <Pencil className="size-4" /> Editar
                           </DropdownMenuItem>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Excluir cadastro?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Esta ação é irreversível. O cadastro de{" "}
-                              <strong>{c.nome_completo}</strong> será removido permanentemente.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => deleteMutation.mutate(c.id)}
-                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        </Link>
+                      )}
+                      {isAdmin && (
+                        <>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                            Status
+                          </DropdownMenuLabel>
+                          {STATUS_OPTIONS.map((s) => (
+                            <DropdownMenuItem
+                              key={s.value}
+                              disabled={c.status === s.value}
+                              onClick={() => statusMutation.mutate({ id: c.id, status: s.value })}
                             >
-                              Excluir
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                              {s.label}
+                            </DropdownMenuItem>
+                          ))}
+                        </>
+                      )}
+                      {isAdmin && (
+                        <>
+                          <DropdownMenuSeparator />
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <DropdownMenuItem
+                                onSelect={(e) => e.preventDefault()}
+                                className="text-destructive focus:text-destructive"
+                              >
+                                <Trash2 className="size-4" /> Excluir
+                              </DropdownMenuItem>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Excluir cadastro?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Esta ação é irreversível. O cadastro de{" "}
+                                  <strong>{c.nome_completo}</strong> será removido permanentemente.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => deleteMutation.mutate(c.id)}
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                >
+                                  Excluir
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </>
+                      )}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
