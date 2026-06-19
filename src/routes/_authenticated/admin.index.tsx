@@ -164,6 +164,19 @@ function AdminDashboard() {
 
   async function exportXLSX() {
     if (!filtered.length) return toast.info("Nada para exportar.");
+    const ids = filtered.map((c) => c.id);
+    const { data: full, error: fetchErr } = await supabase
+      .from("catadores")
+      .select("*")
+      .in("id", ids);
+    if (fetchErr) {
+      toast.error("Erro ao buscar dados completos", { description: fetchErr.message });
+      return;
+    }
+    const rows = (full ?? []).sort(
+      (a, b) => new Date(b.data_cadastro).getTime() - new Date(a.data_cadastro).getTime(),
+    );
+
     const ExcelJS = (await import("exceljs")).default;
     const wb = new ExcelJS.Workbook();
     wb.creator = "RecicladoresBR";
@@ -173,18 +186,33 @@ function AdminDashboard() {
     });
 
     const columns: Array<{ header: string; key: string; numFmt?: string }> = [
-      { header: "Nome", key: "nome" },
+      { header: "Nome completo", key: "nome_completo" },
       { header: "CPF", key: "cpf" },
+      { header: "RG / CIN", key: "rg_cin" },
       { header: "Gênero", key: "genero" },
+      { header: "Autodeclaração racial", key: "autodeclaracao_racial" },
       { header: "Escolaridade", key: "escolaridade" },
-      { header: "Cooperativa", key: "cooperativa" },
-      { header: "Renda (R$)", key: "renda", numFmt: '"R$" #,##0.00' },
-      { header: "Materiais", key: "materiais" },
-      { header: "Contribui INSS", key: "inss" },
-      { header: "CadÚnico", key: "cadunico" },
-      { header: "Bolsa Família", key: "bolsa" },
+      { header: "E-mail", key: "email" },
+      { header: "Telefone", key: "telefone" },
+      { header: "Endereço completo", key: "endereco_completo" },
+      { header: "Cooperativa / Grupo", key: "nome_cooperativa" },
+      { header: "Área de atuação", key: "area_atuacao" },
+      { header: "Materiais coletados", key: "materiais_coletados" },
+      { header: "Possui carroça", key: "possui_carroca" },
+      { header: "Tipo de carroça", key: "tipo_carroca" },
+      { header: "Título de eleitor", key: "titulo_eleitor" },
+      { header: "CTPS", key: "ctps" },
+      { header: "NIS", key: "nis" },
+      { header: "Renda média mensal (R$)", key: "renda_media_mensal", numFmt: '"R$" #,##0.00' },
+      { header: "Contribui INSS", key: "contribui_inss" },
+      { header: "Inscrito CadÚnico", key: "inscrito_cadunico" },
+      { header: "Bolsa Família", key: "possui_bolsa_familia" },
+      { header: "Conta bancária digital", key: "conta_bancaria_digital" },
+      { header: "Cadastro gov.br", key: "cadastro_gov_br" },
+      { header: "Nível gov.br", key: "nivel_cadastro_gov_br" },
       { header: "Status", key: "status" },
-      { header: "Data Cadastro", key: "data", numFmt: "dd/mm/yyyy hh:mm" },
+      { header: "Data de cadastro", key: "data_cadastro", numFmt: "dd/mm/yyyy hh:mm" },
+      { header: "Última atualização", key: "updated_at", numFmt: "dd/mm/yyyy hh:mm" },
     ];
     ws.columns = columns.map((c) => ({
       header: c.header,
@@ -192,20 +220,35 @@ function AdminDashboard() {
       style: c.numFmt ? { numFmt: c.numFmt } : undefined,
     }));
 
-    filtered.forEach((c) => {
+    rows.forEach((c: any) => {
       ws.addRow({
-        nome: c.nome_completo,
+        nome_completo: c.nome_completo,
         cpf: c.cpf,
+        rg_cin: c.rg_cin ?? "",
         genero: GENERO_LABEL[c.genero] ?? c.genero,
-        escolaridade: c.escolaridade,
-        cooperativa: c.nome_cooperativa ?? "",
-        renda: Number(c.renda_media_mensal) || 0,
-        materiais: c.materiais_coletados.join(", "),
-        inss: c.contribui_inss ? "Sim" : "Não",
-        cadunico: c.inscrito_cadunico ? "Sim" : "Não",
-        bolsa: c.possui_bolsa_familia ? "Sim" : "Não",
+        autodeclaracao_racial: c.autodeclaracao_racial ?? "",
+        escolaridade: c.escolaridade ?? "",
+        email: c.email ?? "",
+        telefone: c.telefone ?? "",
+        endereco_completo: c.endereco_completo ?? "",
+        nome_cooperativa: c.nome_cooperativa ?? "",
+        area_atuacao: c.area_atuacao ?? "",
+        materiais_coletados: (c.materiais_coletados ?? []).join(", "),
+        possui_carroca: c.possui_carroca ? "Sim" : "Não",
+        tipo_carroca: c.tipo_carroca ?? "",
+        titulo_eleitor: c.titulo_eleitor ?? "",
+        ctps: c.ctps ?? "",
+        nis: c.nis ?? "",
+        renda_media_mensal: Number(c.renda_media_mensal) || 0,
+        contribui_inss: c.contribui_inss ? "Sim" : "Não",
+        inscrito_cadunico: c.inscrito_cadunico ? "Sim" : "Não",
+        possui_bolsa_familia: c.possui_bolsa_familia ? "Sim" : "Não",
+        conta_bancaria_digital: c.conta_bancaria_digital ?? "",
+        cadastro_gov_br: c.cadastro_gov_br ? "Sim" : "Não",
+        nivel_cadastro_gov_br: c.nivel_cadastro_gov_br ?? "",
         status: STATUS_LABEL[c.status] ?? c.status,
-        data: new Date(c.data_cadastro),
+        data_cadastro: new Date(c.data_cadastro),
+        updated_at: c.updated_at ? new Date(c.updated_at) : null,
       });
     });
 
