@@ -270,11 +270,20 @@ function AdminDashboard() {
           <p className="text-muted-foreground">Gerencie cadastros, filtre e exporte dados.</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={exportXLSX}>
-            <Download className="size-4" /> Exportar Excel
-          </Button>
+          {isAdmin && (
+            <Button variant="outline" onClick={exportXLSX}>
+              <Download className="size-4" /> Exportar Excel
+            </Button>
+          )}
+          {isRecenseador && (
+            <Link to="/admin/novo">
+              <Button>
+                <Plus className="size-4" /> Novo catador
+              </Button>
+            </Link>
+          )}
           <Link to="/admin/associacoes">
-            <Button>Escolher entidade</Button>
+            <Button variant={isRecenseador ? "outline" : "default"}>Escolher entidade</Button>
           </Link>
         </div>
       </div>
