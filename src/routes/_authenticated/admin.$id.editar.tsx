@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin/$id/editar")({
-  beforeLoad: ({ context }) => {
-    if (!context.isRecenseador) throw redirect({ to: "/admin/$id", params: { id: "" } });
+  beforeLoad: ({ context, params }) => {
+    if (!context.isRecenseador) throw redirect({ to: "/admin/$id", params: { id: params.id } });
   },
   head: () => ({ meta: [{ title: "Editar catador — RecicladoresBR" }] }),
   component: EditarCatador,
