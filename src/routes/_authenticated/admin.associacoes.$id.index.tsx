@@ -5,16 +5,20 @@ import {
   Calculator,
   CalendarDays,
   ClipboardPlus,
+  FileDown,
+  FolderOpen,
   MapPin,
   Pencil,
   Scale,
   UserPlus,
   Users,
 } from "lucide-react";
+import { toast } from "sonner";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { buildAssociationReportPDF } from "@/lib/association-report";
 
 export const Route = createFileRoute("/_authenticated/admin/associacoes/$id/")({
   head: () => ({ meta: [{ title: "Detalhes da associação — PROCATE" }] }),
@@ -89,6 +93,40 @@ function AssociationDetails() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          {(isAdmin || isConsultant) && (
+            <>
+              <Link to="/admin/associacoes/$id/documentos" params={{ id }}>
+                <Button size="lg" variant="outline">
+                  <FolderOpen className="size-4" /> Documentos
+                </Button>
+              </Link>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={async () => {
+                  try {
+                    const [{ data: catadores }, { data: documents }] = await Promise.all([
+                      supabase.from("catadores").select("id, genero").eq("association_id", id),
+                      supabase
+                        .from("association_documents")
+                        .select("category, title, issued_at, expires_at")
+                        .eq("association_id", id),
+                    ]);
+                    buildAssociationReportPDF({
+                      association,
+                      assessments,
+                      catadores: catadores ?? [],
+                      documents: documents ?? [],
+                    });
+                  } catch (err: any) {
+                    toast.error(err.message ?? "Falha ao gerar relatório");
+                  }
+                }}
+              >
+                <FileDown className="size-4" /> Relatório PDF
+              </Button>
+            </>
+          )}
           {isAdmin && (
             <Link to="/admin/associacoes/$id/editar" params={{ id }}>
               <Button size="lg" variant="outline">
