@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
-  beforeLoad: async () => {
+  beforeLoad: async ({ location }) => {
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) throw redirect({ to: "/auth" });
     const { data: roles, error: roleError } = await supabase
@@ -26,7 +26,16 @@ export const Route = createFileRoute("/_authenticated")({
       await supabase.auth.signOut();
       throw redirect({ to: "/auth" });
     }
-    return { user: data.user, role, isAdmin, isConsultant, isRecenseador };
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("must_change_password")
+      .eq("user_id", data.user.id)
+      .maybeSingle();
+    const mustChangePassword = !!profile?.must_change_password;
+    if (mustChangePassword && location.pathname !== "/admin/perfil") {
+      throw redirect({ to: "/admin/perfil" });
+    }
+    return { user: data.user, role, isAdmin, isConsultant, isRecenseador, mustChangePassword };
   },
   component: () => <Outlet />,
 });
