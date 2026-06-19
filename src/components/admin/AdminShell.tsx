@@ -97,6 +97,21 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 </Button>
               </Link>
             )}
+            {(isAdmin || isConsultant) && (
+              <Link to="/admin/notificacoes" className="relative">
+                <Button variant="ghost" size="sm" title="Notificações">
+                  <Bell className="size-4" />
+                  {unreadCount > 0 && (
+                    <Badge
+                      variant="destructive"
+                      className="absolute -right-1 -top-1 h-4 min-w-4 px-1 text-[10px]"
+                    >
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </Badge>
+                  )}
+                </Button>
+              </Link>
+            )}
             <Link to="/admin/perfil">
               <Button variant="ghost" size="sm" title="Meu perfil">
                 <UserCircle2 className="size-4" />
