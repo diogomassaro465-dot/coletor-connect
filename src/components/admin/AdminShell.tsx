@@ -4,21 +4,32 @@ import {
   LayoutDashboard,
   Building2,
   BarChart3,
+  Bell,
   ClipboardPenLine,
   UserCog,
   UserCircle2,
 } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { useQueryClient } from "@tanstack/react-query";
 import procateLogo from "@/assets/procate-logo.png";
+import { loadNotifications } from "@/lib/notifications";
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const { isAdmin, isConsultant, isRecenseador } = useRouteContext({
+  const { isAdmin, isConsultant, isRecenseador, user } = useRouteContext({
     from: "/_authenticated",
   });
+
+  const { data: notifications = [] } = useQuery({
+    queryKey: ["notifications", user.id],
+    queryFn: () => loadNotifications({ isAdmin, isConsultant, userId: user.id }),
+    enabled: isAdmin || isConsultant,
+    refetchInterval: 60_000,
+  });
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   async function signOut() {
     await qc.cancelQueries();
@@ -83,6 +94,21 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 <Button variant="ghost" size="sm">
                   <UserCog className="size-4" />{" "}
                   <span className="hidden lg:inline">Usuários</span>
+                </Button>
+              </Link>
+            )}
+            {(isAdmin || isConsultant) && (
+              <Link to="/admin/notificacoes" className="relative">
+                <Button variant="ghost" size="sm" title="Notificações">
+                  <Bell className="size-4" />
+                  {unreadCount > 0 && (
+                    <Badge
+                      variant="destructive"
+                      className="absolute -right-1 -top-1 h-4 min-w-4 px-1 text-[10px]"
+                    >
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </Badge>
+                  )}
                 </Button>
               </Link>
             )}
