@@ -540,6 +540,65 @@ export type Database = {
           },
         ]
       }
+      association_documents: {
+        Row: {
+          association_id: string
+          category: Database["public"]["Enums"]["association_document_category"]
+          created_at: string
+          description: string | null
+          expires_at: string | null
+          file_name: string
+          file_path: string
+          file_size: number | null
+          id: string
+          issued_at: string | null
+          mime_type: string | null
+          title: string
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          association_id: string
+          category?: Database["public"]["Enums"]["association_document_category"]
+          created_at?: string
+          description?: string | null
+          expires_at?: string | null
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          id?: string
+          issued_at?: string | null
+          mime_type?: string | null
+          title: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          association_id?: string
+          category?: Database["public"]["Enums"]["association_document_category"]
+          created_at?: string
+          description?: string | null
+          expires_at?: string | null
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          issued_at?: string | null
+          mime_type?: string | null
+          title?: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "association_documents_association_id_fkey"
+            columns: ["association_id"]
+            isOneToOne: false
+            referencedRelation: "associations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       association_equipment: {
         Row: {
           assessment_id: string
@@ -969,6 +1028,14 @@ export type Database = {
     Enums: {
       app_role: "admin" | "atendente" | "consultor" | "recenseador"
       assessment_module: "social" | "juridico" | "contabil"
+      association_document_category:
+        | "estatuto"
+        | "ata"
+        | "alvara"
+        | "licenca_ambiental"
+        | "balanco"
+        | "comprovante"
+        | "outros"
       catador_genero: "feminino" | "masculino" | "lgbtqia" | "nao_responder"
       catador_status: "pendente" | "ativo" | "inativo"
       diagnostic_status: "regular" | "parcialmente_regular" | "irregular"
@@ -1101,6 +1168,15 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "atendente", "consultor", "recenseador"],
       assessment_module: ["social", "juridico", "contabil"],
+      association_document_category: [
+        "estatuto",
+        "ata",
+        "alvara",
+        "licenca_ambiental",
+        "balanco",
+        "comprovante",
+        "outros",
+      ],
       catador_genero: ["feminino", "masculino", "lgbtqia", "nao_responder"],
       catador_status: ["pendente", "ativo", "inativo"],
       diagnostic_status: ["regular", "parcialmente_regular", "irregular"],
