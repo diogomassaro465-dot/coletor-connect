@@ -6,6 +6,7 @@ import {
   CalendarDays,
   ClipboardPlus,
   MapPin,
+  Pencil,
   Scale,
   UserPlus,
   Users,
