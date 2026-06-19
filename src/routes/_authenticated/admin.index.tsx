@@ -483,6 +483,7 @@ function AdminDashboard() {
                           </AlertDialog>
                         </>
                       )}
+                    </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
               </TableRow>
