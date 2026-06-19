@@ -62,7 +62,8 @@ import {
 
 export const Route = createFileRoute("/_authenticated/admin/")({
   beforeLoad: ({ context }) => {
-    if (context.role !== "admin") throw redirect({ to: "/admin/associacoes" });
+    if (!context.isAdmin && !context.isRecenseador)
+      throw redirect({ to: "/admin/associacoes" });
   },
   head: () => ({ meta: [{ title: "Painel — RecicladoresBR" }] }),
   component: AdminDashboard,
