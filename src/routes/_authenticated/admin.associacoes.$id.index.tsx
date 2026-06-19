@@ -29,7 +29,7 @@ const STATUS_LABEL = {
 
 function AssociationDetails() {
   const { id } = Route.useParams();
-  const { isConsultant } = Route.useRouteContext();
+  const { isAdmin, isConsultant, isRecenseador } = Route.useRouteContext();
   const { data: association, isLoading } = useQuery({
     queryKey: ["association", id],
     queryFn: async () => {
