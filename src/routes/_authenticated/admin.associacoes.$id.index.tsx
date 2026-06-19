@@ -5,16 +5,20 @@ import {
   Calculator,
   CalendarDays,
   ClipboardPlus,
+  FileDown,
+  FolderOpen,
   MapPin,
   Pencil,
   Scale,
   UserPlus,
   Users,
 } from "lucide-react";
+import { toast } from "sonner";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { buildAssociationReportPDF } from "@/lib/association-report";
 
 export const Route = createFileRoute("/_authenticated/admin/associacoes/$id/")({
   head: () => ({ meta: [{ title: "Detalhes da associação — PROCATE" }] }),
