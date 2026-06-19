@@ -526,7 +526,7 @@ function DiagnosticsDashboard() {
                   fontSize={12}
                   stroke="hsl(var(--muted-foreground))"
                 />
-                <RechartsTooltip formatter={(v: number) => `${v}%`} />
+                <RechartsTooltip formatter={(v) => `${v}%`} />
                 <Bar dataKey="indice" fill="hsl(var(--destructive))" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
