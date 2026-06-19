@@ -9,11 +9,14 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ArrowLeft, Pencil, Trash2, ChevronDown } from "lucide-react";
+import {
+  Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { ArrowLeft, Pencil, Trash2, ChevronDown, Check, Info, History } from "lucide-react";
 import { toast } from "sonner";
-import { GENERO_LABEL, STATUS_OPTIONS, STATUS_LABEL } from "@/lib/catador-constants";
+import { GENERO_LABEL, STATUS_OPTIONS, STATUS_LABEL, STATUS_DESCRIPTION } from "@/lib/catador-constants";
 
 export const Route = createFileRoute("/_authenticated/admin/$id/")({
   head: () => ({ meta: [{ title: "Detalhes — RecicladoresBR" }] }),
