@@ -84,6 +84,22 @@ function CatadorDetails() {
           <div className="flex items-center gap-3 flex-wrap">
             <h1 className="text-3xl font-bold">{c.nome_completo}</h1>
             <StatusPill status={c.status} />
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label={`Sobre o status ${STATUS_LABEL[c.status] ?? c.status}`}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <Info className="size-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs text-xs">
+                  {STATUS_DESCRIPTION[c.status] ?? "Sem descrição."}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
           <p className="text-muted-foreground mt-1">
             Cadastrado em {new Date(c.data_cadastro).toLocaleDateString("pt-BR")}
@@ -96,16 +112,33 @@ function CatadorDetails() {
                 Status <ChevronDown className="size-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {STATUS_OPTIONS.map((s) => (
-                <DropdownMenuItem
-                  key={s.value}
-                  disabled={c.status === s.value}
-                  onClick={() => statusMutation.mutate(s.value)}
-                >
-                  {s.label}
-                </DropdownMenuItem>
-              ))}
+            <DropdownMenuContent align="end" className="w-72">
+              <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                Alterar status do cadastro
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {STATUS_OPTIONS.map((s) => {
+                const isCurrent = c.status === s.value;
+                return (
+                  <DropdownMenuItem
+                    key={s.value}
+                    onClick={() => !isCurrent && statusMutation.mutate(s.value)}
+                    className="flex items-start gap-2 py-2"
+                  >
+                    <Check
+                      className={`size-4 mt-0.5 shrink-0 ${isCurrent ? "text-primary" : "opacity-0"}`}
+                    />
+                    <div className="flex-1">
+                      <div className="font-medium">
+                        {s.label} {isCurrent && <span className="text-xs text-muted-foreground">(atual)</span>}
+                      </div>
+                      <p className="text-xs text-muted-foreground leading-snug">
+                        {STATUS_DESCRIPTION[s.value]}
+                      </p>
+                    </div>
+                  </DropdownMenuItem>
+                );
+              })}
             </DropdownMenuContent>
           </DropdownMenu>
           <Link to="/admin/$id/editar" params={{ id }}>
