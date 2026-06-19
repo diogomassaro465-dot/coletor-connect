@@ -159,9 +159,9 @@ function PerfilPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const initials = (profile?.full_name || user.email || "U")
+  const initials = String(profile?.full_name || user.email || "U")
     .split(" ")
-    .map((s) => s[0])
+    .map((s: string) => s[0])
     .slice(0, 2)
     .join("")
     .toUpperCase();
