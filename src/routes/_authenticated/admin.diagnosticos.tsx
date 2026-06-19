@@ -490,9 +490,7 @@ function DiagnosticsDashboard() {
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis dataKey="month" fontSize={12} stroke="hsl(var(--muted-foreground))" />
               <YAxis domain={[0, 100]} fontSize={12} stroke="hsl(var(--muted-foreground))" />
-              <RechartsTooltip
-                formatter={(v: number | null) => (v == null ? "—" : `${v}%`)}
-              />
+              <RechartsTooltip formatter={(v) => (v == null ? "—" : `${v}%`)} />
               <Line
                 type="monotone"
                 dataKey="indice"
