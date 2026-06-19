@@ -224,6 +224,10 @@ function CatadorDetails() {
             <DocPreview label="NIS" path={c.nis_foto_url} />
           </div>
         </Section>
+
+        <Section title="Histórico de alterações" className="lg:col-span-2">
+          <AuditTrail recordId={id} />
+        </Section>
       </div>
     </AdminShell>
   );
