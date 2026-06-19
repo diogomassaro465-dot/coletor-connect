@@ -4,14 +4,17 @@ import {
   LayoutDashboard,
   Building2,
   BarChart3,
+  Bell,
   ClipboardPenLine,
   UserCog,
   UserCircle2,
 } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { useQueryClient } from "@tanstack/react-query";
 import procateLogo from "@/assets/procate-logo.png";
+import { loadNotifications } from "@/lib/notifications";
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
