@@ -102,6 +102,7 @@ export type Database = {
           cooperativa_fornece_epis: string | null
           coordenacao_gerencia: string | null
           created_at: string
+          created_by: string | null
           criancas_adolescentes_dependentes: boolean | null
           data_ultima_eleicao: string | null
           data_visita: string
@@ -208,6 +209,7 @@ export type Database = {
           tipo_galpao: string | null
           todos_sao_cooperados: boolean | null
           updated_at: string
+          updated_by: string | null
           uso_epis: string | null
           vice_presidente_email: string | null
           vice_presidente_nome: string | null
@@ -257,6 +259,7 @@ export type Database = {
           cooperativa_fornece_epis?: string | null
           coordenacao_gerencia?: string | null
           created_at?: string
+          created_by?: string | null
           criancas_adolescentes_dependentes?: boolean | null
           data_ultima_eleicao?: string | null
           data_visita: string
@@ -363,6 +366,7 @@ export type Database = {
           tipo_galpao?: string | null
           todos_sao_cooperados?: boolean | null
           updated_at?: string
+          updated_by?: string | null
           uso_epis?: string | null
           vice_presidente_email?: string | null
           vice_presidente_nome?: string | null
@@ -412,6 +416,7 @@ export type Database = {
           cooperativa_fornece_epis?: string | null
           coordenacao_gerencia?: string | null
           created_at?: string
+          created_by?: string | null
           criancas_adolescentes_dependentes?: boolean | null
           data_ultima_eleicao?: string | null
           data_visita?: string
@@ -518,6 +523,7 @@ export type Database = {
           tipo_galpao?: string | null
           todos_sao_cooperados?: boolean | null
           updated_at?: string
+          updated_by?: string | null
           uso_epis?: string | null
           vice_presidente_email?: string | null
           vice_presidente_nome?: string | null
@@ -625,6 +631,7 @@ export type Database = {
           ativa: boolean
           cnpj: string | null
           created_at: string
+          created_by: string | null
           email: string | null
           endereco_sede: string
           id: string
@@ -637,11 +644,13 @@ export type Database = {
           telefone: string | null
           tipo: string
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           ativa?: boolean
           cnpj?: string | null
           created_at?: string
+          created_by?: string | null
           email?: string | null
           endereco_sede: string
           id?: string
@@ -654,11 +663,13 @@ export type Database = {
           telefone?: string | null
           tipo?: string
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           ativa?: boolean
           cnpj?: string | null
           created_at?: string
+          created_by?: string | null
           email?: string | null
           endereco_sede?: string
           id?: string
@@ -671,6 +682,7 @@ export type Database = {
           telefone?: string | null
           tipo?: string
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: []
       }
@@ -745,6 +757,7 @@ export type Database = {
           titulo_eleitor: string | null
           titulo_eleitor_foto_url: string | null
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           area_atuacao?: string | null
@@ -783,6 +796,7 @@ export type Database = {
           titulo_eleitor?: string | null
           titulo_eleitor_foto_url?: string | null
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           area_atuacao?: string | null
@@ -821,6 +835,7 @@ export type Database = {
           titulo_eleitor?: string | null
           titulo_eleitor_foto_url?: string | null
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -867,6 +882,51 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          birth_date: string | null
+          cpf: string | null
+          created_at: string
+          created_by: string | null
+          email: string
+          full_name: string
+          identificacao_profissional: string | null
+          municipio_referencia: string | null
+          must_change_password: boolean
+          photo_url: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          birth_date?: string | null
+          cpf?: string | null
+          created_at?: string
+          created_by?: string | null
+          email: string
+          full_name: string
+          identificacao_profissional?: string | null
+          municipio_referencia?: string | null
+          must_change_password?: boolean
+          photo_url?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          birth_date?: string | null
+          cpf?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string
+          full_name?: string
+          identificacao_profissional?: string | null
+          municipio_referencia?: string | null
+          must_change_password?: boolean
+          photo_url?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -901,9 +961,10 @@ export type Database = {
         Returns: boolean
       }
       is_field_consultant: { Args: { _user_id: string }; Returns: boolean }
+      is_recenseador: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "admin" | "atendente" | "consultor"
+      app_role: "admin" | "atendente" | "consultor" | "recenseador"
       assessment_module: "social" | "juridico" | "contabil"
       catador_genero: "feminino" | "masculino" | "lgbtqia" | "nao_responder"
       catador_status: "pendente" | "ativo" | "inativo"
@@ -1035,7 +1096,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "atendente", "consultor"],
+      app_role: ["admin", "atendente", "consultor", "recenseador"],
       assessment_module: ["social", "juridico", "contabil"],
       catador_genero: ["feminino", "masculino", "lgbtqia", "nao_responder"],
       catador_status: ["pendente", "ativo", "inativo"],

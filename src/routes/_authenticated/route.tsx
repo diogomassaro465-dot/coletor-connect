@@ -14,12 +14,19 @@ export const Route = createFileRoute("/_authenticated")({
     const isConsultant = !!roles?.some(
       (item) => item.role === "consultor" || item.role === "atendente",
     );
-    const role = isAdmin ? "admin" : isConsultant ? "consultor" : null;
+    const isRecenseador = !!roles?.some((item) => item.role === "recenseador");
+    const role = isAdmin
+      ? "admin"
+      : isConsultant
+        ? "consultor"
+        : isRecenseador
+          ? "recenseador"
+          : null;
     if (roleError || !role) {
       await supabase.auth.signOut();
       throw redirect({ to: "/auth" });
     }
-    return { user: data.user, role, isAdmin, isConsultant };
+    return { user: data.user, role, isAdmin, isConsultant, isRecenseador };
   },
   component: () => <Outlet />,
 });
