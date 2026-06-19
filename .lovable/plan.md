@@ -1,56 +1,55 @@
-## Já implementado (referência rápida)
+## Onde paramos
 
-- Papéis estritos (Admin / Recenseador / Consultor) com guards de rota
-- Cadastro de usuários operacionais pelo Admin (nome, CPF, nascimento, e-mail, senha, perfil)
-- created_by / updated_by + tabela `audit_logs` com triggers em catadores, associações e diagnósticos
-- Bug CTPS / cooperativa / novo catador corrigidos
-- Edição de associação funcionando
-- Exportação Excel de catadores (12 colunas)
+Blocos já entregues: **1 (cadastro complementos)**, **2 (perfil self-service)**, **3 (catadores UX/dados)** e **7 (identidade visual / hero)**.
 
-## Pendente — agrupado por bloco
+Próximo da fila: **Bloco 6 — Regularidade institucional (dashboards)**. Depois seguem 4 (importação em massa), 5 (documentos/relatórios de associação) e 8 (notificações).
 
-### Bloco 1 — Cadastro de usuários (complementos rápidos)
-- Adicionar campos **Município de Referência** e **Identificação Profissional** no formulário de novo usuário.
-- Validador de força de senha + flag `must_reset_password` (forçar redefinição no 1º acesso).
+## O que vou fazer agora (Bloco 6)
 
-### Bloco 2 — Perfil self-service
-- Rota `/admin/perfil` para Recenseador/Consultor editar nome, e-mail, município, identificação, foto (bucket novo `avatars`) e trocar senha. CPF somente leitura.
+Reformular a tela `/admin/diagnosticos` para virar um painel real de acompanhamento da regularidade das associações, usando os diagnósticos já cadastrados (`association_assessments`).
 
-### Bloco 3 — Catadores: ajustes de dados e UX
-- Atualizar `RENDA_THRESHOLD` para **R$ 1.621,00** (lista e exportação).
-- Expandir `MATERIAIS_OPTIONS` com regionalismos (PET, garrafa, sucata branca/preta, papelão misto, tetrapak, EPS, etc.).
-- Inverter lógica do dropdown de Status: status atual marcado/destacado, demais como opções selecionáveis (já está disabled-no-atual; trocar para checkmark + ordem fixa).
-- Tooltip explicando o status **Inativo** ("catador sem coleta nos últimos 90 dias").
-- Exportação Excel **completa**: incluir todos os ~37 campos do catador (endereço, dependentes, programas sociais, CTPS, etc.).
-- Aba **Histórico** no detalhe do catador lendo `audit_logs` filtrado por `record_id`.
+### Cards de resumo no topo
+- **Índice médio de regularidade** (média de `regularity_index` dos diagnósticos validados).
+- **Total de diagnósticos** no período filtrado.
+- **Evidências pendentes** (`evidence_validated = false`).
+- **Associações sem diagnóstico nos últimos 90 dias**.
 
-### Bloco 4 — Catadores: importação em massa
-- Upload CSV/XLSX com pré-visualização, validação por linha (CPF, materiais, renda), detecção de duplicidade por CPF e relatório final de sucesso/erro.
+### Categorias de regularidade
+Derivadas do `regularity_index` do diagnóstico mais recente de cada associação:
+- **Regulares** — índice ≥ 80
+- **Atenção parcial** — índice 50–79
+- **Ação prioritária** — índice < 50
+- **Sem diagnóstico** — associação sem registro
 
-### Bloco 5 — Associações: relatórios e documentos
-- Tab "Documentos" na associação: bucket `associacoes-docs`, upload com versionamento (`document_versions`).
-- Relatório PDF/Excel por associação: dados cadastrais + histórico de diagnósticos + evolução do índice + lista de catadores vinculados.
+Cada categoria vira um card clicável que filtra a lista abaixo.
 
-### Bloco 6 — Regularidade institucional (dashboards)
-- Reformular `/admin/diagnosticos`: cards (índice médio, total, evidências pendentes), gráfico de distribuição de status, gráfico de evolução temporal.
-- Categorias **Regulares / Atenção parcial / Ação prioritária** derivadas do `regularity_index` (≥80 / 50–79 / <50).
-- Filtros por município e período.
+### Gráficos (Recharts)
+- **Distribuição por categoria** (donut/pizza): Regulares / Atenção / Prioritária / Sem diagnóstico.
+- **Evolução do índice médio** (linha) por mês nos últimos 12 meses.
+- **Top municípios** (barras horizontais) com pior índice médio — para orientar visita técnica.
 
-### Bloco 7 — Identidade visual e UX
-- Hero image gerada por IA na landing `/` (reciclagem positiva, sem rostos).
-- Ajuste do dropdown de status (item do Bloco 3, separado para tocar no índice landing).
+### Filtros
+- **Município** (select com municípios distintos das associações).
+- **Período** (últimos 30 / 90 / 180 / 365 dias / tudo).
+- **Status do diagnóstico** (regular / parcialmente_regular / irregular).
 
-### Bloco 8 — Notificações
-- Sino no header listando: diagnósticos pendentes (>30d sem visita), evidências não validadas, novos cadastros aguardando ativação. Tabela `notifications` + RLS por papel.
+### Lista detalhada
+Tabela com: associação, município, índice mais recente, categoria (badge colorido), data do último diagnóstico, evidências validadas (sim/não), ação (abrir diagnóstico). Mantém a busca por nome.
+
+### Acesso por papel
+- **Admin** e **Consultor**: veem tudo.
+- **Recenseador**: não tem acesso à tela (já bloqueado pelo guard atual, mantemos).
 
 ## Detalhes técnicos
 
-- Migrations novas: `profiles` ganha `municipio_referencia`, `identificacao_profissional`, `avatar_url`, `must_reset_password`; nova tabela `notifications`; novo bucket `avatars` (público) e `associacoes-docs` (privado) + policies por papel.
-- Frontend: novas rotas `/admin/perfil`, `/admin/catadores/importar`, `/admin/associacoes/$id/documentos`, `/admin/associacoes/$id/relatorio`. Recharts já é candidato para os gráficos do Bloco 6.
-- Hero image: `imagegen--generate_image` (standard) em `src/assets/hero-reciclagem.jpg`.
+- Tudo client-side com queries Supabase já existentes; nada de schema novo.
+- Cálculo da categoria por associação usa a linha mais recente de `association_assessments` (por `association_id`, `created_at desc`).
+- Recharts já está no projeto (`src/components/ui/chart.tsx`); reusar `ChartContainer` para manter tema.
+- Cores das categorias via tokens semânticos já definidos em `src/styles.css` (success / warning / destructive / muted) — nada hard-coded.
+- Arquivo principal: `src/routes/_authenticated/admin.diagnosticos.tsx` (refatoração completa).
+- Sem mudanças de banco; sem novas migrations; sem novos buckets.
 
-## Sugestão de execução
+## Fora do escopo deste bloco
+Importação em massa (Bloco 4), documentos/relatório PDF da associação (Bloco 5) e notificações (Bloco 8) — entrego em rodadas seguintes.
 
-Posso atacar **Blocos 1 + 3 + 7 (hero) em uma rodada** (mudanças pequenas e visíveis), depois **Bloco 2 (perfil self-service)**, depois **Bloco 6 (dashboards)**, e por fim os blocos pesados (4 importação, 5 documentos/relatórios, 8 notificações).
-
-Me confirma se sigo nessa ordem ou se quer outra priorização.
+Sigo por aqui?
