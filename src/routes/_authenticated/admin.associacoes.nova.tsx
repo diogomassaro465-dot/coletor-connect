@@ -18,7 +18,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/admin/associacoes/nova")({
   beforeLoad: ({ context }) => {
-    if (context.role !== "admin") throw redirect({ to: "/admin/associacoes" });
+    if (!context.isAdmin) throw redirect({ to: "/admin/associacoes" });
   },
   head: () => ({ meta: [{ title: "Nova associação — PROCATE" }] }),
   component: NewAssociationPage,
