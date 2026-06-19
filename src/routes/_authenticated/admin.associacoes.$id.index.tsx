@@ -6,6 +6,7 @@ import {
   CalendarDays,
   ClipboardPlus,
   MapPin,
+  Pencil,
   Scale,
   UserPlus,
   Users,
@@ -28,7 +29,7 @@ const STATUS_LABEL = {
 
 function AssociationDetails() {
   const { id } = Route.useParams();
-  const { isConsultant } = Route.useRouteContext();
+  const { isAdmin, isConsultant, isRecenseador } = Route.useRouteContext();
   const { data: association, isLoading } = useQuery({
     queryKey: ["association", id],
     queryFn: async () => {
@@ -87,13 +88,22 @@ function AssociationDetails() {
             <MapPin className="size-4" /> {association.municipio}
           </p>
         </div>
-        {isConsultant && (
-          <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2">
+          {isAdmin && (
+            <Link to="/admin/associacoes/$id/editar" params={{ id }}>
+              <Button size="lg" variant="outline">
+                <Pencil className="size-4" /> Editar entidade
+              </Button>
+            </Link>
+          )}
+          {isRecenseador && (
             <Link to="/admin/associacoes/$id/catadores/novo" params={{ id }}>
               <Button size="lg">
                 <UserPlus className="size-4" /> Cadastrar catador
               </Button>
             </Link>
+          )}
+          {isConsultant && (
             <Link
               to="/admin/associacoes/$id/diagnostico/novo"
               params={{ id }}
@@ -103,8 +113,8 @@ function AssociationDetails() {
                 <ClipboardPlus className="size-4" /> Novo cadastro de campo
               </Button>
             </Link>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {isConsultant && (
