@@ -59,6 +59,7 @@ import {
   STATUS_OPTIONS,
   STATUS_LABEL,
   GENERO_LABEL,
+  RENDA_REFERENCIA,
 } from "@/lib/catador-constants";
 
 export const Route = createFileRoute("/_authenticated/admin/")({
