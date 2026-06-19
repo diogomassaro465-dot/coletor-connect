@@ -6,6 +6,7 @@ import {
   BarChart3,
   ClipboardPenLine,
   UserCog,
+  UserCircle2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -85,6 +86,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 </Button>
               </Link>
             )}
+            <Link to="/admin/perfil">
+              <Button variant="ghost" size="sm" title="Meu perfil">
+                <UserCircle2 className="size-4" />
+              </Button>
+            </Link>
             <Button variant="ghost" size="sm" onClick={signOut} title="Sair">
               <LogOut className="size-4" />
             </Button>
