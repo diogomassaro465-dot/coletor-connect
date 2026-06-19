@@ -109,7 +109,7 @@ function AdminDashboard() {
     },
   });
 
-  const RENDA_THRESHOLD = 1412; // salário mínimo de referência
+  const RENDA_THRESHOLD = RENDA_REFERENCIA; // salário mínimo de referência
 
   const filtered = useMemo(() => {
     if (!catadores) return [];
