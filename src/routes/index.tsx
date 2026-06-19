@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Users, BarChart3, ShieldCheck, ArrowRight, LeafyGreen } from "lucide-react";
 import procateLogo from "@/assets/procate-logo.png";
+import heroImage from "@/assets/hero-reciclagem.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
