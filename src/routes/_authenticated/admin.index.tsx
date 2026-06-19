@@ -321,6 +321,13 @@ function AdminDashboard() {
             </Button>
           )}
           {isRecenseador && (
+            <Link to="/admin/importar">
+              <Button variant="outline">
+                <Download className="size-4 rotate-180" /> Importar planilha
+              </Button>
+            </Link>
+          )}
+          {isRecenseador && (
             <Link to="/admin/novo">
               <Button>
                 <Plus className="size-4" /> Novo catador

@@ -17,6 +17,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authenticated/admin.usuarios'
 import { Route as AuthenticatedAdminPerfilRouteImport } from './routes/_authenticated/admin.perfil'
 import { Route as AuthenticatedAdminNovoRouteImport } from './routes/_authenticated/admin.novo'
+import { Route as AuthenticatedAdminImportarRouteImport } from './routes/_authenticated/admin.importar'
 import { Route as AuthenticatedAdminDiagnosticosRouteImport } from './routes/_authenticated/admin.diagnosticos'
 import { Route as AuthenticatedAdminAssociacoesIndexRouteImport } from './routes/_authenticated/admin.associacoes.index'
 import { Route as AuthenticatedAdminIdIndexRouteImport } from './routes/_authenticated/admin.$id.index'
@@ -70,6 +71,12 @@ const AuthenticatedAdminNovoRoute = AuthenticatedAdminNovoRouteImport.update({
   path: '/novo',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminImportarRoute =
+  AuthenticatedAdminImportarRouteImport.update({
+    id: '/importar',
+    path: '/importar',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminDiagnosticosRoute =
   AuthenticatedAdminDiagnosticosRouteImport.update({
     id: '/diagnosticos',
@@ -142,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/admin/diagnosticos': typeof AuthenticatedAdminDiagnosticosRoute
+  '/admin/importar': typeof AuthenticatedAdminImportarRoute
   '/admin/novo': typeof AuthenticatedAdminNovoRoute
   '/admin/perfil': typeof AuthenticatedAdminPerfilRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRouteWithChildren
@@ -161,6 +169,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin/diagnosticos': typeof AuthenticatedAdminDiagnosticosRoute
+  '/admin/importar': typeof AuthenticatedAdminImportarRoute
   '/admin/novo': typeof AuthenticatedAdminNovoRoute
   '/admin/perfil': typeof AuthenticatedAdminPerfilRoute
   '/admin/usuarios': typeof AuthenticatedAdminUsuariosRouteWithChildren
@@ -183,6 +192,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/admin/diagnosticos': typeof AuthenticatedAdminDiagnosticosRoute
+  '/_authenticated/admin/importar': typeof AuthenticatedAdminImportarRoute
   '/_authenticated/admin/novo': typeof AuthenticatedAdminNovoRoute
   '/_authenticated/admin/perfil': typeof AuthenticatedAdminPerfilRoute
   '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRouteWithChildren
@@ -205,6 +215,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/admin'
     | '/admin/diagnosticos'
+    | '/admin/importar'
     | '/admin/novo'
     | '/admin/perfil'
     | '/admin/usuarios'
@@ -224,6 +235,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/admin/diagnosticos'
+    | '/admin/importar'
     | '/admin/novo'
     | '/admin/perfil'
     | '/admin/usuarios'
@@ -245,6 +257,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/admin'
     | '/_authenticated/admin/diagnosticos'
+    | '/_authenticated/admin/importar'
     | '/_authenticated/admin/novo'
     | '/_authenticated/admin/perfil'
     | '/_authenticated/admin/usuarios'
@@ -323,6 +336,13 @@ declare module '@tanstack/react-router' {
       path: '/novo'
       fullPath: '/admin/novo'
       preLoaderRoute: typeof AuthenticatedAdminNovoRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/importar': {
+      id: '/_authenticated/admin/importar'
+      path: '/importar'
+      fullPath: '/admin/importar'
+      preLoaderRoute: typeof AuthenticatedAdminImportarRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/diagnosticos': {
@@ -421,6 +441,7 @@ const AuthenticatedAdminUsuariosRouteWithChildren =
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminDiagnosticosRoute: typeof AuthenticatedAdminDiagnosticosRoute
+  AuthenticatedAdminImportarRoute: typeof AuthenticatedAdminImportarRoute
   AuthenticatedAdminNovoRoute: typeof AuthenticatedAdminNovoRoute
   AuthenticatedAdminPerfilRoute: typeof AuthenticatedAdminPerfilRoute
   AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRouteWithChildren
@@ -438,6 +459,7 @@ interface AuthenticatedAdminRouteChildren {
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminDiagnosticosRoute: AuthenticatedAdminDiagnosticosRoute,
+  AuthenticatedAdminImportarRoute: AuthenticatedAdminImportarRoute,
   AuthenticatedAdminNovoRoute: AuthenticatedAdminNovoRoute,
   AuthenticatedAdminPerfilRoute: AuthenticatedAdminPerfilRoute,
   AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRouteWithChildren,
@@ -482,13 +504,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
