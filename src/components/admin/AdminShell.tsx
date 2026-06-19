@@ -1,5 +1,12 @@
 import { Link, useNavigate, useRouteContext } from "@tanstack/react-router";
-import { LogOut, LayoutDashboard, Building2, BarChart3, ClipboardPenLine } from "lucide-react";
+import {
+  LogOut,
+  LayoutDashboard,
+  Building2,
+  BarChart3,
+  ClipboardPenLine,
+  UserCog,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -8,7 +15,9 @@ import procateLogo from "@/assets/procate-logo.png";
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const { isAdmin } = useRouteContext({ from: "/_authenticated" });
+  const { isAdmin, isConsultant, isRecenseador } = useRouteContext({
+    from: "/_authenticated",
+  });
 
   async function signOut() {
     await qc.cancelQueries();

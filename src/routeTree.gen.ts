@@ -18,6 +18,7 @@ import { Route as AuthenticatedAdminUsuariosRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminDiagnosticosRouteImport } from './routes/_authenticated/admin.diagnosticos'
 import { Route as AuthenticatedAdminAssociacoesIndexRouteImport } from './routes/_authenticated/admin.associacoes.index'
 import { Route as AuthenticatedAdminIdIndexRouteImport } from './routes/_authenticated/admin.$id.index'
+import { Route as AuthenticatedAdminUsuariosNovoRouteImport } from './routes/_authenticated/admin.usuarios.novo'
 import { Route as AuthenticatedAdminAssociacoesNovaRouteImport } from './routes/_authenticated/admin.associacoes.nova'
 import { Route as AuthenticatedAdminIdEditarRouteImport } from './routes/_authenticated/admin.$id.editar'
 import { Route as AuthenticatedAdminAssociacoesIdIndexRouteImport } from './routes/_authenticated/admin.associacoes.$id.index'
@@ -73,6 +74,12 @@ const AuthenticatedAdminIdIndexRoute =
     path: '/$id/',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminUsuariosNovoRoute =
+  AuthenticatedAdminUsuariosNovoRouteImport.update({
+    id: '/novo',
+    path: '/novo',
+    getParentRoute: () => AuthenticatedAdminUsuariosRoute,
+  } as any)
 const AuthenticatedAdminAssociacoesNovaRoute =
   AuthenticatedAdminAssociacoesNovaRouteImport.update({
     id: '/associacoes/nova',
@@ -115,10 +122,11 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/admin/diagnosticos': typeof AuthenticatedAdminDiagnosticosRoute
-  '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/admin/usuarios': typeof AuthenticatedAdminUsuariosRouteWithChildren
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/$id/editar': typeof AuthenticatedAdminIdEditarRoute
   '/admin/associacoes/nova': typeof AuthenticatedAdminAssociacoesNovaRoute
+  '/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
   '/admin/$id/': typeof AuthenticatedAdminIdIndexRoute
   '/admin/associacoes/': typeof AuthenticatedAdminAssociacoesIndexRoute
   '/admin/associacoes/$id/': typeof AuthenticatedAdminAssociacoesIdIndexRoute
@@ -130,10 +138,11 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/admin/diagnosticos': typeof AuthenticatedAdminDiagnosticosRoute
-  '/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/admin/usuarios': typeof AuthenticatedAdminUsuariosRouteWithChildren
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/$id/editar': typeof AuthenticatedAdminIdEditarRoute
   '/admin/associacoes/nova': typeof AuthenticatedAdminAssociacoesNovaRoute
+  '/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
   '/admin/$id': typeof AuthenticatedAdminIdIndexRoute
   '/admin/associacoes': typeof AuthenticatedAdminAssociacoesIndexRoute
   '/admin/associacoes/$id': typeof AuthenticatedAdminAssociacoesIdIndexRoute
@@ -148,10 +157,11 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/admin/diagnosticos': typeof AuthenticatedAdminDiagnosticosRoute
-  '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRoute
+  '/_authenticated/admin/usuarios': typeof AuthenticatedAdminUsuariosRouteWithChildren
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/$id/editar': typeof AuthenticatedAdminIdEditarRoute
   '/_authenticated/admin/associacoes/nova': typeof AuthenticatedAdminAssociacoesNovaRoute
+  '/_authenticated/admin/usuarios/novo': typeof AuthenticatedAdminUsuariosNovoRoute
   '/_authenticated/admin/$id/': typeof AuthenticatedAdminIdIndexRoute
   '/_authenticated/admin/associacoes/': typeof AuthenticatedAdminAssociacoesIndexRoute
   '/_authenticated/admin/associacoes/$id/': typeof AuthenticatedAdminAssociacoesIdIndexRoute
@@ -170,6 +180,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/admin/$id/editar'
     | '/admin/associacoes/nova'
+    | '/admin/usuarios/novo'
     | '/admin/$id/'
     | '/admin/associacoes/'
     | '/admin/associacoes/$id/'
@@ -185,6 +196,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin/$id/editar'
     | '/admin/associacoes/nova'
+    | '/admin/usuarios/novo'
     | '/admin/$id'
     | '/admin/associacoes'
     | '/admin/associacoes/$id'
@@ -202,6 +214,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/'
     | '/_authenticated/admin/$id/editar'
     | '/_authenticated/admin/associacoes/nova'
+    | '/_authenticated/admin/usuarios/novo'
     | '/_authenticated/admin/$id/'
     | '/_authenticated/admin/associacoes/'
     | '/_authenticated/admin/associacoes/$id/'
@@ -281,6 +294,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIdIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/usuarios/novo': {
+      id: '/_authenticated/admin/usuarios/novo'
+      path: '/novo'
+      fullPath: '/admin/usuarios/novo'
+      preLoaderRoute: typeof AuthenticatedAdminUsuariosNovoRouteImport
+      parentRoute: typeof AuthenticatedAdminUsuariosRoute
+    }
     '/_authenticated/admin/associacoes/nova': {
       id: '/_authenticated/admin/associacoes/nova'
       path: '/associacoes/nova'
@@ -326,9 +346,23 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminUsuariosRouteChildren {
+  AuthenticatedAdminUsuariosNovoRoute: typeof AuthenticatedAdminUsuariosNovoRoute
+}
+
+const AuthenticatedAdminUsuariosRouteChildren: AuthenticatedAdminUsuariosRouteChildren =
+  {
+    AuthenticatedAdminUsuariosNovoRoute: AuthenticatedAdminUsuariosNovoRoute,
+  }
+
+const AuthenticatedAdminUsuariosRouteWithChildren =
+  AuthenticatedAdminUsuariosRoute._addFileChildren(
+    AuthenticatedAdminUsuariosRouteChildren,
+  )
+
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminDiagnosticosRoute: typeof AuthenticatedAdminDiagnosticosRoute
-  AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRoute
+  AuthenticatedAdminUsuariosRoute: typeof AuthenticatedAdminUsuariosRouteWithChildren
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminIdEditarRoute: typeof AuthenticatedAdminIdEditarRoute
   AuthenticatedAdminAssociacoesNovaRoute: typeof AuthenticatedAdminAssociacoesNovaRoute
@@ -342,7 +376,7 @@ interface AuthenticatedAdminRouteChildren {
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminDiagnosticosRoute: AuthenticatedAdminDiagnosticosRoute,
-  AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRoute,
+  AuthenticatedAdminUsuariosRoute: AuthenticatedAdminUsuariosRouteWithChildren,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedAdminIdEditarRoute: AuthenticatedAdminIdEditarRoute,
   AuthenticatedAdminAssociacoesNovaRoute:
