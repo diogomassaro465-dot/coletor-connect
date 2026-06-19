@@ -342,8 +342,8 @@ function AdminDashboard() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="todos">Todas as rendas</SelectItem>
-              <SelectItem value="menor">Menor que R$ 1.412</SelectItem>
-              <SelectItem value="maior">Maior ou igual a R$ 1.412</SelectItem>
+              <SelectItem value="menor">Menor que R$ {RENDA_THRESHOLD.toLocaleString("pt-BR")}</SelectItem>
+              <SelectItem value="maior">Maior ou igual a R$ {RENDA_THRESHOLD.toLocaleString("pt-BR")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
