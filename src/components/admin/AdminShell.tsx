@@ -41,11 +41,15 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               className="h-10 w-auto sm:h-11"
             />
             <span className="hidden sm:inline-block text-xs font-medium uppercase tracking-wider text-muted-foreground ml-2 px-2 py-0.5 rounded bg-muted">
-              {isAdmin ? "Administrador UCIP" : "Consultor"}
+              {isAdmin
+                ? "Administrador UCIP"
+                : isRecenseador
+                  ? "Recenseador"
+                  : "Consultor"}
             </span>
           </Link>
           <nav className="flex items-center gap-1">
-            {isAdmin && (
+            {(isAdmin || isRecenseador) && (
               <Link to="/admin">
                 <Button variant="ghost" size="sm">
                   <LayoutDashboard className="size-4" />{" "}
@@ -53,23 +57,33 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 </Button>
               </Link>
             )}
-            <Link to="/admin/associacoes">
-              <Button variant="ghost" size="sm">
-                {isAdmin ? (
-                  <Building2 className="size-4" />
-                ) : (
-                  <ClipboardPenLine className="size-4" />
-                )}{" "}
-                <span className="hidden md:inline">
-                  {isAdmin ? "Associações" : "Cadastros de campo"}
-                </span>
-              </Button>
-            </Link>
+            {(isAdmin || isConsultant) && (
+              <Link to="/admin/associacoes">
+                <Button variant="ghost" size="sm">
+                  {isAdmin ? (
+                    <Building2 className="size-4" />
+                  ) : (
+                    <ClipboardPenLine className="size-4" />
+                  )}{" "}
+                  <span className="hidden md:inline">
+                    {isAdmin ? "Associações" : "Cadastros de campo"}
+                  </span>
+                </Button>
+              </Link>
+            )}
             {isAdmin && (
               <Link to="/admin/diagnosticos">
                 <Button variant="ghost" size="sm">
                   <BarChart3 className="size-4" />{" "}
                   <span className="hidden lg:inline">Regularidade</span>
+                </Button>
+              </Link>
+            )}
+            {isAdmin && (
+              <Link to="/admin/usuarios">
+                <Button variant="ghost" size="sm">
+                  <UserCog className="size-4" />{" "}
+                  <span className="hidden lg:inline">Usuários</span>
                 </Button>
               </Link>
             )}
