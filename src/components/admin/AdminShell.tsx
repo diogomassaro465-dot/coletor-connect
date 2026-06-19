@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   Building2,
   BarChart3,
+  Beaker,
   Bell,
   ClipboardPenLine,
   UserCog,
