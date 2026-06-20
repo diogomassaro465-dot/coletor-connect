@@ -130,27 +130,6 @@ function Landing() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="container mx-auto px-4 pb-24">
-        <div className="rounded-3xl bg-gradient-warm p-10 md:p-14 text-secondary-foreground shadow-soft">
-          <div className="max-w-2xl">
-            <h2 className="text-3xl md:text-4xl font-bold">Pronto para começar?</h2>
-            <p className="mt-3 text-white/90 text-lg">
-              Crie sua conta de administrador em segundos e comece a cadastrar catadores agora
-              mesmo.
-            </p>
-            <Link to="/auth" className="inline-block mt-8">
-              <Button
-                size="lg"
-                variant="outline"
-                className="bg-white text-secondary border-white hover:bg-white/90 hover:text-secondary"
-              >
-                Acessar painel <ArrowRight className="ml-1 size-4" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
 
       <footer className="border-t border-border py-8">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
