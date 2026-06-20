@@ -80,21 +80,35 @@ function AssociationsPage() {
           <p className="mt-1 text-sm text-muted-foreground">Cadastre a primeira entidade ou carregue a relação oficial das 116 associações.</p>
         </div>
       ) : (
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid auto-rows-fr gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {filtered.map((item) => (
-            <Link key={item.id} to="/admin/associacoes/$id" params={{ id: item.id }} className="block">
-            <article className="rounded-xl border border-border bg-card p-5 shadow-card transition hover:border-primary/40 hover:shadow-soft">
-              <div className="flex items-start justify-between gap-3">
-                <div className="grid size-10 shrink-0 place-items-center rounded-lg bg-primary-soft text-primary"><Building2 className="size-5" /></div>
-                <Badge variant={item.ativa ? "secondary" : "outline"}>{item.ativa ? "Ativa" : "Inativa"}</Badge>
-              </div>
-              <h2 className="mt-4 font-semibold leading-snug">{item.nome}</h2>
-              <p className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground"><MapPin className="size-3.5" /> {item.municipio}</p>
-              <div className="mt-4 border-t border-border pt-4 text-sm">
-                <span className="text-muted-foreground">Associados atuais</span>
-                <strong className="float-right tabular-nums">{item.numero_associados_atual}</strong>
-              </div>
-            </article>
+            <Link
+              key={item.id}
+              to="/admin/associacoes/$id"
+              params={{ id: item.id }}
+              className="group block h-full"
+            >
+              <article className="flex h-full flex-col rounded-xl border border-border bg-card p-5 shadow-card transition group-hover:border-primary/40 group-hover:shadow-soft">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="grid size-10 shrink-0 place-items-center rounded-lg bg-primary-soft text-primary">
+                    <Building2 className="size-5" />
+                  </div>
+                  <Badge variant={item.ativa ? "secondary" : "outline"} className="shrink-0">
+                    {item.ativa ? "Ativa" : "Inativa"}
+                  </Badge>
+                </div>
+                <h2 className="mt-4 line-clamp-2 min-h-[2.75rem] font-semibold leading-snug">
+                  {item.nome}
+                </h2>
+                <p className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <MapPin className="size-3.5 shrink-0" />
+                  <span className="truncate">{item.municipio}</span>
+                </p>
+                <div className="mt-auto flex items-center justify-between border-t border-border pt-4 text-sm">
+                  <span className="text-muted-foreground">Associados atuais</span>
+                  <strong className="tabular-nums">{item.numero_associados_atual}</strong>
+                </div>
+              </article>
             </Link>
           ))}
         </div>
