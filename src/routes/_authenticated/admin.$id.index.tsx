@@ -14,9 +14,18 @@ import {
 import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ArrowLeft, Pencil, Trash2, ChevronDown, Check, Info, History } from "lucide-react";
+import { ArrowLeft, Pencil, Trash2, ChevronDown, Check, Info, History, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
-import { GENERO_LABEL, STATUS_OPTIONS, STATUS_LABEL, STATUS_DESCRIPTION } from "@/lib/catador-constants";
+import { GENERO_LABEL, STATUS_OPTIONS, STATUS_LABEL, STATUS_DESCRIPTION, STATUS_INATIVO_CRITERIOS } from "@/lib/catador-constants";
+import {
+  canViewSensitive,
+  maskCPF,
+  maskRG,
+  maskPhone,
+  maskEmail,
+  maskAddress,
+  maskDocument,
+} from "@/lib/mask-sensitive";
 
 export const Route = createFileRoute("/_authenticated/admin/$id/")({
   head: () => ({ meta: [{ title: "Detalhes — RecicladoresBR" }] }),
