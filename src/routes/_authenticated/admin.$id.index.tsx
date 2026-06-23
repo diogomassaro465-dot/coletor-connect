@@ -34,6 +34,8 @@ export const Route = createFileRoute("/_authenticated/admin/$id/")({
 
 function CatadorDetails() {
   const { id } = Route.useParams();
+  const { role } = Route.useRouteContext();
+  const showFull = canViewSensitive(role);
   const navigate = useNavigate();
   const qc = useQueryClient();
 
