@@ -288,7 +288,8 @@ function Section({ title, children, className = "" }: { title: string; children:
   );
 }
 
-function Field({ k, v }: { k: string; v: React.ReactNode }) {
+function Field({ k, v, sensitive = false }: { k: string; v: React.ReactNode; sensitive?: boolean }) {
+  void sensitive;
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-3 text-sm">
       <div className="text-muted-foreground">{k}</div>
