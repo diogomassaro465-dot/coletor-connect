@@ -67,8 +67,15 @@ export const STATUS_OPTIONS = [
 export const STATUS_DESCRIPTION: Record<string, string> = {
   pendente: "Cadastro recém-criado, aguardando validação dos dados pelo Administrador.",
   ativo: "Catador validado e participando ativamente das atividades de coleta.",
-  inativo: "Catador desligado, afastado ou sem coleta registrada nos últimos 90 dias.",
+  inativo:
+    "Catador sem atividade de coleta registrada nos últimos 6 meses, com solicitação formal de desativação ou com documentos essenciais (CPF, comprovante de residência ou vínculo com cooperativa) não renovados/inválidos.",
 };
+
+export const STATUS_INATIVO_CRITERIOS: string[] = [
+  "Sem atividade de coleta registrada nos últimos 6 meses.",
+  "Solicitação formal de desativação pelo próprio catador ou pela cooperativa.",
+  "Documentos essenciais não renovados ou inválidos (CPF, comprovante de residência, vínculo com cooperativa).",
+];
 
 export const STATUS_LABEL: Record<string, string> = Object.fromEntries(
   STATUS_OPTIONS.map((o) => [o.value, o.label]),
