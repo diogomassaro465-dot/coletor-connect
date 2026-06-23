@@ -119,37 +119,51 @@ function CatadorDetails() {
         <div className="flex gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                Status <ChevronDown className="size-4" />
+              <Button variant="outline" className="gap-2">
+                <span className="text-xs text-muted-foreground">Status atual:</span>
+                <StatusPill status={c.status} />
+                <ChevronDown className="size-4 opacity-60" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-72">
-              <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-                Alterar status do cadastro
+            <DropdownMenuContent align="end" className="w-80">
+              <DropdownMenuLabel className="flex items-start gap-2 py-3 bg-muted/40">
+                <Check className="size-4 mt-0.5 text-primary shrink-0" />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                      Status atual
+                    </span>
+                    <StatusPill status={c.status} />
+                  </div>
+                  <p className="text-xs text-muted-foreground font-normal leading-snug mt-1">
+                    {STATUS_DESCRIPTION[c.status]}
+                  </p>
+                  {c.status === "inativo" && (
+                    <ul className="mt-2 space-y-0.5 text-[11px] text-muted-foreground list-disc pl-4">
+                      {STATUS_INATIVO_CRITERIOS.map((cr) => <li key={cr}>{cr}</li>)}
+                    </ul>
+                  )}
+                </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {STATUS_OPTIONS.map((s) => {
-                const isCurrent = c.status === s.value;
-                return (
-                  <DropdownMenuItem
-                    key={s.value}
-                    onClick={() => !isCurrent && statusMutation.mutate(s.value)}
-                    className="flex items-start gap-2 py-2"
-                  >
-                    <Check
-                      className={`size-4 mt-0.5 shrink-0 ${isCurrent ? "text-primary" : "opacity-0"}`}
-                    />
-                    <div className="flex-1">
-                      <div className="font-medium">
-                        {s.label} {isCurrent && <span className="text-xs text-muted-foreground">(atual)</span>}
-                      </div>
-                      <p className="text-xs text-muted-foreground leading-snug">
-                        {STATUS_DESCRIPTION[s.value]}
-                      </p>
-                    </div>
-                  </DropdownMenuItem>
-                );
-              })}
+              <DropdownMenuLabel className="text-[11px] font-normal uppercase tracking-wide text-muted-foreground pt-2">
+                Alterar para
+              </DropdownMenuLabel>
+              {STATUS_OPTIONS.filter((s) => s.value !== c.status).map((s) => (
+                <DropdownMenuItem
+                  key={s.value}
+                  onClick={() => statusMutation.mutate(s.value)}
+                  className="flex items-start gap-2 py-2"
+                >
+                  <div className="size-4 mt-0.5 shrink-0" />
+                  <div className="flex-1">
+                    <div className="font-medium text-sm">{s.label}</div>
+                    <p className="text-xs text-muted-foreground leading-snug">
+                      {STATUS_DESCRIPTION[s.value]}
+                    </p>
+                  </div>
+                </DropdownMenuItem>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
           <Link to="/admin/$id/editar" params={{ id }}>
