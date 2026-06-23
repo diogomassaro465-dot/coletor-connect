@@ -14,9 +14,18 @@ import {
 import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ArrowLeft, Pencil, Trash2, ChevronDown, Check, Info, History } from "lucide-react";
+import { ArrowLeft, Pencil, Trash2, ChevronDown, Check, Info, History, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
-import { GENERO_LABEL, STATUS_OPTIONS, STATUS_LABEL, STATUS_DESCRIPTION } from "@/lib/catador-constants";
+import { GENERO_LABEL, STATUS_OPTIONS, STATUS_LABEL, STATUS_DESCRIPTION, STATUS_INATIVO_CRITERIOS } from "@/lib/catador-constants";
+import {
+  canViewSensitive,
+  maskCPF,
+  maskRG,
+  maskPhone,
+  maskEmail,
+  maskAddress,
+  maskDocument,
+} from "@/lib/mask-sensitive";
 
 export const Route = createFileRoute("/_authenticated/admin/$id/")({
   head: () => ({ meta: [{ title: "Detalhes — RecicladoresBR" }] }),
@@ -25,6 +34,8 @@ export const Route = createFileRoute("/_authenticated/admin/$id/")({
 
 function CatadorDetails() {
   const { id } = Route.useParams();
+  const { role } = Route.useRouteContext();
+  const showFull = canViewSensitive(role);
   const navigate = useNavigate();
   const qc = useQueryClient();
 
@@ -108,37 +119,51 @@ function CatadorDetails() {
         <div className="flex gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                Status <ChevronDown className="size-4" />
+              <Button variant="outline" className="gap-2">
+                <span className="text-xs text-muted-foreground">Status atual:</span>
+                <StatusPill status={c.status} />
+                <ChevronDown className="size-4 opacity-60" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-72">
-              <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-                Alterar status do cadastro
+            <DropdownMenuContent align="end" className="w-80">
+              <DropdownMenuLabel className="flex items-start gap-2 py-3 bg-muted/40">
+                <Check className="size-4 mt-0.5 text-primary shrink-0" />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs uppercase tracking-wide text-muted-foreground">
+                      Status atual
+                    </span>
+                    <StatusPill status={c.status} />
+                  </div>
+                  <p className="text-xs text-muted-foreground font-normal leading-snug mt-1">
+                    {STATUS_DESCRIPTION[c.status]}
+                  </p>
+                  {c.status === "inativo" && (
+                    <ul className="mt-2 space-y-0.5 text-[11px] text-muted-foreground list-disc pl-4">
+                      {STATUS_INATIVO_CRITERIOS.map((cr) => <li key={cr}>{cr}</li>)}
+                    </ul>
+                  )}
+                </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {STATUS_OPTIONS.map((s) => {
-                const isCurrent = c.status === s.value;
-                return (
-                  <DropdownMenuItem
-                    key={s.value}
-                    onClick={() => !isCurrent && statusMutation.mutate(s.value)}
-                    className="flex items-start gap-2 py-2"
-                  >
-                    <Check
-                      className={`size-4 mt-0.5 shrink-0 ${isCurrent ? "text-primary" : "opacity-0"}`}
-                    />
-                    <div className="flex-1">
-                      <div className="font-medium">
-                        {s.label} {isCurrent && <span className="text-xs text-muted-foreground">(atual)</span>}
-                      </div>
-                      <p className="text-xs text-muted-foreground leading-snug">
-                        {STATUS_DESCRIPTION[s.value]}
-                      </p>
-                    </div>
-                  </DropdownMenuItem>
-                );
-              })}
+              <DropdownMenuLabel className="text-[11px] font-normal uppercase tracking-wide text-muted-foreground pt-2">
+                Alterar para
+              </DropdownMenuLabel>
+              {STATUS_OPTIONS.filter((s) => s.value !== c.status).map((s) => (
+                <DropdownMenuItem
+                  key={s.value}
+                  onClick={() => statusMutation.mutate(s.value)}
+                  className="flex items-start gap-2 py-2"
+                >
+                  <div className="size-4 mt-0.5 shrink-0" />
+                  <div className="flex-1">
+                    <div className="font-medium text-sm">{s.label}</div>
+                    <p className="text-xs text-muted-foreground leading-snug">
+                      {STATUS_DESCRIPTION[s.value]}
+                    </p>
+                  </div>
+                </DropdownMenuItem>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
           <Link to="/admin/$id/editar" params={{ id }}>
@@ -172,9 +197,21 @@ function CatadorDetails() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
+        {!showFull && (
+          <div className="lg:col-span-2 rounded-xl border border-warning/40 bg-warning/10 p-4 flex items-start gap-3">
+            <ShieldAlert className="size-5 text-warning-foreground shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="font-medium">Dados sensíveis protegidos (LGPD)</p>
+              <p className="text-muted-foreground text-xs mt-1">
+                CPF, RG/CIN, endereço, telefone e e-mail estão mascarados. A visualização completa
+                é restrita a perfis com permissão específica (Administrador UCIP).
+              </p>
+            </div>
+          </div>
+        )}
         <Section title="Identificação">
-          <Field k="CPF" v={c.cpf} />
-          <Field k="RG / CIN" v={c.rg_cin} />
+          <Field k="CPF" v={showFull ? c.cpf : maskCPF(c.cpf)} sensitive={!showFull} />
+          <Field k="RG / CIN" v={showFull ? c.rg_cin : maskRG(c.rg_cin)} sensitive={!showFull} />
           <Field k="Gênero" v={GENERO_LABEL[c.genero] ?? c.genero} />
           <Field k="Autodeclaração racial" v={c.autodeclaracao_racial} />
           <Field k="Escolaridade" v={c.escolaridade} />
@@ -182,15 +219,15 @@ function CatadorDetails() {
         </Section>
 
         <Section title="Contato">
-          <Field k="E-mail" v={c.email ?? "—"} />
-          <Field k="Telefone" v={c.telefone ?? "—"} />
-          <Field k="Endereço" v={c.endereco_completo} />
+          <Field k="E-mail" v={showFull ? (c.email ?? "—") : maskEmail(c.email)} sensitive={!showFull} />
+          <Field k="Telefone" v={showFull ? (c.telefone ?? "—") : maskPhone(c.telefone)} sensitive={!showFull} />
+          <Field k="Endereço" v={showFull ? c.endereco_completo : maskAddress(c.endereco_completo)} sensitive={!showFull} />
         </Section>
 
         <Section title="Documentação">
-          <Field k="Título de Eleitor" v={c.titulo_eleitor ?? "—"} />
-          <Field k="CTPS" v={c.ctps ?? "—"} />
-          <Field k="NIS" v={c.nis ?? "—"} />
+          <Field k="Título de Eleitor" v={showFull ? (c.titulo_eleitor ?? "—") : maskDocument(c.titulo_eleitor)} sensitive={!showFull} />
+          <Field k="CTPS" v={showFull ? (c.ctps ?? "—") : maskDocument(c.ctps)} sensitive={!showFull} />
+          <Field k="NIS" v={showFull ? (c.nis ?? "—") : maskDocument(c.nis)} sensitive={!showFull} />
         </Section>
 
         <Section title="Socioeconômico">
@@ -251,7 +288,8 @@ function Section({ title, children, className = "" }: { title: string; children:
   );
 }
 
-function Field({ k, v }: { k: string; v: React.ReactNode }) {
+function Field({ k, v, sensitive = false }: { k: string; v: React.ReactNode; sensitive?: boolean }) {
+  void sensitive;
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-3 text-sm">
       <div className="text-muted-foreground">{k}</div>
