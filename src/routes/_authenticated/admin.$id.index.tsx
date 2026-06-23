@@ -197,9 +197,21 @@ function CatadorDetails() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
+        {!showFull && (
+          <div className="lg:col-span-2 rounded-xl border border-warning/40 bg-warning/10 p-4 flex items-start gap-3">
+            <ShieldAlert className="size-5 text-warning-foreground shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="font-medium">Dados sensíveis protegidos (LGPD)</p>
+              <p className="text-muted-foreground text-xs mt-1">
+                CPF, RG/CIN, endereço, telefone e e-mail estão mascarados. A visualização completa
+                é restrita a perfis com permissão específica (Administrador UCIP).
+              </p>
+            </div>
+          </div>
+        )}
         <Section title="Identificação">
-          <Field k="CPF" v={c.cpf} />
-          <Field k="RG / CIN" v={c.rg_cin} />
+          <Field k="CPF" v={showFull ? c.cpf : maskCPF(c.cpf)} sensitive={!showFull} />
+          <Field k="RG / CIN" v={showFull ? c.rg_cin : maskRG(c.rg_cin)} sensitive={!showFull} />
           <Field k="Gênero" v={GENERO_LABEL[c.genero] ?? c.genero} />
           <Field k="Autodeclaração racial" v={c.autodeclaracao_racial} />
           <Field k="Escolaridade" v={c.escolaridade} />
@@ -207,15 +219,15 @@ function CatadorDetails() {
         </Section>
 
         <Section title="Contato">
-          <Field k="E-mail" v={c.email ?? "—"} />
-          <Field k="Telefone" v={c.telefone ?? "—"} />
-          <Field k="Endereço" v={c.endereco_completo} />
+          <Field k="E-mail" v={showFull ? (c.email ?? "—") : maskEmail(c.email)} sensitive={!showFull} />
+          <Field k="Telefone" v={showFull ? (c.telefone ?? "—") : maskPhone(c.telefone)} sensitive={!showFull} />
+          <Field k="Endereço" v={showFull ? c.endereco_completo : maskAddress(c.endereco_completo)} sensitive={!showFull} />
         </Section>
 
         <Section title="Documentação">
-          <Field k="Título de Eleitor" v={c.titulo_eleitor ?? "—"} />
-          <Field k="CTPS" v={c.ctps ?? "—"} />
-          <Field k="NIS" v={c.nis ?? "—"} />
+          <Field k="Título de Eleitor" v={showFull ? (c.titulo_eleitor ?? "—") : maskDocument(c.titulo_eleitor)} sensitive={!showFull} />
+          <Field k="CTPS" v={showFull ? (c.ctps ?? "—") : maskDocument(c.ctps)} sensitive={!showFull} />
+          <Field k="NIS" v={showFull ? (c.nis ?? "—") : maskDocument(c.nis)} sensitive={!showFull} />
         </Section>
 
         <Section title="Socioeconômico">
