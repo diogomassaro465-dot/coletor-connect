@@ -28,8 +28,10 @@ export const Route = createFileRoute("/_authenticated/admin/usuarios/novo")({
 
 function genPassword() {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+  const arr = new Uint32Array(12);
+  crypto.getRandomValues(arr);
   let out = "";
-  for (let i = 0; i < 12; i++) out += chars[Math.floor(Math.random() * chars.length)];
+  for (const n of arr) out += chars[n % chars.length];
   return out + "@1";
 }
 
